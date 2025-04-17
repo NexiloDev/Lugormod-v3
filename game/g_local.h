@@ -61,7 +61,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"^5Mystic Lugormod"
+#define	GAMEVERSION	"^5L^7ugormod ^5v3"
 
 #define BODY_QUEUE_SIZE		8
 

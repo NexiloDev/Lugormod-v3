@@ -44,7 +44,7 @@ const char *verMods =
 
 #else
 
-#define LUGORMODVERSION_CORE "1.0.3"
+#define LUGORMODVERSION_CORE "v3.0.3"
 #ifdef LMD_EXPERIMENTAL
 #define LUGORMODVERSION LUGORMODVERSION_CORE" Alpha"
 #else
@@ -620,7 +620,7 @@ static cvarTable_t		gameCvarTable[] = {
 	// noset vars
 	{ &g_uptime, "serveruptime", "0", CVAR_ROM|CVAR_SERVERINFO,0,qfalse},
 #ifndef LMD_VER_ENC_LOCK
-	{ &Lugormod_Version, "MysticLMD_Version", LUGORMODVERSION, CVAR_ROM|CVAR_SERVERINFO, 0, qfalse},
+	{ &Lugormod_Version, "Lugormod_Version", LUGORMODVERSION, CVAR_ROM|CVAR_SERVERINFO, 0, qfalse},
 	{ &gamename, "gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
 #endif
 	{ NULL, "gamedate", __DATE__ , CVAR_ROM, 0, qfalse  },
@@ -4697,7 +4697,7 @@ void CheckCvars( void ) {
 		//=========================================================
 		trap_Cvar_Set(cvar, value);
 #else
-		trap_Cvar_Set("MysticLMD_Version", LUGORMODVERSION);
+		trap_Cvar_Set("Lugormod_Version", LUGORMODVERSION);
 		trap_Cvar_Set("gamename", GAMEVERSION);
 #endif
 

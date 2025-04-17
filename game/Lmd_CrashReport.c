@@ -189,13 +189,13 @@ void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 		//RoboPhred
 		fileHandle_t oldf = level.logFile;
 		char version[MAX_STRING_CHARS];
-		trap_Cvar_VariableStringBuffer("MysticLMD_Version", version, sizeof(version));
+		trap_Cvar_VariableStringBuffer("Lugormod_Version", version, sizeof(version));
 		trap_FS_FOpenFile("CrashLog.txt", &level.logFile, FS_APPEND);
 		G_LogPrintf("-8<------- Crash Information ------->8-\n");
 		G_LogPrintf(" Please forward to the "GAMEVERSION" developer. \n");
 		G_LogPrintf("---------------------------------------\n");
 		G_LogPrintf("Version: %s Linux\n", GAMEVERSION);
-		G_LogPrintf("Mystic Lugormod version: %s\n", version);
+		G_LogPrintf("Lugormod Version: %s\n", version);
 		G_LogPrintf("Map: %s\n", level.rawmapname);
 		linux_siginfo(signal, siginfo);
 		linux_dsoinfo();
@@ -689,7 +689,7 @@ LONG CALLBACK win32_exception_handler(LPEXCEPTION_POINTERS e) {
 	fileHandle_t old;
 	old = level.logFile;
 	trap_FS_FOpenFile("CrashLog.txt", &level.logFile, FS_APPEND);
-	trap_Cvar_VariableStringBuffer("MysticLMD_Version", version, sizeof(version));
+	trap_Cvar_VariableStringBuffer("Lugormod_Version", version, sizeof(version));
 	//search path for symbols...
 	trap_Cvar_VariableStringBuffer("fs_basepath", basepath, sizeof(basepath));
 	trap_Cvar_VariableStringBuffer("fs_game", gamepath, sizeof(gamepath));
@@ -699,7 +699,7 @@ LONG CALLBACK win32_exception_handler(LPEXCEPTION_POINTERS e) {
 	G_LogPrintf(" Please forward to the developer. \n");
 	G_LogPrintf("-----------------------------------\n");
 	G_LogPrintf("Version: %s Win32\n", GAMEVERSION);
-	G_LogPrintf("Mystic Lugormod version: %s\n", version);
+	G_LogPrintf("Lugormod Version: %s\n", version);
 	G_LogPrintf("Map: %s\n",level.rawmapname);
 	win32_exceptioninfo(e);
 	win32_dllinfo();

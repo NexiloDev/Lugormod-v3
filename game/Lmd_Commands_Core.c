@@ -265,7 +265,7 @@ void Cmd_Help_f(gentity_t *ent){
 		}
 	}
 	else {
-		Disp(ent, va("^2Mystic Lugormod %s\n", Lugormod_Version.string));
+		Disp(ent, va("^2Lugormod %s\n", Lugormod_Version.string));
 		Cmd_Help_ListCategories(ent);
 	}
 }

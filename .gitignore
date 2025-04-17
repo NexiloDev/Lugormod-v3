@@ -238,3 +238,6 @@ $RECYCLE.BIN/
 *.txt
 *.rar
 *.opendb
+
+# We can ignore *.txt files alright, but not CMakeLists.txt
+!CMakeLists.txt

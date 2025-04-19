@@ -48,12 +48,85 @@ void BlowUpEntity (gentity_t *ent) {
 	}
 }
 
+extern void G_TestLine(vec3_t start, vec3_t end, int color, int time);
+
+void Lmd_Display_Bounds(gentity_t* targ, int lineTime) {
+	// Too early to refresh the "test lines"
+	if (level.time < targ->Lmd.boundsDisplayedUntil) {
+		return;
+	}
+
+	targ->Lmd.boundsDisplayedUntil = level.time + lineTime;
+
+	vec3_t ofs;
+	VectorSubtract(targ->r.absmax, targ->r.absmin, ofs);
+
+	// Bottom
+
+	vec3_t b1;
+	vec3_t b2;
+	vec3_t b3;
+	vec3_t b4;
+
+	VectorCopy(targ->r.absmin, b1);
+	VectorCopy(targ->r.absmin, b2);
+	VectorCopy(targ->r.absmin, b3);
+	VectorCopy(targ->r.absmin, b4);
+
+	b2[0] += ofs[0];
+	b3[1] += ofs[1];
+	b4[0] += ofs[0];
+	b4[1] += ofs[1];
+
+	G_TestLine(b1, b2, 0x000000ff, lineTime);
+	G_TestLine(b1, b3, SABER_GREEN, lineTime);
+	G_TestLine(b2, b4, SABER_GREEN, lineTime);
+	G_TestLine(b3, b4, 0x000000ff, lineTime);
+
+	// Top
+
+	vec3_t t1;
+	vec3_t t2;
+	vec3_t t3;
+	vec3_t t4;
+
+	VectorCopy(b1, t1);
+	VectorCopy(b2, t2);
+	VectorCopy(b3, t3);
+	VectorCopy(b4, t4);
+
+	t1[2] += ofs[2];
+	t2[2] += ofs[2];
+	t3[2] += ofs[2];
+	t4[2] += ofs[2];
+
+	G_TestLine(t1, t2, 0x000000ff, lineTime);
+	G_TestLine(t1, t3, SABER_GREEN, lineTime);
+	G_TestLine(t2, t4, SABER_GREEN, lineTime);
+	G_TestLine(t3, t4, 0x000000ff, lineTime);
+
+
+	// Sides
+	G_TestLine(b1, t1, SABER_BLUE, lineTime);
+	G_TestLine(b2, t2, SABER_BLUE, lineTime);
+	G_TestLine(b3, t3, SABER_BLUE, lineTime);
+	G_TestLine(b4, t4, SABER_BLUE, lineTime);
+}
+
+void Lmd_Bounds_Think(gentity_t* targ) {
+	const int lineTime = 1000; // Don't set this too low, or the "Test Lines" won't work properly
+	// (They will "blink", and/or most of them will be invisible)
+
+	Lmd_Display_Bounds(targ, lineTime);
+
+	targ->nextthink = level.time + lineTime;
+}
+
 int G_FindConfigstringIndex( const char *name, int start, int max, qboolean create );
 extern vec3_t model_mins [MAX_MODELS];
 extern vec3_t model_maxs [MAX_MODELS];
 unsigned char G_ReadMD3MinsMaxes(const fileHandle_t fh, vec3_t mins, vec3_t maxs);
-extern void G_TestLine(vec3_t start, vec3_t end, int color, int time);
-void Cmd_Bounds_f (gentity_t *ent, int iArg) {
+void Cmd_Bounds_f(gentity_t* ent, int iArg) {
 	// If no args, trace model and give built in and current
 	// If int args, use int as entity num and give built in and current
 	// If string args, use as model path
@@ -69,68 +142,46 @@ void Cmd_Bounds_f (gentity_t *ent, int iArg) {
 
 	if (targ)
 	{
-		const int lineTime = 3000;
-		Disp(ent, va(
+		if (!targ->Lmd.displayBounds) { // The entity isn't displaying its bounds (yet)
+			// Display the relevant information
+			Disp(ent, va(
 				CT_B"Mins: "CT_V"%s\n"
 				CT_B"Maxs: "CT_V"%s",
 				vtos2(targ->r.mins),
 				vtos2(targ->r.maxs)));
-		Disp(ent, va("^3Contents: ^2%x ^3Clipmask: ^2%x", ent->r.contents, ent->clipmask));
+			Disp(ent, va("^3Contents: ^2%x ^3Clipmask: ^2%x", ent->r.contents, ent->clipmask));
 
-		vec3_t ofs;
-		VectorSubtract(targ->r.absmax, targ->r.absmin, ofs);
+			// Toggle the bounding box ON
+			targ->Lmd.displayBounds = qtrue;
+			if (!targ->think)
+			{
+				targ->think = Lmd_Bounds_Think;
+				targ->nextthink = level.time;
+			}
+			Disp(ent, "^3Bounding box ^2ON");
+			return;
+		}
 
-		// Bottom
-		
-		vec3_t b1;
-		vec3_t b2;
-		vec3_t b3;
-		vec3_t b4;
+		// Otherwise, the entity is currently displaying its bounds => Restore entity "think"
+		// Toggle the bounding box OFF
+		targ->Lmd.displayBounds = qfalse;
+		if (targ->Lmd.oldThink)
+		{
+			targ->think = targ->Lmd.oldThink;
+			targ->nextthink = level.time + targ->Lmd.oldNextthink;
+		}
+		else
+		{
+			targ->think = NULL;
+			targ->nextthink = 0;
+		}
 
-		VectorCopy(targ->r.absmin, b1);
-		VectorCopy(targ->r.absmin, b2);
-		VectorCopy(targ->r.absmin, b3);
-		VectorCopy(targ->r.absmin, b4);
+		// Reset other fields
+		targ->Lmd.oldThink = 0;
+		targ->Lmd.oldNextthink = 0;
 
-		b2[0] += ofs[0];
-		b3[1] += ofs[1];
-		b4[0] += ofs[0];
-		b4[1] += ofs[1];
-
-		G_TestLine(b1, b2, 0xff0000, lineTime);
-		G_TestLine(b1, b3, 0xff0000, lineTime);
-		G_TestLine(b2, b4, 0xff0000, lineTime);
-		G_TestLine(b3, b4, 0xff0000, lineTime);
-
-		// Top
-
-		vec3_t t1;
-		vec3_t t2;
-		vec3_t t3;
-		vec3_t t4;
-
-		VectorCopy(b1, t1);
-		VectorCopy(b2, t2);
-		VectorCopy(b3, t3);
-		VectorCopy(b4, t4);
-
-		t1[2] += ofs[2];
-		t2[2] += ofs[2];
-		t3[2] += ofs[2];
-		t4[2] += ofs[2];
-
-		G_TestLine(t1, t2, 0xff0000, lineTime);
-		G_TestLine(t1, t3, 0xff0000, lineTime);
-		G_TestLine(t2, t4, 0xff0000, lineTime);
-		G_TestLine(t3, t4, 0xff0000, lineTime);
-
-
-		// Sides
-		G_TestLine(b1, t1, 0xff0000, lineTime);
-		G_TestLine(b2, t2, 0xff0000, lineTime);
-		G_TestLine(b3, t3, 0xff0000, lineTime);
-		G_TestLine(b4, t4, 0xff0000, lineTime);
-
+		// Notify the user
+		Disp(ent, "^3Bounding box ^2OFF");
 	}
 	else if (arg[0]) {
 		int configIndex = G_FindConfigstringIndex (arg, CS_MODELS, MAX_MODELS, qfalse);
@@ -481,9 +532,15 @@ void Cmd_GetEnt_f(gentity_t *ent, int iArg) {
 		Disp(ent, "^2Teleported to entity.");
 	}
 	else{
+		qboolean wasBoundingBoxDisplayed = targ->Lmd.displayBounds;
 		Lmd_Entities_setSpawnstringKey(targ->Lmd.spawnData, "origin", va("%d %d %d", (int)dest[0], (int)dest[1], (int)dest[2]));
 		spawnEntity(targ, targ->Lmd.spawnData);
 		Disp(ent, "^2Entity moved to your position.");
+		if (wasBoundingBoxDisplayed) {
+			targ->Lmd.displayBounds = qtrue;
+			targ->think = Lmd_Bounds_Think;
+			targ->nextthink = level.time;
+		}
 	}
 }
 
@@ -688,18 +745,27 @@ void Cmd_Nudge_f(gentity_t *ent, int iArg){
 		VectorCopy(vec3_origin, v2);
 	VectorAdd(v2, NudgeNudge, v2);
 
+	qboolean wasBoundingBoxDisplayed = targ->Lmd.displayBounds;
 	curSpawn = targ->Lmd.spawnData;
 	backupSpawn = cloneSpawnstring(curSpawn);
 	Lmd_Entities_setSpawnstringKey(curSpawn, "origin", vtos2(v2));
 
 	if(spawnEntity(targ, curSpawn) == NULL){
 		Disp(ent, "^3Entity failed to respawn, reverting...");
-		if(spawnEntity(targ, backupSpawn) == NULL)
+		if (spawnEntity(targ, backupSpawn) == NULL) {
 			Disp(ent, "^1Failed to revert to old spawnstring, entity did not spawn.");
+			return;
+		}
 	}
 	else{
 		Disp(ent, "^2Entity nudged.");
 		removeSpawnstring(backupSpawn);
+	}
+
+	if (wasBoundingBoxDisplayed) {
+		targ->Lmd.displayBounds = qtrue;
+		targ->think = Lmd_Bounds_Think;
+		targ->nextthink = level.time;
 	}
 }
 
@@ -1020,6 +1086,7 @@ void Cmd_Spawnstring_f(gentity_t *ent, int iArg){
 		trap_Argv(2 + (argc >= 5), arg, sizeof(arg));
 		trap_Argv(3 + (argc >= 5), arg2, sizeof(arg2));
 
+		qboolean wasBoundingBoxDisplayed = targ->Lmd.displayBounds;
 		curSpawn = targ->Lmd.spawnData;
 
 		backupSpawn = cloneSpawnstring(curSpawn);
@@ -1027,12 +1094,20 @@ void Cmd_Spawnstring_f(gentity_t *ent, int iArg){
 
 		if(spawnEntity(targ, curSpawn) == NULL){
 			Disp(ent, "^3Entity failed to respawn, reverting...");
-			if(spawnEntity(targ, backupSpawn) == NULL)
+			if (spawnEntity(targ, backupSpawn) == NULL) {
 				Disp(ent, "^1Failed to revert to old spawnstring, entity did not spawn.");
+				return;
+			}
 		}
 		else{
 			Disp(ent, va("^3Entity modified."));
 			removeSpawnstring(backupSpawn);
+		}
+
+		if (wasBoundingBoxDisplayed) {
+			targ->Lmd.displayBounds = qtrue;
+			targ->think = Lmd_Bounds_Think;
+			targ->nextthink = level.time;
 		}
 	}
 	else if(Q_stricmp(arg, "deletekey") == 0){
@@ -1054,6 +1129,7 @@ void Cmd_Spawnstring_f(gentity_t *ent, int iArg){
 
 		trap_Argv(2 + (argc > 3), arg, sizeof(arg));
 
+		qboolean wasBoundingBoxDisplayed = targ->Lmd.displayBounds;
 		curSpawn = targ->Lmd.spawnData;
 
 		backupSpawn = cloneSpawnstring(curSpawn);
@@ -1061,14 +1137,22 @@ void Cmd_Spawnstring_f(gentity_t *ent, int iArg){
 
 		if(spawnEntity(targ, curSpawn) == NULL){
 			Disp(ent, "^3Entity failed to respawn, reverting...");
-			if(spawnEntity(targ, backupSpawn) == NULL)
+			if (spawnEntity(targ, backupSpawn) == NULL) {
 				Disp(ent, "^1Failed to revert to old spawnstring, entity did not spawn.");
+				return;
+			}
 			else
 				removeSpawnstring(curSpawn);
 		}
 		else{
 			Disp(ent, va("^3Entity modified."));
 			removeSpawnstring(backupSpawn);
+		}
+
+		if (wasBoundingBoxDisplayed) {
+			targ->Lmd.displayBounds = qtrue;
+			targ->think = Lmd_Bounds_Think;
+			targ->nextthink = level.time;
 		}
 	}
 	else
@@ -1270,6 +1354,11 @@ void Lmdp_Grabbed_Think(gentity_t* self)
 			self->think = self->Lmd.oldThink;
 			self->nextthink = level.time + self->Lmd.oldNextthink;
 		}
+		else if (self->Lmd.displayBounds)
+		{
+			self->think = Lmd_Bounds_Think;
+			self->nextthink = level.time;
+		}
 
 		// reset dummy fields
 		self->Lmd.oldThink = 0;
@@ -1391,6 +1480,11 @@ void Lmdp_Grabbed_Think(gentity_t* self)
 				VectorAdd(positionOffset, self->r.currentOrigin, self->r.currentOrigin);
 			}
 		}
+
+		if (self->Lmd.displayBounds)
+		{
+			Lmd_Display_Bounds(self, 1000); // Don't set "lineTime" too low, or the lines will blink / be invisible
+		}
 	}
 
 	self->nextthink = level.time + 10;
@@ -1405,6 +1499,7 @@ qboolean Lmdp_EditEntity(gentity_t* ent)
 	if (ent == NULL)
 		return qfalse;	// invalid entity or key/value
 
+	qboolean wereBoundsDisplayed = ent->Lmd.displayBounds;
 	spawnData = ent->Lmd.spawnData;	// get entity's spawn data
 	backupData = cloneSpawnstring(spawnData);	// backup ent data
 	newEnt = spawnEntity(ent, spawnData); // respawn ent
@@ -1417,8 +1512,20 @@ qboolean Lmdp_EditEntity(gentity_t* ent)
 		{
 			G_FreeEntity(newEnt); // backup failed
 			// TODO: print warning, entity was completely lost
+			return qfalse;
+		}
+		if (wereBoundsDisplayed) {
+			newEnt->Lmd.displayBounds = qtrue;
+			newEnt->think = Lmd_Bounds_Think;
+			newEnt->nextthink = level.time;
 		}
 		return qfalse;
+	}
+
+	if (wereBoundsDisplayed) {
+		newEnt->Lmd.displayBounds = qtrue;
+		newEnt->think = Lmd_Bounds_Think;
+		newEnt->nextthink = level.time;
 	}
 
 	removeSpawnstring(backupData);	// free backup spawndata
@@ -1457,6 +1564,11 @@ int Lmdp_Grabbed_Set(gentity_t* player, gentity_t* ent, int mode, qboolean msg, 
 		{
 			ent->think = ent->Lmd.oldThink;
 			ent->nextthink = level.time + ent->Lmd.oldNextthink;
+		}
+		else if (ent->Lmd.displayBounds)
+		{
+			ent->think = Lmd_Bounds_Think;
+			ent->nextthink = level.time;
 		}
 		else
 		{
@@ -1606,6 +1718,11 @@ void Cmd_CancelGrab_f(gentity_t* ent)
 		targ->think = targ->Lmd.oldThink;
 		targ->nextthink = level.time + targ->Lmd.oldNextthink;
 	}
+	else if (targ->Lmd.displayBounds)
+	{
+		targ->think = Lmd_Bounds_Think;
+		targ->nextthink = level.time;
+	}
 	else
 	{
 		targ->think = NULL;
@@ -1625,7 +1742,7 @@ void Cmd_CancelGrab_f(gentity_t* ent)
 	if (!Lmdp_EditEntity(targ))
 	{
 		Disp(ent, "^1Entity failed to respawn.");
-		return 0;
+		return;
 	}
 
 	Disp(ent, "^3Entity ^2%i ^3dropped. Initial position restored.", targ->s.number);

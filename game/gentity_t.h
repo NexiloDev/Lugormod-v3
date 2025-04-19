@@ -361,6 +361,8 @@ struct gentity_s {
 		qboolean grabX; // Rotate along the X axis
 		qboolean grabY; // Rotate along the Y axis
 		qboolean grabZ; // Rotate along the Z axis
+		qboolean displayBounds; // Display the bounding box?
+		int boundsDisplayedUntil; // How long will the bounding box be displayed? (level.time + xxx)
 	}Lmd;
 	//RoboPhred
 	qboolean isAutoTargeted; //we were given a targetname automatically

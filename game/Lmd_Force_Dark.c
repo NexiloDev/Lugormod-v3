@@ -416,6 +416,9 @@ void Force_Lightning_Damage(gentity_t *self, gentity_t *target, vec3_t dir, cons
 	}
 }
 
+extern vmCvar_t lmd_lightning_below_level_3_range;
+
+
 qboolean Force_Lightning_Run(gentity_t *self, const void* vData) {
 	GETFORCEDATA(forceLightning_t);
 	if (self->client->ps.forceHandExtend != HANDEXTEND_FORCE_HOLD){ 
@@ -517,17 +520,25 @@ qboolean Force_Lightning_Run(gentity_t *self, const void* vData) {
 		}
 	}
 	else{
-		VectorMA( self->client->ps.origin, data->range, forward, end );
+		trace_t tr;
+		vec3_t tfrom, tto, fwd;
+		
+		VectorCopy(self->client->ps.origin, tfrom);
+		tfrom[2] += self->client->ps.viewheight;
+		AngleVectors(self->client->ps.viewangles, fwd, NULL, NULL);
+		tto[0] = tfrom[0] + fwd[0] * lmd_lightning_below_level_3_range.integer;
+		tto[1] = tfrom[1] + fwd[1] * lmd_lightning_below_level_3_range.integer;
+		tto[2] = tfrom[2] + fwd[2] * lmd_lightning_below_level_3_range.integer;
 
-		trap_Trace( &tr, self->client->ps.origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT );
-		if ( tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
+		trap_Trace(&tr, tfrom, NULL, NULL, tto, self->s.number, MASK_PLAYERSOLID);
+		
+		if (tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0f || tr.allsolid || tr.startsolid)
 		{
 			Force_DrainForceEnergy(self, FP_LIGHTNING, data->forcepower); //Ufo: was missing
 			return qtrue;
 		}
-
-		traceEnt = &g_entities[tr.entityNum];
-		Force_Lightning_Damage( self, traceEnt, forward, data);
+		
+		Force_Lightning_Damage( self, &g_entities[tr.entityNum], forward, data);
 	}
 	Force_DrainForceEnergy(self, FP_LIGHTNING, data->forcepower);
 	return qtrue;
@@ -840,6 +851,8 @@ void Force_Drain_Damage( gentity_t *self, gentity_t *target, vec3_t dir, vec3_t 
 	}
 }
 
+extern vmCvar_t lmd_drain_below_level_3_range;
+
 qboolean Force_Drain_Run(gentity_t *self, const void *vData) {
 	GETFORCEDATA(forceDrain_t);
 	if (self->client->ps.forceHandExtend != HANDEXTEND_FORCE_HOLD)
@@ -930,20 +943,25 @@ qboolean Force_Drain_Run(gentity_t *self, const void *vData) {
 	}
 	else
 	{//trace-line
-		VectorMA( self->client->ps.origin, 2048, forward, end );
+		trace_t tr;
+		vec3_t tfrom, tto, fwd;
+		
+		VectorCopy(self->client->ps.origin, tfrom);
+		tfrom[2] += self->client->ps.viewheight;
+		AngleVectors(self->client->ps.viewangles, fwd, NULL, NULL);
+		tto[0] = tfrom[0] + fwd[0] * lmd_drain_below_level_3_range.integer;
+		tto[1] = tfrom[1] + fwd[1] * lmd_drain_below_level_3_range.integer;
+		tto[2] = tfrom[2] + fwd[2] * lmd_drain_below_level_3_range.integer;
 
-		trap_Trace( &tr, self->client->ps.origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT );
-		if ( tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0 || tr.allsolid || tr.startsolid ||
-			!g_entities[tr.entityNum].client || !g_entities[tr.entityNum].inuse )
+		trap_Trace(&tr, tfrom, NULL, NULL, tto, self->s.number, MASK_PLAYERSOLID);
+		
+		if (tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0f || tr.allsolid || tr.startsolid)
 		{
-			//Lugormod Shouldn't be able to just go on and on ..
 			BG_ForcePowerDrain( &self->client->ps, FP_DRAIN, data->forcepower );
-			return 0;
+			return qfalse;
 		}
-
-		traceEnt = &g_entities[tr.entityNum];
-		Force_Drain_Damage( self, traceEnt, forward, tr.endpos, data);
-		gotOneOrMore = qtrue;
+		
+		Force_Drain_Damage( self, &g_entities[tr.entityNum], forward, tr.endpos, data);
 	}
 
 	self->client->ps.activeForcePass = self->client->ps.fd.forcePowerLevel[FP_DRAIN] + FORCE_LEVEL_3;

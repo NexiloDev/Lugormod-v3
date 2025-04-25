@@ -101,8 +101,46 @@ void Lmd_PlayerThink(gentity_t *ent){
 	if (ent->client->Lmd.lmd_restrict & 4)
 		Jetpack_Off(ent);
 #endif
+<<<<<<< HEAD
 
 	if (ent->client->Lmd.lmd_restrict & 8 && ent->client->pers.Lmd.persistantFlags & SPF_IONLYDUEL){
+=======
+	
+	int allowedSaberOffenseLevel = 3;
+	
+	if (ent->client->Lmd.restrict & 256 && ent->client->Lmd.restrict & 512)
+	{
+		allowedSaberOffenseLevel = 5;
+	}
+	else if (ent->client->Lmd.restrict & 512)
+	{
+		if (ent->client->ps.fd.saberAnimLevel == SS_DESANN)
+		{
+			ent->client->ps.fd.saberAnimLevel = SS_TAVION;
+		}
+		allowedSaberOffenseLevel = 5;
+	}
+	else if (ent->client->Lmd.restrict & 256)
+	{
+		allowedSaberOffenseLevel = 4;
+	}
+	
+	if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > allowedSaberOffenseLevel)
+	{
+		ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = allowedSaberOffenseLevel;
+		
+		if (ent->client->ps.fd.saberAnimLevel == SS_TAVION && allowedSaberOffenseLevel < 5)
+			ent->client->ps.fd.saberAnimLevel = SS_FAST;
+		else if (ent->client->ps.fd.saberAnimLevel == SS_DESANN && allowedSaberOffenseLevel < 4)
+			ent->client->ps.fd.saberAnimLevel = SS_STRONG;
+	}
+	else if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] < allowedSaberOffenseLevel)
+	{
+		ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = allowedSaberOffenseLevel;
+	}
+	
+	if (ent->client->Lmd.restrict & 8 && ent->client->pers.Lmd.persistantFlags & SPF_IONLYDUEL){
+>>>>>>> eec35ad (Adjusted Trace for lightning and drain. Added Drain < 3 Range Cvar.)
 		Cmd_Kill_f(ent);
 	}
 

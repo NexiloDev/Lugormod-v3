@@ -3355,9 +3355,6 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 	{
 		selectLevel++;
 		//RoboPhred
-		/*
-		1, desann stands totally removed 
-		*/
 		//if(selectLevel == FORCE_LEVEL_4) 
 		//	selectLevel = FORCE_LEVEL_5;
 		

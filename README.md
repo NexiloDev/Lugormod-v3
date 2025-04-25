@@ -42,6 +42,7 @@ Lugormod v3 is primarily written in **C**, with some **C++** components, and is 
 ### Contributors
 Special thanks to:
 - **Daggo**
+- **Lumaya**
 - **Tayst**
 - **GCJ**
 
@@ -50,10 +51,11 @@ Interested in contributing? Join our community and get in touch via our [Discord
 ## Credits (Legacy Versions)
 - **Lugor**: Creator of the original Lugormod.
 - **RoboPhred**: Lead developer of Lugormod T2 and U#, significantly advancing the mod.
+- **Ufo**: Continued development of Lugormod U# prior to the codebase being released on GitHub.
 
 ## License
 
-A version of Lugormod U# was open-sourced on March 26, 2018, by Dydzio, licensed under **GPL version 2 or later**. Additionally, RoboPhred, the Lugormod U# developer, provided Nexilo with an updated, previously unreleased codebase and their blessing to continue development. Other unofficial forks of the open-sourced codebase exist but are not recognized by RoboPhred.
+A version of Lugormod U# was open-sourced on March 26, 2018 by Dydzio with permission from Ufo, licensed under **GPL version 2**. Additionally, RoboPhred, the Lugormod U# developer, provided Nexilo with an updated, previously unreleased codebase and their blessing to continue development of Lugormod.
 
 ## Copyright
 

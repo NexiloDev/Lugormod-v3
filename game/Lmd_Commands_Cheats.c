@@ -355,6 +355,20 @@ void Cmd_Noclip_f( gentity_t *ent, int iArg ) {
 	Disp(ent, msg);
 }
 
+void Cmd_NoSpectate_f(gentity_t *ent, int iArg)
+{
+	ent->client->sess.Lmd.noSpec = !ent->client->sess.Lmd.noSpec;
+
+	// check if anyone's specing us?
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		gentity_t* specEnt = &g_entities[i];
+		if ( specEnt->client->sess.sessionTeam == TEAM_SPECTATOR && specEnt->client->sess.spectatorClient == ent->client->ps.clientNum ) StopFollowing(specEnt);
+	}
+	
+	Disp(ent, ent->client->sess.Lmd.noSpec ? "^3nospectate ^2ON" : "^3nospectate ^1OFF");
+}
+
 void Cmd_PlayFX_f (gentity_t *ent, int iArg) {
 	if (trap_Argc() < 2)
 		return;
@@ -547,6 +561,7 @@ cmdEntry_t cheatCommandEntries[] = {
 	{"invisible","The specified player will become completly invisible.\nIf no argument is provided, you will become invisible.", Cmd_Invisible_f, 0, qtrue, 2, 0, 0},
 	{"killother","Kills the specified player. If no argument is provided, the target in sight will be killed.", Cmd_KillOther_f, 0, qtrue, 3, 0, (1 << GT_SIEGE)|(1 << GT_BATTLE_GROUND)},
 	{"noclip", "Bestows noclip to the specified player, or yourself if no argument is provided.", Cmd_Noclip_f, 0, qtrue, 2, 0, 0},
+	{"nospectate", "Disallow spectators.", Cmd_NoSpectate_f, 0, qtrue, 1, 0, 0},
 	{"playfx", "Play the specified effect (relative to /effects).", Cmd_PlayFX_f, 0, qtrue, 1, 0, 0},
 	{"playmusic", "Play the specified music.", Cmd_PlayMusic_f, 0, qtrue, 1, 0, 0},
 	{"playsnd", "Play the specified sound.", Cmd_PlaySnd_f, 0, qtrue, 1, 0, 0},

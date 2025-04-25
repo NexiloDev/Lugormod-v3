@@ -24,7 +24,6 @@ jobs:
         build_type: [Debug, Release]
         exclude:
           - build_type: Debug
-          - portable: Portable
         include:
           - arch: x86
             platform: Win32

@@ -22,13 +22,9 @@ jobs:
       matrix:
         arch: [x86]
         build_type: [Debug, Release]
-        exclude:
-          - build_type: Debug
         include:
           - arch: x86
             platform: Win32
-          - arch: x86_64
-            platform: x64
     steps:
       - name: Checkout Pull-Request branch
         uses: actions/checkout@v3

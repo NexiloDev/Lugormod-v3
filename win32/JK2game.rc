@@ -51,7 +51,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,4,0 // Lugormod Version
+ FILEVERSION 3,0,5,0 // Lugormod Version
  PRODUCTVERSION 1,0,1,0 // JKA Version, do not change
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG

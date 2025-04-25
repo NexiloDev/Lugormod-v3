@@ -363,7 +363,11 @@ void Cmd_NoSpectate_f(gentity_t *ent, int iArg)
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		gentity_t* specEnt = &g_entities[i];
-		if ( specEnt->client->sess.sessionTeam == TEAM_SPECTATOR && specEnt->client->sess.spectatorClient == ent->client->ps.clientNum ) StopFollowing(specEnt);
+		if (specEnt && specEnt->client && specEnt->client->sess.sessionTeam == TEAM_SPECTATOR
+			&& specEnt->client->sess.spectatorClient == ent->client->ps.clientNum) 
+		{
+			StopFollowing(specEnt);
+		}
 	}
 	
 	Disp(ent, ent->client->sess.Lmd.noSpec ? "^3nospectate ^2ON" : "^3nospectate ^1OFF");

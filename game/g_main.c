@@ -44,7 +44,7 @@ const char *verMods =
 
 #else
 
-#define LUGORMODVERSION_CORE "v3.0.4"
+#define LUGORMODVERSION_CORE "v3.0.5"
 #ifdef LMD_EXPERIMENTAL
 #define LUGORMODVERSION LUGORMODVERSION_CORE" Alpha"
 #else
@@ -390,6 +390,9 @@ vmCvar_t lmd_enableCorpseDrag;
 
 vmCvar_t lmd_rewardcr_kill;
 
+vmCvar_t lmd_lightning_below_level_3_range;
+vmCvar_t lmd_drain_below_level_3_range;
+
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
 
@@ -454,6 +457,7 @@ static cvarTable_t		gameCvarTable[] = {
 		"Set this to 1 to log all levels to seperate files, or 2 to log them all to the "
 		"file set by lmd_admindefaultlogfile"
 	},
+	
 
 	{ &lmd_admindefaultlogfile, "lmd_adminDefaultLogFile", "all", CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse, qfalse,
 		"Admins who have no other logfile set will log to this by default."
@@ -604,6 +608,12 @@ static cvarTable_t		gameCvarTable[] = {
 		"Give a player credits for killing other players.  Does not work for killing NPCs.",
 	},
 
+{ &lmd_lightning_below_level_3_range, "lmd_lightning_below_level_3_range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the range for force lightning below level 3.",
+},
+	{ &lmd_drain_below_level_3_range, "lmd_drain_below_level_3_range", "512", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the range for force drain below level 3.",
+},
 	//====================================================================================================
 	//====================================================================================================
 

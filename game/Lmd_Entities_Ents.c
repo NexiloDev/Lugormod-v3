@@ -2397,6 +2397,8 @@ const entityInfoData_t lmd_restrict_spawnflags[] = {
 	{"8", "Players in this area will not be able to duel.  Existing duels will be broken if a player enters it."},
 	{ "16", "Players in this area will not be able to fire weapons.  Players may still see the weapon fire animation." },
 	{"128", "Start disabled.  Must be used by a target_activate to have any effect."},
+		{"256", "Allow Desann Stance."},
+		{"512", "Allow Tavion Stance."},
 	{NULL, NULL}
 };
 const entityInfoData_t lmd_restrict_keys[] = {

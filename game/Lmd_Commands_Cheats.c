@@ -561,7 +561,7 @@ cmdEntry_t cheatCommandEntries[] = {
 	{"invisible","The specified player will become completly invisible.\nIf no argument is provided, you will become invisible.", Cmd_Invisible_f, 0, qtrue, 2, 0, 0},
 	{"killother","Kills the specified player. If no argument is provided, the target in sight will be killed.", Cmd_KillOther_f, 0, qtrue, 3, 0, (1 << GT_SIEGE)|(1 << GT_BATTLE_GROUND)},
 	{"noclip", "Bestows noclip to the specified player, or yourself if no argument is provided.", Cmd_Noclip_f, 0, qtrue, 2, 0, 0},
-	{"nospectate", "Disallow spectators.", Cmd_NoSpectate_f, 0, qtrue, 1, 0, 0},
+	{"nospectate", "Prevents other players from spectating you.", Cmd_NoSpectate_f, 0, qtrue, 1, 0, 0},
 	{"playfx", "Play the specified effect (relative to /effects).", Cmd_PlayFX_f, 0, qtrue, 1, 0, 0},
 	{"playmusic", "Play the specified music.", Cmd_PlayMusic_f, 0, qtrue, 1, 0, 0},
 	{"playsnd", "Play the specified sound.", Cmd_PlaySnd_f, 0, qtrue, 1, 0, 0},

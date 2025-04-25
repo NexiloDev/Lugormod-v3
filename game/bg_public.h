@@ -544,7 +544,9 @@ typedef enum {
         STAT_PROFESSION,      //Lugormod profession
         STAT_LEVEL,           //Lugormod Level
         STAT_EXTRA_FORCE_BITS, //Lugormod extra bits for >3 force levels
-        STAT_EXTRA_FORCE_BITS2  //Lugormod extra bits for >3 force levels
+        STAT_EXTRA_FORCE_BITS2,  //Lugormod extra bits for >3 force levels
+		STAT_EXTRA_FORCE_BITS_L5, //Lugormod extra bits for force level 5
+		STAT_EXTRA_FORCE_BITS_L5_2 //Lugormod extra bits for force level 5
 
 //        STAT_PERS_FLAGS, //Lugormod persistant flags
 } statIndex_t;

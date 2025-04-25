@@ -546,7 +546,6 @@ void Cmd_Notarget_f( gentity_t *ent ) {
 	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
 }
 
-
 /*
 ==================
 Cmd_Noclip_f
@@ -1714,7 +1713,7 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 			continue;
 		}
 		//RoboPhred: cant follow admins
-		if(Auths_PlayerHasAuthFlag(&g_entities[clientnum], AUTH_UNFOLLOWABLE) && g_gametype.integer == GT_FFA) {
+		if(Auths_PlayerHasAuthFlag(&g_entities[clientnum], AUTH_UNFOLLOWABLE) && g_gametype.integer == GT_FFA && g_entities[clientnum].client->sess.Lmd.noSpec) {
 			continue;
 		}
 

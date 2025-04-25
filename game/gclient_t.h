@@ -163,6 +163,7 @@ typedef struct {
 			int lastDebounce;
 			int count;
 		}penalties;
+		qboolean noSpec;
 	}Lmd;
 } clientSession_t;
 

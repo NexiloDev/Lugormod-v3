@@ -1,0 +1,95 @@
+name: Build Release
+
+on:
+  push:
+    branches: [ "develop" ]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "docs/*"
+  pull_request:
+    branches: [ "develop" ]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "docs/*"
+
+jobs:
+  windows-build:
+    name: Windows ${{ matrix.arch }} ${{ matrix.build_type }}
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        arch: [x86]
+        build_type: [Debug, Release]
+        include:
+          - arch: x86
+            platform: Win32
+    steps:
+      - name: Checkout Pull-Request branch
+        uses: actions/checkout@v3
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{ github.workspace }}/build
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          OPTIONS="-DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_INSTALL_PREFIX=bin"
+          cmake $GITHUB_WORKSPACE -A ${{ matrix.platform }} $OPTIONS
+      - name: Build
+        working-directory: ${{ github.workspace }}/build
+        shell: bash
+        run: cmake --build . --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS
+      - name: Install
+        if: ${{ matrix.build_type == 'Release' }}
+        working-directory: ${{ github.workspace }}/build
+        shell: bash
+        run: cmake --install . --config ${{ matrix.build_type }}
+
+  linux-build:
+    name: Ubuntu ${{ matrix.arch }} ${{ matrix.build_type }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86]
+        build_type: [Debug, Release]
+        c_compiler: [gcc]
+        cpp_compiler: [g++]
+    steps:
+    - name: Checkout Pull-Request branch
+      uses: actions/checkout@v4
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+    - name: Fetch Build dependencies
+      run: |
+        if [ ${{ matrix.arch }} == "x86" ]; then
+          sudo dpkg --add-architecture i386
+          sudo apt -qq update
+          sudo apt install -y gcc-multilib g++-multilib libc6-dev-i386
+        else
+          sudo apt-get -qq update
+        fi
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      # NOTE: might need to adapt the OPTIONS again if we want to have multiple toolchains...
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} -j $(nproc)
+    - name: Install
+      if: ${{ matrix.build_type == 'Release' }}
+      working-directory: ${{ github.workspace }}/build
+      shell: bash
+      run: cmake --install .

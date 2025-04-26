@@ -11,6 +11,7 @@
 #include "Lmd_EntityCore.h"
 #include "Lmd_PlayerActions.h"
 #include "Lmd_Arrays.h"
+#include "Lmd_Console.h"
 #include "Lmd_Time.h"
 
 gentity_t *G_GetJediMaster (void);
@@ -1045,6 +1046,55 @@ Cmd disable
 void Cmd_Confirm_f(gentity_t *ent, int iArg);
 void Cmd_Interact_f(gentity_t *ent, int iArg);
 
+<<<<<<< Updated upstream
+=======
+/*
+==================
+Cmd_SetSaber_f
+Lugormod
+==================
+*/
+void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
+	char arg[2][64];
+	qboolean invalid = qfalse;
+
+	if (!ent || !ent->client) {
+		return;
+	}
+
+	if (trap_Argc() == 3) {
+		for (int i = 0; i < 2; i++) {
+			trap_Argv(i + 1, arg[i], sizeof(arg[i]));
+		}
+		forceSaber(ent, arg[0], arg[1]);
+	}
+	else if (trap_Argc() == 2) {
+		trap_Argv(1, arg[0], sizeof(arg[0]));
+
+		if (!Q_stricmp(arg[0], "single")) {
+			forceSaber(ent, "kyle", "none");
+		}
+		else if (!Q_stricmp(arg[0], "duals")) {
+			forceSaber(ent, "kyle", "kyle");
+		}
+		else if (!Q_stricmp(arg[0], "staff")) {
+			forceSaber(ent, "dual_2", "none");
+		}
+		else
+		{
+			invalid = qtrue;
+		}
+	}
+	else {
+		invalid = qtrue;
+	}
+
+	if (invalid) Disp(ent, CT_B"Usage: "CT_C"/setsaber "CT_AO"single | duals | staff "CT_B"OR "CT_C"/setsaber "CT_AO"<saber1> <saber2>");
+
+}
+
+
+>>>>>>> Stashed changes
 cmdEntry_t playerCommandEntries[] = {
 	//{"testline", "\n", Cmd_TestLine_f, 0, 1, 0, 0, 0},
 	{"actions", "List and use your current pending actions.", Cmd_Action_f, 0, qfalse, 0, 0, 0, 0},

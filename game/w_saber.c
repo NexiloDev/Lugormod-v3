@@ -247,6 +247,54 @@ static GAME_INLINE int G_SaberAttackPower(gentity_t *ent, qboolean attacking)
 	return baseLevel;
 }
 
+extern qboolean G_SetSaber(gentity_t *ent, int saberNum, char *saberName, qboolean siegeOverride);
+extern qboolean G_SaberModelSetup(gentity_t *ent);
+extern qboolean WP_SaberStyleValidForSaber(int clientNum, saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel);
+extern qboolean WP_UseFirstValidSaberStyle(int clientNum, saberInfo_t* saber1, saberInfo_t* saber2, int holstered, int* saberAnimLevel);
+void forceSaber(gentity_t *ent, char* saber1, char* saber2)
+{
+	ent->client->ps.saberHolstered = 2;
+	char userinfo[MAX_INFO_STRING];
+
+	trap_GetUserinfo(ent->s.number, userinfo, sizeof(userinfo));
+	Info_SetValueForKey(userinfo, "saber1", saber1);
+	G_SetSaber(ent, 0, saber1, qfalse);
+	Info_SetValueForKey(userinfo, "saber2", saber2);
+	G_SetSaber(ent, 1, saber2, qfalse);
+
+	trap_SetUserinfo(ent->s.number, userinfo);
+	ClientUserinfoChanged(ent->s.number);
+
+	G_SaberModelSetup(ent);
+	
+	// Update saber anim level based on equipped sabers
+	if (ent->client->saber[0].saberFlags & SFL_TWO_HANDED) { // Staff always first
+		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
+	}
+	else if (ent->client->saber[1].model[0] && Q_stricmp(ent->client->saber[1].model, "none")) { // Dual sabers only if saber2 is valid
+		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
+	}
+	else { // Single saber
+		if (ent->client->sess.saberLevel < SS_FAST) {
+			ent->client->sess.saberLevel = SS_FAST;
+		}
+		else if (ent->client->sess.saberLevel > SS_STRONG) {
+			ent->client->sess.saberLevel = SS_STRONG;
+		}
+		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
+		if (ent->client->ps.fd.saberAnimLevel > ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE]) {
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel = ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE];
+		}
+	}
+
+	
+	// let's just make sure the styles we chose are cool
+	if (!WP_SaberStyleValidForSaber(ent->s.number, &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, ent->client->ps.fd.saberAnimLevel)) {
+		WP_UseFirstValidSaberStyle(ent->s.number, &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &ent->client->ps.fd.saberAnimLevel);
+		ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
+	}
+}
+
 void WP_DeactivateSaber( gentity_t *self, qboolean clearLength )
 {
 	if ( !self || !self->client )
@@ -9691,5 +9739,9 @@ qboolean HasSetSaberOnly(void)
 
 	return qtrue;
 
+<<<<<<< Updated upstream
 }
 
+=======
+}
+>>>>>>> Stashed changes

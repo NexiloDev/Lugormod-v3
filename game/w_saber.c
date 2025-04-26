@@ -253,6 +253,8 @@ extern qboolean WP_SaberStyleValidForSaber(int clientNum, saberInfo_t *saber1, s
 extern qboolean WP_UseFirstValidSaberStyle(int clientNum, saberInfo_t* saber1, saberInfo_t* saber2, int holstered, int* saberAnimLevel);
 void forceSaber(gentity_t *ent, char* saber1, char* saber2)
 {
+	qboolean turnOnAgain = qfalse;
+	if (ent->client->ps.saberHolstered == 0) turnOnAgain = qtrue;
 	ent->client->ps.saberHolstered = 2;
 	char userinfo[MAX_INFO_STRING];
 
@@ -292,6 +294,8 @@ void forceSaber(gentity_t *ent, char* saber1, char* saber2)
 		WP_UseFirstValidSaberStyle(ent->s.number, &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &ent->client->ps.fd.saberAnimLevel);
 		ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
 	}
+
+	if (turnOnAgain) Cmd_ToggleSaber_f(ent);
 }
 
 void WP_DeactivateSaber( gentity_t *self, qboolean clearLength )

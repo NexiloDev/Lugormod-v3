@@ -251,10 +251,10 @@ extern qboolean G_SetSaber(gentity_t *ent, int saberNum, char *saberName, qboole
 extern qboolean G_SaberModelSetup(gentity_t *ent);
 extern qboolean WP_SaberStyleValidForSaber(int clientNum, saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel);
 extern qboolean WP_UseFirstValidSaberStyle(int clientNum, saberInfo_t* saber1, saberInfo_t* saber2, int holstered, int* saberAnimLevel);
+extern vmCvar_t lmd_set_saber_delay;
 void forceSaber(gentity_t *ent, char* saber1, char* saber2)
 {
-	qboolean turnOnAgain = qfalse;
-	if (ent->client->ps.saberHolstered == 0) turnOnAgain = qtrue;
+	if (ent->client->ps.saberHolstered == 0) ent->client->Lmd.setSaber.openAgain = qtrue;
 	ent->client->ps.saberHolstered = 2;
 	char userinfo[MAX_INFO_STRING];
 
@@ -294,8 +294,8 @@ void forceSaber(gentity_t *ent, char* saber1, char* saber2)
 		WP_UseFirstValidSaberStyle(ent->s.number, &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &ent->client->ps.fd.saberAnimLevel);
 		ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
 	}
-
-	if (turnOnAgain) Cmd_ToggleSaber_f(ent);
+	
+	ent->client->ps.weaponTime = lmd_set_saber_delay.integer;
 }
 
 void WP_DeactivateSaber( gentity_t *self, qboolean clearLength )

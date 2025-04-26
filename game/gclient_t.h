@@ -539,6 +539,12 @@ struct gclient_s {
 
 		vec3_t mark;
 		int grabOffset;
+
+		struct 
+		{
+			qboolean openAgain;
+		} setSaber;
+		
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

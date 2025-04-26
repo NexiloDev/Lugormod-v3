@@ -1064,6 +1064,12 @@ void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
 		return;
 	}
 
+	if (ent->client->Lmd.setSaber.delayTime >= level.time)
+	{
+		Disp(ent, "^3Already in use. Please wait!");
+		return;
+	}
+
 	if (trap_Argc() == 3) {
 		for (int i = 0; i < 2; i++) {
 			trap_Argv(i + 1, arg[i], sizeof(arg[i]));

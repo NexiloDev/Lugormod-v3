@@ -295,6 +295,7 @@ void forceSaber(gentity_t *ent, char* saber1, char* saber2)
 		ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
 	}
 	
+	ent->client->Lmd.setSaber.delayTime = level.time +  lmd_set_saber_delay.integer;
 	ent->client->ps.weaponTime = lmd_set_saber_delay.integer;
 }
 

@@ -13056,13 +13056,21 @@ void Pmove (pmove_t *pmove) {
 	int i;
 	for (i = 0;i < 8;i++) {
 		if (pmove->ps->fd.forcePowerLevel[i] & 4) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS]|=(1 << i);
+			// Turn the "extra force bit" flag ON for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS] |= (1 << i);
+		} else {
+			// Turn the "extra force bit" flag OFF for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS] &= ~(1 << i);
 		}
 	}
 
 	for (i = 8;i < 16;i++) {
 		if (pmove->ps->fd.forcePowerLevel[i] & 4) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2]|=(1 << (i - 8));
+			// Turn the "extra force bit" flag ON for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2] |= (1 << (i - 8));
+		} else {
+			// Turn the "extra force bit" flag OFF for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2] &= ~(1 << (i - 8));
 		}
 	}
 

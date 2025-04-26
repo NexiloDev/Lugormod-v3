@@ -1091,7 +1091,7 @@ void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
 		invalid = qtrue;
 	}
 
-	if (invalid) Disp(ent, CT_B"Usage: "CT_C"/setsaber "CT_AO"single | duals | staff "CT_B"OR "CT_C"/setsaber "CT_AO"<saber1> <saber2>");
+	if (invalid) Disp(ent, CT_B"Usage: "CT_C"/setsaber "CT_AO"<single | duals | staff> "CT_B"OR "CT_C"/setsaber "CT_AO"<saber1> <saber2>");
 
 }
 
@@ -1141,7 +1141,7 @@ cmdEntry_t playerCommandEntries[] = {
 	{"say_buddies", "Send a message to your buddies.", Cmd_Say2_f, SAY_BUDDIES, qfalse, 0, 0, 0, 0},
 	{"say_close", "Send a message to those standing close to where you are.", Cmd_Say2_f, SAY_CLOSE, qfalse, 0, 0, 0, 0},
 	//{"scanner", "Scans for players, items, and the money stash.", Cmd_TechScanner_f, 0, 0, 256, 0, PROF_TECH},
-	{"setsaber", "Set your saber type and model. Usage: "CT_C"/setsaber "CT_AO"single | duals | staff "CT_B"OR "CT_C"/setsaber "CT_AO"<saber1> <saber2>", Cmd_SetSaber_f, 0, qfalse, 0, 0, ~(1 << GT_FFA), PROF_JEDI},
+	{"setsaber", "Set your saber type and model. Usage: "CT_C"/setsaber "CT_AO"<single | duals | staff> "CT_B"OR "CT_C"/setsaber "CT_AO"<saber1> <saber2>", Cmd_SetSaber_f, 0, qfalse, 0, 0, ~(1 << GT_FFA), PROF_JEDI},
 	{"stash", "Tells you if there is a money stash spawned, and who is holding on to it (if anyone).", Cmd_Stash_f, 0, qfalse, 0, 512 | 128, 0, 0},
 	{NULL},
 };

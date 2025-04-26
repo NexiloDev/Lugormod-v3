@@ -267,14 +267,13 @@ void forceSaber(gentity_t *ent, char* saber1, char* saber2)
 
 	G_SaberModelSetup(ent);
 	
-	// Update saber anim level based on equipped sabers
-	if (ent->client->saber[0].saberFlags & SFL_TWO_HANDED) { // Staff always first
+	if (ent->client->saber[0].saberFlags & SFL_TWO_HANDED) {
 		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
 	}
-	else if (ent->client->saber[1].model[0] && Q_stricmp(ent->client->saber[1].model, "none")) { // Dual sabers only if saber2 is valid
+	else if (ent->client->saber[1].model[0] && Q_stricmp(ent->client->saber[1].model, "none")) {
 		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
 	}
-	else { // Single saber
+	else {
 		if (ent->client->sess.saberLevel < SS_FAST) {
 			ent->client->sess.saberLevel = SS_FAST;
 		}
@@ -9739,9 +9738,5 @@ qboolean HasSetSaberOnly(void)
 
 	return qtrue;
 
-<<<<<<< Updated upstream
 }
 
-=======
-}
->>>>>>> Stashed changes

@@ -16,7 +16,7 @@ Lugormod has evolved through several versions:
 - **Lugormod** (by Lugor): The original mod, introducing RPG-based leveling and map-building features.
 - **Lugormod T2** (by RoboPhred): Expanded features and improved stability.
 - **Lugormod U#** (by RoboPhred): Advanced scripting, new entity interfaces, and significant enhancements.
-- **Lugormod v3** (by Nexilo): The current version, with modernized features and active community-driven development.
+- **Lugormod v3** (by Nexilo, formerly the JKA clan 'Mystic Forces'): The current version, with modernized features and active community-driven development.
 
 ## Features
 
@@ -53,7 +53,7 @@ We welcome contributions to Lugormod v3! Whether you're fixing bugs, adding feat
 
 #### Contribution Guidelines
 
-- **Code Quality:** Provide clear, well-structured and commented code to ensure readability and maintainability by others.
+- **Code Quality:** Provide clear, well-commented code to ensure readability and maintainability by others.
 - **Pull Request Details:** Include a detailed explanation in your pull request, describing the changes, their purpose, and any relevant context.
 - **Build Verification:** Ensure your code compiles successfully and passes any existing tests before submitting.
 - **Major Changes:** For significant changes or new features, consider opening an issue or contacting us on Discord to discuss your approach beforehand.

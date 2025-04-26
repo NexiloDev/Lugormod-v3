@@ -13054,21 +13054,15 @@ void Pmove (pmove_t *pmove) {
 
 #ifdef QAGAME
 	int i;
-	for (i = 0; i < 8; i++) {
+	for (i = 0;i < 8;i++) {
 		if (pmove->ps->fd.forcePowerLevel[i] & 4) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS] |= (1 << i);
-		}
-		if (pmove->ps->fd.forcePowerLevel[i] >= 5) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS_L5] |= (1 << i);
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS]|=(1 << i);
 		}
 	}
 
-	for (i = 8; i < 16; i++) {
+	for (i = 8;i < 16;i++) {
 		if (pmove->ps->fd.forcePowerLevel[i] & 4) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2] |= (1 << (i - 8));
-		}
-		if (pmove->ps->fd.forcePowerLevel[i] >= 5) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS_L5_2] |= (1 << (i - 8));
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2]|=(1 << (i - 8));
 		}
 	}
 

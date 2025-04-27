@@ -539,6 +539,16 @@ struct gclient_s {
 
 		vec3_t mark;
 		int grabOffset;
+
+		struct 
+		{
+			int entityNum;
+			unsigned int selection;
+			qboolean stoppedPressingUsing;
+			qboolean stoppedPressingForward;
+			qboolean stoppedPressingBackward;
+
+		} lmdMenu;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

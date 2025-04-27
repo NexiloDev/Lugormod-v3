@@ -4874,6 +4874,9 @@ void Lmd_RunFrame(void);
 void Lmd_logic_think();
 int Merc_JetpackDefuel(gentity_t *ent);
 int Merc_JetpackRefuel(gentity_t *ent);
+extern void lmd_menu_key(gentity_t *player, usercmd_t *cmd);
+extern void lmd_menu_show(gentity_t *player, gentity_t *menu);
+extern void lmd_menu_exit(gentity_t *player);
 void G_RunFrame( int levelTime ) {
 	int			i;
 	gentity_t	       *ent;
@@ -5607,6 +5610,17 @@ ContinueThink:
 				WP_ForcePowersUpdate(ent, &ent->client->pers.cmd );
 				WP_SaberPositionUpdate(ent, &ent->client->pers.cmd);
 				WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
+				if (ent->client->Lmd.lmdMenu.entityNum != ENTITYNUM_NONE && ent->client->Lmd.lmdMenu.entityNum != 0) {
+					gentity_t *menu = &g_entities[ent->client->Lmd.lmdMenu.entityNum];
+					if (menu && menu->inuse) {
+						lmd_menu_show(ent, menu); // show the menu
+						lmd_menu_key(ent, &ent->client->pers.cmd); // handle input
+					} else {
+						lmd_menu_exit(ent); // menu entity no longer valid, exit
+					}
+				}
+
+
 			}
 
 			if (g_allowNPC.integer)

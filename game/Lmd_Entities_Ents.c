@@ -1352,81 +1352,217 @@ void lmd_door(gentity_t *ent){
 	}
 }
 
-void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator){
+// lumaya: thehehehe
+void lmd_menu_show(gentity_t *player, gentity_t *menu) {
 	char msg[MAX_STRING_CHARS] = "";
-	int i = 0;
-	if(self->genericValue1 > level.time)
-		return;
-	self->genericValue1 = level.time + 800;
-	if(!PlayerUseableCheck(self, activator))
-		return;
-	if(self->message){
-		Q_strcat(msg, sizeof(msg), va("%s\n^5==============================\n", self->message));
+	int i;
+
+	const char *primary = menu->Lmd.primaryColor ? menu->Lmd.primaryColor : "^7";
+	const char *secondary = menu->Lmd.secondaryColor ? menu->Lmd.secondaryColor : "^5";
+
+	Q_strncpyz(msg, va("%s==============================\n", primary), sizeof(msg));
+
+	if (menu->message && *menu->message)
+		Q_strcat(msg, sizeof(msg), va("%s%s\n", primary, menu->message));
+
+	Q_strcat(msg, sizeof(msg), va("%s==============================\n", primary));
+
+	for (i = 0; i < menu->count; i++) {
+		if (i == player->client->Lmd.lmdMenu.selection)
+			Q_strcat(msg, sizeof(msg), va("%s[ %s%s%s ]\n", secondary, primary, menu->GenericStrings[i], secondary));
+		else
+			Q_strcat(msg, sizeof(msg), va("  %s%s\n", primary, menu->GenericStrings[i]));
 	}
 
-	for(i = 0;i<self->count;i++){
+	Q_strcat(msg, sizeof(msg), va("%s==============================\n", primary));
+	Q_strcat(msg, sizeof(msg), va("%sMove Forward%s: Up\n%sMove Downward%s: Down\n%sALT Attack%s: Exit",
+								  secondary, primary,
+								  secondary, primary,
+								  secondary, primary));
+
+	trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
+}
+
+
+
+void lmd_menu_exit(gentity_t *player) {
+	if (!player || !player->client)
+		return;
+	
+	//player->client->Lmd.flags &= ~SNF_FREEZE;
+	player->client->Lmd.lmdMenu.entityNum = ENTITYNUM_NONE;
+	player->client->Lmd.lmdMenu.selection = 0;
+	player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+}
+
+void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
+    if (!player || !player->client)
+        return;
+
+    if (player->client->Lmd.lmdMenu.entityNum == ENTITYNUM_NONE)
+        return;
+
+    gentity_t *menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu || !menu->inuse)
+        return;
+
+    // Movement UP (forward)
+    if (cmd->forwardmove > 0) {
+        if (player->client->Lmd.lmdMenu.stoppedPressingForward) {
+            if (player->client->Lmd.lmdMenu.selection > 0)
+                player->client->Lmd.lmdMenu.selection--;
+            else
+                player->client->Lmd.lmdMenu.selection = menu->count - 1;
+            lmd_menu_show(player, menu);
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+
+            player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
+        }
+    }
+    else {
+        player->client->Lmd.lmdMenu.stoppedPressingForward = qtrue;
+    }
+
+    // Movement DOWN (backward)
+    if (cmd->forwardmove < 0) {
+        if (player->client->Lmd.lmdMenu.stoppedPressingBackward) {
+            player->client->Lmd.lmdMenu.selection = (player->client->Lmd.lmdMenu.selection + 1) % menu->count;
+            lmd_menu_show(player, menu);
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+
+            player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
+        }
+    }
+    else {
+        player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
+    }
+
+    // Confirm (USE button)
+    if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing) {
+        switch (player->client->Lmd.lmdMenu.selection) {
+        case 0: G_UseTargets2(menu, player, menu->target); break;
+        case 1: G_UseTargets2(menu, player, menu->target2); break;
+        case 2: G_UseTargets2(menu, player, menu->target3); break;
+        case 3: G_UseTargets2(menu, player, menu->target4); break;
+        case 4: G_UseTargets2(menu, player, menu->target5); break;
+        case 5: G_UseTargets2(menu, player, menu->target6); break;
+        }
+        G_UseTargets2(menu, player, menu->GenericStrings[8]);
+        G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/movers/switches/switch1.mp3")); // Selection sound
+        lmd_menu_exit(player);
+
+        player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse; // block until key is released
+    }
+    else if (!(cmd->buttons & BUTTON_USE)) {
+        player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
+    }
+
+    // Cancel (ALT_ATTACK button)
+    if (cmd->buttons & BUTTON_ALT_ATTACK) {
+        G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+        lmd_menu_exit(player);
+    }
+	
+	player->client->Lmd.customSpeed.value = 0;
+	player->client->Lmd.customSpeed.time = level.time + FRAMETIME;
+	player->client->ps.weaponTime = FRAMETIME;
+	//G_SetAnim(player, SETANIM_BOTH, RP_END_DEATH_ANIM, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD|SETANIM_FLAG_HOLDLESS, 0);
+
+}
+
+
+
+
+void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
+	if (!PlayerUseableCheck(self, activator))
+		return;
+
+	if (self->genericValue1 > level.time)
+		return;
+	self->genericValue1 = level.time + 800;
+
+	if (self->spawnflags & 4) { // spawnflag 4 = open menu
+		if (activator->client->ps.pm_type != PM_NORMAL)
+			return;
+
+		//activator->client->Lmd.flags |= SNF_FREEZE;
+		activator->client->Lmd.lmdMenu.entityNum = self->s.number;
+		activator->client->Lmd.lmdMenu.selection = 0;
+
+		lmd_menu_show(activator, self);
+		return;
+	}
+
+	// Normal mode (spawnflag 1 or 2)
+	char msg[MAX_STRING_CHARS] = "";
+	int i;
+	if (self->message)
+		Q_strcat(msg, sizeof(msg), va("%s\n^5==============================\n", self->message));
+
+	for (i = 0; i < self->count; i++) {
 		Q_strcat(msg, sizeof(msg), va("^2%i^3: %s\n", i + 1, self->GenericStrings[i]));
 	}
 	Q_strcat(msg, sizeof(msg), "^5==============================\n^3Type ^2/interact <cmd>^3 to use a command.");
 
-	if(self->spawnflags & 1 || self->spawnflags & 2)
+	if (self->spawnflags & 1 || self->spawnflags & 2)
 		trap_SendServerCommand(activator->s.number, va("cp \"%s\"", msg));
-	if(!(self->spawnflags & 2)){
-		if(!(self->spawnflags & 1))
+	if (!(self->spawnflags & 2)) {
+		if (!(self->spawnflags & 1))
 			trap_SendServerCommand(activator->s.number, va("cp \"%s\n^5Output sent to console\"", self->message));
 		Disp(activator, msg);
 	}
+
 	G_UseTargets2(self, activator, self->GenericStrings[7]);
 }
 
-void lmd_terminal_interact(gentity_t *self, gentity_t *activator){
+
+void lmd_terminal_interact(gentity_t *self, gentity_t *activator) {
 	char arg1[MAX_STRING_CHARS];
-	if(!PlayerUseableCheck(self, activator))
+	int i;
+
+	if (!PlayerUseableCheck(self, activator))
 		return;
+
+	if (self->spawnflags & 4) { // spawnflag 4 = menu
+		lmd_menu_show(activator, self);
+		return;
+	}
+
 	trap_Argv(1, arg1, sizeof(arg1));
-	int i = atoi(arg1);
-	if(!arg1[0])
-	{
+	if (!arg1[0]) {
 		lmd_terminal_use(self, activator, activator);
 		return;
 	}
-	//(i == 0 && !(arg1[0] == '0' && arg1[1] == 0)) || 
-	if(i <= 0 || i > self->count){
+
+	i = atoi(arg1);
+	if (i <= 0 || i > self->count) {
 		Disp(activator, va("^3Unknown interaction command, expected number between 1 and %i", self->count));
 		return;
 	}
-	switch(i){
-		case 1:
-			G_UseTargets2(self, activator, self->target);
-			break;
-		case 2:
-			G_UseTargets2(self, activator, self->target2);
-			break;
-		case 3:
-			G_UseTargets2(self, activator, self->target3);
-			break;
-		case 4:
-			G_UseTargets2(self, activator, self->target4);
-			break;
-		case 5:
-			G_UseTargets2(self, activator, self->target5);
-			break;
-		case 6:
-			G_UseTargets2(self, activator, self->target6);
-			break;
-		default:
-			Disp(activator, "^3Unknown interaction command.");
-			return;
+
+	switch (i) {
+	case 1: G_UseTargets2(self, activator, self->target); break;
+	case 2: G_UseTargets2(self, activator, self->target2); break;
+	case 3: G_UseTargets2(self, activator, self->target3); break;
+	case 4: G_UseTargets2(self, activator, self->target4); break;
+	case 5: G_UseTargets2(self, activator, self->target5); break;
+	case 6: G_UseTargets2(self, activator, self->target6); break;
+	default:
+		Disp(activator, "^3Unknown interaction command.");
+		return;
 	}
-	G_UseTargets2(self, activator, self->GenericStrings[8]);
+	G_UseTargets2(self, activator, self->GenericStrings[8]); // global target
 	Disp(activator, "^2Command successful.");
 }
+
 
 const entityInfoData_t lmd_terminal_spawnflags[] = {
 	{"1", "Send the output to the player's screen."},
 	{"2", "Do not send the output to the player's console."},
-	NULL
+	{"4", "Freeze player and show interactive menu."},
+	{NULL, NULL}
 };
+
 const entityInfoData_t lmd_terminal_keys[] = {
 	{"#UKEYS", NULL},
 	{"#MODEL", NULL},
@@ -1456,7 +1592,9 @@ void lmd_terminal(gentity_t *ent){
 	[u]Keys[/u]
 	message: This is the message to display when the terminal is used.  Use this as a description.
 	usetarget: target to fire when used
-	globaltarget: target to fire when any 
+	globaltarget: target to fire when any
+	primarycolor: Color code (like ^7, ^5, ^3) used for normal text and separators.
+	secondarycolor: Color code used for highlights and menu selection brackets.
 
 
 	cmd:
@@ -1484,6 +1622,9 @@ void lmd_terminal(gentity_t *ent){
 
 	G_SpawnString("usetarget", "", &ent->GenericStrings[7]);
 	G_SpawnString("globaltarget", "", &ent->GenericStrings[8]);
+	G_SpawnString("primarycolor", "^7", &ent->Lmd.primaryColor);
+	G_SpawnString("secondarycolor", "^5", &ent->Lmd.secondaryColor);
+
 
 
 	if(ent->Lmd.spawnData && Q_stricmp(ent->classname, "t2_terminal") == 0){

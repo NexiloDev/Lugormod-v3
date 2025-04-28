@@ -1401,7 +1401,7 @@ void lmd_menu_exit(gentity_t *player) {
 	player->client->ps.legsTimer = 0;
 	player->client->ps.torsoTimer = 0;
 	player->flags &= ~FL_GODMODE;
-	trap_SendServerCommand(player->s.number, "cp \"\"");
+	trap_SendServerCommand(player->s.number, "cp \" \"");
 }
 
 
@@ -1473,18 +1473,6 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     else if (!(cmd->buttons & BUTTON_USE)) {
         player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
     }
-	
-	vec3_t dir;
-	VectorSubtract(menu->r.currentOrigin, player->r.currentOrigin, dir);
-	VectorNormalize(dir);
-
-	vec3_t angles;
-	angles[2] += 15;
-	vectoangles(dir, angles);
-	SetClientViewAngle(player, angles);
-
-	player->client->Lmd.customSpeed.value = 0;
-	player->client->Lmd.customSpeed.time = level.time + 250;
 }
 
 
@@ -1498,13 +1486,21 @@ void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
 		return;
 	self->genericValue1 = level.time + 800;
 
-	if (self->spawnflags & 4 && (activator->client->Lmd.lmdMenu.entityNum == ENTITYNUM_NONE || activator->client->Lmd.lmdMenu.entityNum == 0)) { // spawnflag 4 = open menu
-		activator->client->Lmd.lmdMenu.entityNum = self->s.number;
-		activator->client->Lmd.lmdMenu.selection = 0;
-		lmd_menu_show(activator, self);
-		activator->flags |= FL_GODMODE;
-		G_SetAnim(activator, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
-		activator->client->Lmd.flags |= SNF_FREEZE;
+	if (self->spawnflags & 4) {
+		if ((activator->client->Lmd.lmdMenu.entityNum == ENTITYNUM_NONE || activator->client->Lmd.lmdMenu.entityNum == 0)
+		&& activator->client->ps.groundEntityNum != ENTITYNUM_NONE)
+		{
+			activator->client->Lmd.lmdMenu.entityNum = self->s.number;
+			activator->client->Lmd.lmdMenu.selection = 0;
+			lmd_menu_show(activator, self);
+			activator->flags |= FL_GODMODE;
+			for (int j = 0; j < 2; j++)
+			{
+				activator->client->ps.velocity[j] = 0.0f;
+			}
+			G_SetAnim(activator, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+			activator->client->Lmd.flags |= SNF_FREEZE;	
+		}
 		return;
 	}
 

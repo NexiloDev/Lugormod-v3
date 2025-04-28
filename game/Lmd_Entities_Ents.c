@@ -1356,49 +1356,52 @@ void lmd_menu_show(gentity_t *player, gentity_t *menu) {
 	char msg[MAX_STRING_CHARS] = "";
 	int i;
 
-	const char *primary = menu->Lmd.primaryColor ? menu->Lmd.primaryColor : "^7";
-	const char *secondary = menu->Lmd.secondaryColor ? menu->Lmd.secondaryColor : "^5";
-
-	Q_strncpyz(msg, va("%s==============================\n", primary), sizeof(msg));
-
 	if (menu->message && *menu->message)
-		Q_strcat(msg, sizeof(msg), va("%s%s\n", primary, menu->message));
-
-	Q_strcat(msg, sizeof(msg), va("%s==============================\n", primary));
+		Q_strcat(msg, sizeof(msg), va("%s%s\n\n", menu->Lmd.color, menu->message));
 
 	for (i = 0; i < menu->count; i++) {
-		if (i == player->client->Lmd.lmdMenu.selection)
-			Q_strcat(msg, sizeof(msg), va("%s[ %s%s%s ]\n", secondary, primary, menu->GenericStrings[i], secondary));
-		else
-			Q_strcat(msg, sizeof(msg), va("  %s%s\n", primary, menu->GenericStrings[i]));
+		if (i == player->client->Lmd.lmdMenu.selection) {
+			Q_strcat(msg, sizeof(msg), va("%s[ %s%d%s ] ^7%s\n", menu->Lmd.color, menu->Lmd.color2, i + 1, menu->Lmd.color, menu->GenericStrings[i]));
+			// [ number ] text
+		}
+		else {
+			Q_strcat(msg, sizeof(msg), va("  %s%d. ^7%s\n", menu->Lmd.color2, i + 1, menu->GenericStrings[i]));
+			//  number. text
+		}
 	}
 
-	Q_strcat(msg, sizeof(msg), va("%s==============================\n", primary));
-	Q_strcat(msg, sizeof(msg), va("%sMove Forward%s: Up\n%sMove Downward%s: Down\n%sALT Attack%s: Exit",
-								  secondary, primary,
-								  secondary, primary,
-								  secondary, primary));
+	Q_strcat(msg, sizeof(msg), "\n");
+
+	if (player->client->Lmd.lmdMenu.selection == menu->count) {
+		Q_strcat(msg, sizeof(msg), va("%s[ %sCancel%s ]\n", menu->Lmd.color, menu->Lmd.color2, menu->Lmd.color));
+	}
+	else {
+		Q_strcat(msg, sizeof(msg), va("  %sCancel\n", menu->Lmd.color2));
+	}
 
 	trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
-	
 }
+
+
+
 
 
 
 void lmd_menu_exit(gentity_t *player) {
 	if (!player || !player->client)
 		return;
-
-	player->client->ps.pm_type = PM_NORMAL;
 	player->client->Lmd.lmdMenu.entityNum = ENTITYNUM_NONE;
 	player->client->Lmd.lmdMenu.selection = 0;
 	player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
 	player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
 	player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
-	
+
+	player->client->Lmd.flags &= ~SNF_FREEZE;
 	player->client->ps.weaponTime = 0;
 	player->client->ps.legsTimer = 0;
 	player->client->ps.torsoTimer = 0;
+	player->flags &= ~FL_GODMODE;
+	trap_SendServerCommand(player->s.number, "cp \"\"");
 }
 
 
@@ -1416,12 +1419,12 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     // Movement UP (forward)
     if (cmd->forwardmove > 0) {
         if (player->client->Lmd.lmdMenu.stoppedPressingForward) {
-            if (player->client->Lmd.lmdMenu.selection > 0)
-                player->client->Lmd.lmdMenu.selection--;
-            else
-                player->client->Lmd.lmdMenu.selection = menu->count - 1;
+        	if (player->client->Lmd.lmdMenu.selection > 0)
+        		player->client->Lmd.lmdMenu.selection--;
+        	else
+        		player->client->Lmd.lmdMenu.selection = menu->count;
             lmd_menu_show(player, menu);
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
 
             player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
         }
@@ -1433,9 +1436,9 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     // Movement DOWN (backward)
     if (cmd->forwardmove < 0) {
         if (player->client->Lmd.lmdMenu.stoppedPressingBackward) {
-            player->client->Lmd.lmdMenu.selection = (player->client->Lmd.lmdMenu.selection + 1) % menu->count;
+        	player->client->Lmd.lmdMenu.selection = (player->client->Lmd.lmdMenu.selection + 1) % (menu->count + 1);
             lmd_menu_show(player, menu);
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
 
             player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
         }
@@ -1443,29 +1446,32 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     else {
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
     }
+	
+	// Confirm (USE button)
+	if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing) {
+		if (player->client->Lmd.lmdMenu.selection == menu->count) {
+			// Selected the Cancel button
+			G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
+			lmd_menu_exit(player);
+		} else {
+			// Normal selection
+			switch (player->client->Lmd.lmdMenu.selection) {
+			case 0: G_UseTargets2(menu, player, menu->target); break;
+			case 1: G_UseTargets2(menu, player, menu->target2); break;
+			case 2: G_UseTargets2(menu, player, menu->target3); break;
+			case 3: G_UseTargets2(menu, player, menu->target4); break;
+			case 4: G_UseTargets2(menu, player, menu->target5); break;
+			case 5: G_UseTargets2(menu, player, menu->target6); break;
+			}
+			G_UseTargets2(menu, player, menu->GenericStrings[8]);
+			G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.selectsnd));
+			lmd_menu_exit(player);
+		}
+		player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+	}
 
-    // Confirm (USE button)
-    if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing) {
-        switch (player->client->Lmd.lmdMenu.selection) {
-        case 0: G_UseTargets2(menu, player, menu->target); break;
-        case 1: G_UseTargets2(menu, player, menu->target2); break;
-        case 2: G_UseTargets2(menu, player, menu->target3); break;
-        case 3: G_UseTargets2(menu, player, menu->target4); break;
-        case 4: G_UseTargets2(menu, player, menu->target5); break;
-        case 5: G_UseTargets2(menu, player, menu->target6); break;
-        }
-        G_UseTargets2(menu, player, menu->GenericStrings[8]);
-        G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/movers/switches/switch1.mp3")); // Selection sound
-        lmd_menu_exit(player);
-    }
     else if (!(cmd->buttons & BUTTON_USE)) {
         player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
-    }
-
-    // Cancel (ALT_ATTACK button)
-    if (cmd->buttons & BUTTON_ALT_ATTACK) {
-        G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
-        lmd_menu_exit(player);
     }
 	
 	vec3_t dir;
@@ -1476,11 +1482,9 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
 	angles[2] += 15;
 	vectoangles(dir, angles);
 	SetClientViewAngle(player, angles);
+
 	player->client->Lmd.customSpeed.value = 0;
-	player->client->Lmd.customSpeed.time = level.time + FRAMETIME;
-	G_SetAnim(player, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
-	player->client->ps.torsoTimer = FRAMETIME;
-	player->client->ps.legsTimer = FRAMETIME;
+	player->client->Lmd.customSpeed.time = level.time + 250;
 }
 
 
@@ -1498,6 +1502,9 @@ void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
 		activator->client->Lmd.lmdMenu.entityNum = self->s.number;
 		activator->client->Lmd.lmdMenu.selection = 0;
 		lmd_menu_show(activator, self);
+		activator->flags |= FL_GODMODE;
+		G_SetAnim(activator, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+		activator->client->Lmd.flags |= SNF_FREEZE;
 		return;
 	}
 
@@ -1580,6 +1587,11 @@ const entityInfoData_t lmd_terminal_keys[] = {
 	{"GlobalTarget", "Targe to fire when any command is used."},
 	{"Cmd-Cmd6", "Name of each command."},
 	{"Target-Target6", "Target to use for each command."},
+	{"Color1", "Color code used for the selection brackets."},
+	{"Color2", "Color code used for the Cancel button."},
+	{"selectsnd", "Sound played for confirmation."},
+	{"navsnd", "Sound played for navigation."},
+	{"cancelsnd", "Sound played for cancel."},
 	NULL
 };
 
@@ -1601,8 +1613,6 @@ void lmd_terminal(gentity_t *ent){
 	message: This is the message to display when the terminal is used.  Use this as a description.
 	usetarget: target to fire when used
 	globaltarget: target to fire when any
-	primarycolor: Color code (like ^7, ^5, ^3) used for normal text and separators.
-	secondarycolor: Color code used for highlights and menu selection brackets.
 
 
 	cmd:
@@ -1630,9 +1640,11 @@ void lmd_terminal(gentity_t *ent){
 
 	G_SpawnString("usetarget", "", &ent->GenericStrings[7]);
 	G_SpawnString("globaltarget", "", &ent->GenericStrings[8]);
-	G_SpawnString("primarycolor", "^7", &ent->Lmd.primaryColor);
-	G_SpawnString("secondarycolor", "^5", &ent->Lmd.secondaryColor);
-
+	G_SpawnString("color1", "^7", &ent->Lmd.color);
+	G_SpawnString("color2", "^7", &ent->Lmd.color2);
+	G_SpawnString("selectsnd", "sound/movers/switches/switch1.mp3", &ent->Lmd.selectsnd);
+	G_SpawnString("navsnd", "sound/interface/menuroam.mp3", &ent->Lmd.navsnd);
+	G_SpawnString("cancelsnd", "sound/interface/esc.mp3", &ent->Lmd.cancelsnd);
 
 
 	if(ent->Lmd.spawnData && Q_stricmp(ent->classname, "t2_terminal") == 0){

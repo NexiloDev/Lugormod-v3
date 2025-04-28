@@ -363,8 +363,11 @@ struct gentity_s {
 		qboolean grabZ; // Rotate along the Z axis
 		qboolean displayBounds; // Display the bounding box?
 		int boundsDisplayedUntil; // How long will the bounding box be displayed? (level.time + xxx)
-		char * primaryColor;
-		char * secondaryColor;
+		char * color;
+		char * color2;
+		char * selectsnd;
+		char * navsnd;
+		char * cancelsnd;
 	}Lmd;
 	//RoboPhred
 	qboolean isAutoTargeted; //we were given a targetname automatically

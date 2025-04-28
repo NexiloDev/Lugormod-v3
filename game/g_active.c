@@ -2601,10 +2601,6 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 	else if(client->Lmd.flags & SNF_FREEZE)
 		client->ps.pm_type = PM_FREEZE;
-	else if (client->Lmd.lmdMenu.entityNum != ENTITYNUM_NONE && client->Lmd.lmdMenu.entityNum != 0)
-	{
-		client->ps.pm_type = PM_FREEZE;
-	}
 	else
 		client->ps.pm_type = PM_NORMAL;
 

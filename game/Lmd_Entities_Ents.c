@@ -1352,7 +1352,6 @@ void lmd_door(gentity_t *ent){
 	}
 }
 
-// lumaya: thehehehe
 void lmd_menu_show(gentity_t *player, gentity_t *menu) {
 	char msg[MAX_STRING_CHARS] = "";
 	int i;
@@ -1381,6 +1380,7 @@ void lmd_menu_show(gentity_t *player, gentity_t *menu) {
 								  secondary, primary));
 
 	trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
+	
 }
 
 
@@ -1388,12 +1388,19 @@ void lmd_menu_show(gentity_t *player, gentity_t *menu) {
 void lmd_menu_exit(gentity_t *player) {
 	if (!player || !player->client)
 		return;
-	
-	//player->client->Lmd.flags &= ~SNF_FREEZE;
+
+	player->client->ps.pm_type = PM_NORMAL;
 	player->client->Lmd.lmdMenu.entityNum = ENTITYNUM_NONE;
 	player->client->Lmd.lmdMenu.selection = 0;
 	player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+	player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
+	player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
+	
+	player->client->ps.weaponTime = 0;
+	player->client->ps.legsTimer = 0;
+	player->client->ps.torsoTimer = 0;
 }
+
 
 void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     if (!player || !player->client)
@@ -1450,8 +1457,6 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
         G_UseTargets2(menu, player, menu->GenericStrings[8]);
         G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/movers/switches/switch1.mp3")); // Selection sound
         lmd_menu_exit(player);
-
-        player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse; // block until key is released
     }
     else if (!(cmd->buttons & BUTTON_USE)) {
         player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
@@ -1463,11 +1468,19 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
         lmd_menu_exit(player);
     }
 	
+	vec3_t dir;
+	VectorSubtract(menu->r.currentOrigin, player->r.currentOrigin, dir);
+	VectorNormalize(dir);
+
+	vec3_t angles;
+	angles[2] += 15;
+	vectoangles(dir, angles);
+	SetClientViewAngle(player, angles);
 	player->client->Lmd.customSpeed.value = 0;
 	player->client->Lmd.customSpeed.time = level.time + FRAMETIME;
-	player->client->ps.weaponTime = FRAMETIME;
-	//G_SetAnim(player, SETANIM_BOTH, RP_END_DEATH_ANIM, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD|SETANIM_FLAG_HOLDLESS, 0);
-
+	G_SetAnim(player, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+	player->client->ps.torsoTimer = FRAMETIME;
+	player->client->ps.legsTimer = FRAMETIME;
 }
 
 
@@ -1481,14 +1494,9 @@ void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
 		return;
 	self->genericValue1 = level.time + 800;
 
-	if (self->spawnflags & 4) { // spawnflag 4 = open menu
-		if (activator->client->ps.pm_type != PM_NORMAL)
-			return;
-
-		//activator->client->Lmd.flags |= SNF_FREEZE;
+	if (self->spawnflags & 4 && (activator->client->Lmd.lmdMenu.entityNum == ENTITYNUM_NONE || activator->client->Lmd.lmdMenu.entityNum == 0)) { // spawnflag 4 = open menu
 		activator->client->Lmd.lmdMenu.entityNum = self->s.number;
 		activator->client->Lmd.lmdMenu.selection = 0;
-
 		lmd_menu_show(activator, self);
 		return;
 	}
@@ -1559,7 +1567,7 @@ void lmd_terminal_interact(gentity_t *self, gentity_t *activator) {
 const entityInfoData_t lmd_terminal_spawnflags[] = {
 	{"1", "Send the output to the player's screen."},
 	{"2", "Do not send the output to the player's console."},
-	{"4", "Freeze player and show interactive menu."},
+	{"4", "Freeze player and show interactive menu. Not combineable with spawnflags 1 and/or 2."},
 	{NULL, NULL}
 };
 

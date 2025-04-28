@@ -5610,13 +5610,13 @@ ContinueThink:
 				WP_ForcePowersUpdate(ent, &ent->client->pers.cmd );
 				WP_SaberPositionUpdate(ent, &ent->client->pers.cmd);
 				WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
-				if (ent->client->Lmd.lmdMenu.entityNum != ENTITYNUM_NONE && ent->client->Lmd.lmdMenu.entityNum != 0) {
+				if (ent->client->Lmd.lmdMenu.entityNum != 0) {
 					gentity_t *menu = &g_entities[ent->client->Lmd.lmdMenu.entityNum];
 					if (menu && menu->inuse) {
-						lmd_menu_show(ent, menu); // show the menu
-						lmd_menu_key(ent, &ent->client->pers.cmd); // handle input
+						lmd_menu_show(ent, menu);
+						lmd_menu_key(ent, &ent->client->pers.cmd);
 					} else {
-						lmd_menu_exit(ent); // menu entity no longer valid, exit
+						lmd_menu_exit(ent);
 					}
 				}
 

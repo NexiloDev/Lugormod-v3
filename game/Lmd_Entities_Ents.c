@@ -1390,7 +1390,7 @@ void lmd_menu_show(gentity_t *player, gentity_t *menu) {
 void lmd_menu_exit(gentity_t *player) {
 	if (!player || !player->client)
 		return;
-	player->client->Lmd.lmdMenu.entityNum = ENTITYNUM_NONE;
+	player->client->Lmd.lmdMenu.entityNum = 0;
 	player->client->Lmd.lmdMenu.selection = 0;
 	player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
 	player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -1404,12 +1404,26 @@ void lmd_menu_exit(gentity_t *player) {
 	trap_SendServerCommand(player->s.number, "cp \" \"");
 }
 
+void lmd_menu_enter(gentity_t *player, gentity_t *menu)
+{
+	player->client->Lmd.lmdMenu.entityNum = menu->s.number;
+	player->client->Lmd.lmdMenu.selection = 0;
+	lmd_menu_show(player, menu);
+	player->flags |= FL_GODMODE;
+	for (int j = 0; j < 2; j++)
+	{
+		player->client->ps.velocity[j] = 0.0f;
+	}
+	G_SetAnim(player, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+	player->client->Lmd.flags |= SNF_FREEZE;	
+}
+
 
 void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     if (!player || !player->client)
         return;
 
-    if (player->client->Lmd.lmdMenu.entityNum == ENTITYNUM_NONE)
+    if (player->client->Lmd.lmdMenu.entityNum == 0)
         return;
 
     gentity_t *menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
@@ -1417,8 +1431,10 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
         return;
 
     // Movement UP (forward)
-    if (cmd->forwardmove > 0) {
-        if (player->client->Lmd.lmdMenu.stoppedPressingForward) {
+    if (cmd->forwardmove > 0)
+    {
+        if (player->client->Lmd.lmdMenu.stoppedPressingForward)
+        {
         	if (player->client->Lmd.lmdMenu.selection > 0)
         		player->client->Lmd.lmdMenu.selection--;
         	else
@@ -1449,12 +1465,25 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
 	
 	// Confirm (USE button)
 	if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing) {
-		if (player->client->Lmd.lmdMenu.selection == menu->count) {
-			// Selected the Cancel button
+		if (player->client->Lmd.lmdMenu.selection == menu->count)
+		{
 			G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
 			lmd_menu_exit(player);
-		} else {
-			// Normal selection
+		}
+		else
+		{
+			const char* targetName = NULL;
+
+			switch (player->client->Lmd.lmdMenu.selection) {
+			case 0: targetName = menu->target; break;
+			case 1: targetName = menu->target2; break;
+			case 2: targetName = menu->target3; break;
+			case 3: targetName = menu->target4; break;
+			case 4: targetName = menu->target5; break;
+			case 5: targetName = menu->target6; break;
+			}
+			
+			// Fire normal selection
 			switch (player->client->Lmd.lmdMenu.selection) {
 			case 0: G_UseTargets2(menu, player, menu->target); break;
 			case 1: G_UseTargets2(menu, player, menu->target2); break;
@@ -1465,10 +1494,24 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
 			}
 			G_UseTargets2(menu, player, menu->GenericStrings[8]);
 			G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.selectsnd));
+
+
 			lmd_menu_exit(player);
+			
+			if (targetName && *targetName) {
+				gentity_t *t = NULL;
+				while ((t = G_Find(t, FOFS(targetname), targetName)) != NULL) {
+					if (!Q_stricmp(t->classname, "lmd_terminal") && (t->spawnflags & 4)) {
+						lmd_menu_enter(player, t);
+						break;
+					}
+				}
+			}
+			
 		}
 		player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
 	}
+
 
     else if (!(cmd->buttons & BUTTON_USE)) {
         player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
@@ -1487,19 +1530,10 @@ void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
 	self->genericValue1 = level.time + 800;
 
 	if (self->spawnflags & 4) {
-		if ((activator->client->Lmd.lmdMenu.entityNum == ENTITYNUM_NONE || activator->client->Lmd.lmdMenu.entityNum == 0)
+		if (activator->client->Lmd.lmdMenu.entityNum == 0
 		&& activator->client->ps.groundEntityNum != ENTITYNUM_NONE)
 		{
-			activator->client->Lmd.lmdMenu.entityNum = self->s.number;
-			activator->client->Lmd.lmdMenu.selection = 0;
-			lmd_menu_show(activator, self);
-			activator->flags |= FL_GODMODE;
-			for (int j = 0; j < 2; j++)
-			{
-				activator->client->ps.velocity[j] = 0.0f;
-			}
-			G_SetAnim(activator, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
-			activator->client->Lmd.flags |= SNF_FREEZE;	
+			lmd_menu_enter(activator, self);
 		}
 		return;
 	}
@@ -1588,6 +1622,7 @@ const entityInfoData_t lmd_terminal_keys[] = {
 	{"selectsnd", "Sound played for confirmation."},
 	{"navsnd", "Sound played for navigation."},
 	{"cancelsnd", "Sound played for cancel."},
+	{"targetname", "Activate the lmd_terminal when targetted."},
 	NULL
 };
 

@@ -1352,38 +1352,54 @@ void lmd_door(gentity_t *ent){
 	}
 }
 
-void lmd_menu_show(gentity_t *player, gentity_t *menu) {
-	char msg[MAX_STRING_CHARS] = "";
-	int i;
+void lmd_menu_show(gentity_t *player, gentity_t *menu)
+{
+    char msg[MAX_STRING_CHARS] = "";
+    int i;
+    int visibleChars = player->client->Lmd.lmdMenu.messageCharsVisible;
+    int srcIndex = 0; // aktueller Index in menu->message
+    int printedChars = 0; // wie viele echte Zeichen schon kopiert
 
-	if (menu->message && *menu->message)
-		Q_strcat(msg, sizeof(msg), va("%s%s\n\n", menu->Lmd.color, menu->message));
+    if (menu->message && *menu->message) {
+        char temp[MAX_STRING_CHARS] = "";
 
-	for (i = 0; i < menu->count; i++) {
-		if (i == player->client->Lmd.lmdMenu.selection) {
-			Q_strcat(msg, sizeof(msg), va("%s[ %s%d%s ] ^7%s\n", menu->Lmd.color, menu->Lmd.color2, i + 1, menu->Lmd.color, menu->GenericStrings[i]));
-			// [ number ] text
-		}
-		else {
-			Q_strcat(msg, sizeof(msg), va("  %s%d. ^7%s\n", menu->Lmd.color2, i + 1, menu->GenericStrings[i]));
-			//  number. text
-		}
-	}
+        while (menu->message[srcIndex] && printedChars < visibleChars) {
+            if (menu->message[srcIndex] == '^' && menu->message[srcIndex + 1]) {
+                // Farbcodes direkt übernehmen
+                temp[srcIndex] = menu->message[srcIndex];
+                srcIndex++;
+                temp[srcIndex] = menu->message[srcIndex];
+                srcIndex++;
+            } else {
+                temp[srcIndex] = menu->message[srcIndex];
+                srcIndex++;
+                printedChars++; // nur bei echtem Buchstaben erhöhen
+            }
+        }
+        temp[srcIndex] = '\0'; // Nullterminierung nicht vergessen
+
+        Q_strcat(msg, sizeof(msg), va("%s%s\n\n", menu->Lmd.color, temp));
+    }
+
+    for (i = 0; i < player->client->Lmd.lmdMenu.choicesVisible && i < menu->count; i++) {
+        if (i == player->client->Lmd.lmdMenu.selection) {
+            Q_strcat(msg, sizeof(msg), va("%s[ %s%d%s ] ^7%s\n", menu->Lmd.color, menu->Lmd.color2, i + 1, menu->Lmd.color, menu->GenericStrings[i]));
+        } else {
+            Q_strcat(msg, sizeof(msg), va("  %s%d. ^7%s\n", menu->Lmd.color2, i + 1, menu->GenericStrings[i]));
+        }
+    }
 
 	Q_strcat(msg, sizeof(msg), "\n");
 
 	if (player->client->Lmd.lmdMenu.selection == menu->count) {
 		Q_strcat(msg, sizeof(msg), va("%s[ %sCancel%s ]\n", menu->Lmd.color, menu->Lmd.color2, menu->Lmd.color));
-	}
-	else {
+	} else {
 		Q_strcat(msg, sizeof(msg), va("  %sCancel\n", menu->Lmd.color2));
 	}
 
-	trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
+
+    trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
-
-
-
 
 
 
@@ -1396,6 +1412,11 @@ void lmd_menu_exit(gentity_t *player) {
 	player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
 	player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
 
+	player->client->Lmd.lmdMenu.messageCharsVisible = 0;
+	player->client->Lmd.lmdMenu.choicesVisible = 0;
+	player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
+	player->client->Lmd.lmdMenu.menuActive = qfalse;
+
 	player->client->Lmd.flags &= ~SNF_FREEZE;
 	player->client->ps.weaponTime = 0;
 	player->client->ps.legsTimer = 0;
@@ -1407,16 +1428,76 @@ void lmd_menu_exit(gentity_t *player) {
 void lmd_menu_enter(gentity_t *player, gentity_t *menu)
 {
 	player->client->Lmd.lmdMenu.entityNum = menu->s.number;
-	player->client->Lmd.lmdMenu.selection = 0;
-	lmd_menu_show(player, menu);
+	player->client->Lmd.lmdMenu.selection = menu->count;
+	player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+	player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
+	player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
+
+	player->client->Lmd.lmdMenu.messageCharsVisible = 0;
+	player->client->Lmd.lmdMenu.choicesVisible = 0;
+	player->client->Lmd.lmdMenu.menuActive = qtrue;
+	player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
+
 	player->flags |= FL_GODMODE;
-	for (int j = 0; j < 2; j++)
-	{
+	for (int j = 0; j < 2; j++) {
 		player->client->ps.velocity[j] = 0.0f;
 	}
 	G_SetAnim(player, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
-	player->client->Lmd.flags |= SNF_FREEZE;	
+	player->client->Lmd.flags |= SNF_FREEZE;
 }
+
+
+void lmd_menu_update(gentity_t *player) {
+	if (!player || !player->client)
+		return;
+
+	if (!player->client->Lmd.lmdMenu.menuActive)
+		return;
+
+	gentity_t *menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+	if (!menu || !menu->inuse)
+		return;
+
+	if (level.time < player->client->Lmd.lmdMenu.nextUpdateTime)
+		return;
+	
+	if (menu->message && player->client->Lmd.lmdMenu.messageCharsVisible < (int)strlen(menu->message)) {
+		if (menu->Lmd.messageDelay == 0) {
+			player->client->Lmd.lmdMenu.messageCharsVisible = strlen(menu->message);
+		}
+		else {
+			player->client->Lmd.lmdMenu.messageCharsVisible++;
+			player->client->Lmd.lmdMenu.nextUpdateTime = level.time + menu->Lmd.messageDelay;
+			return;
+		}
+	}
+	
+	if (player->client->Lmd.lmdMenu.messageCharsVisible >= (int)strlen(menu->message)) {
+		if (player->client->Lmd.lmdMenu.choicesVisible < menu->count) {
+			if (menu->Lmd.choiceDelay == 0) {
+				player->client->Lmd.lmdMenu.choicesVisible = menu->count;
+				player->client->Lmd.lmdMenu.selection = 0;
+			}
+			else {
+				player->client->Lmd.lmdMenu.choicesVisible++;
+				if (player->client->Lmd.lmdMenu.choicesVisible == 1) player->client->Lmd.lmdMenu.selection = 0;
+				player->client->Lmd.lmdMenu.nextUpdateTime = level.time + menu->Lmd.choiceDelay;
+				return;
+			}
+
+			
+		}
+	}
+	
+	if (player->client->Lmd.lmdMenu.messageCharsVisible >= (int)strlen(menu->message) &&
+		player->client->Lmd.lmdMenu.choicesVisible >= menu->count) {
+		player->client->Lmd.lmdMenu.menuActive = qfalse;
+		}
+}
+
+
+
+
 
 
 void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
@@ -1431,7 +1512,7 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
         return;
 
     // Movement UP (forward)
-    if (cmd->forwardmove > 0)
+    if (cmd->forwardmove > 0 && player->client->Lmd.lmdMenu.choicesVisible > 0)
     {
         if (player->client->Lmd.lmdMenu.stoppedPressingForward)
         {
@@ -1439,7 +1520,6 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
         		player->client->Lmd.lmdMenu.selection--;
         	else
         		player->client->Lmd.lmdMenu.selection = menu->count;
-            lmd_menu_show(player, menu);
             G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
 
             player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -1450,10 +1530,9 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     }
 
     // Movement DOWN (backward)
-    if (cmd->forwardmove < 0) {
+    if (cmd->forwardmove < 0 && player->client->Lmd.lmdMenu.choicesVisible > 0) {
         if (player->client->Lmd.lmdMenu.stoppedPressingBackward) {
         	player->client->Lmd.lmdMenu.selection = (player->client->Lmd.lmdMenu.selection + 1) % (menu->count + 1);
-            lmd_menu_show(player, menu);
             G_Sound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
 
             player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -1518,9 +1597,6 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
     }
 }
 
-
-
-
 void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
 	if (!PlayerUseableCheck(self, activator))
 		return;
@@ -1568,8 +1644,7 @@ void lmd_terminal_interact(gentity_t *self, gentity_t *activator) {
 	if (!PlayerUseableCheck(self, activator))
 		return;
 
-	if (self->spawnflags & 4) { // spawnflag 4 = menu
-		lmd_menu_show(activator, self);
+	if (self->spawnflags & 4) {
 		return;
 	}
 
@@ -1676,6 +1751,8 @@ void lmd_terminal(gentity_t *ent){
 	G_SpawnString("selectsnd", "sound/movers/switches/switch1.mp3", &ent->Lmd.selectsnd);
 	G_SpawnString("navsnd", "sound/interface/menuroam.mp3", &ent->Lmd.navsnd);
 	G_SpawnString("cancelsnd", "sound/interface/esc.mp3", &ent->Lmd.cancelsnd);
+	G_SpawnInt("messageDelay", "0", &ent->Lmd.messageDelay);
+	G_SpawnInt("choiceDelay", "0", &ent->Lmd.choiceDelay);
 
 
 	if(ent->Lmd.spawnData && Q_stricmp(ent->classname, "t2_terminal") == 0){

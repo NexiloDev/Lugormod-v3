@@ -368,6 +368,8 @@ struct gentity_s {
 		char * selectsnd;
 		char * navsnd;
 		char * cancelsnd;
+		int messageDelay;
+		int choiceDelay;
 	}Lmd;
 	//RoboPhred
 	qboolean isAutoTargeted; //we were given a targetname automatically

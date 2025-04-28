@@ -548,6 +548,10 @@ struct gclient_s {
 			qboolean stoppedPressingForward;
 			qboolean stoppedPressingBackward;
 
+			int messageCharsVisible;   // wie viele Zeichen der Message sichtbar sind
+			int choicesVisible;        // wie viele Choices sichtbar sind
+			int nextUpdateTime;        // nächstes Update in ms
+			qboolean menuActive;       // ob ein Menü-Effekt läuft
 		} lmdMenu;
 	}Lmd;
 	unsigned int lastTargetUse;

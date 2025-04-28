@@ -4877,6 +4877,7 @@ int Merc_JetpackRefuel(gentity_t *ent);
 extern void lmd_menu_key(gentity_t *player, usercmd_t *cmd);
 extern void lmd_menu_show(gentity_t *player, gentity_t *menu);
 extern void lmd_menu_exit(gentity_t *player);
+extern void lmd_menu_update(gentity_t *player);
 void G_RunFrame( int levelTime ) {
 	int			i;
 	gentity_t	       *ent;
@@ -5613,6 +5614,7 @@ ContinueThink:
 				if (ent->client->Lmd.lmdMenu.entityNum != 0) {
 					gentity_t *menu = &g_entities[ent->client->Lmd.lmdMenu.entityNum];
 					if (menu && menu->inuse) {
+						lmd_menu_update(ent);
 						lmd_menu_show(ent, menu);
 						lmd_menu_key(ent, &ent->client->pers.cmd);
 					} else {

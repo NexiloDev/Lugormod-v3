@@ -1383,9 +1383,9 @@ void lmd_menu_show(gentity_t *player, gentity_t *menu)
 
     for (i = 0; i < player->client->Lmd.lmdMenu.choicesVisible && i < menu->count; i++) {
         if (i == player->client->Lmd.lmdMenu.selection) {
-            Q_strcat(msg, sizeof(msg), va("%s[ %s%d%s ] ^7%s\n", menu->Lmd.color, menu->Lmd.color2, i + 1, menu->Lmd.color, menu->GenericStrings[i]));
+            Q_strcat(msg, sizeof(msg), va("%s[ %s%d%s ] %s\n", menu->Lmd.color, menu->Lmd.color2, i + 1, menu->Lmd.color, menu->GenericStrings[i]));
         } else {
-            Q_strcat(msg, sizeof(msg), va("  %s%d. ^7%s\n", menu->Lmd.color2, i + 1, menu->GenericStrings[i]));
+            Q_strcat(msg, sizeof(msg), va("  %s%d. %s\n", menu->Lmd.color2, i + 1, menu->GenericStrings[i]));
         }
     }
 
@@ -1562,7 +1562,6 @@ void lmd_menu_key(gentity_t *player, usercmd_t *cmd) {
 			case 5: targetName = menu->target6; break;
 			}
 			
-			// Fire normal selection
 			switch (player->client->Lmd.lmdMenu.selection) {
 			case 0: G_UseTargets2(menu, player, menu->target); break;
 			case 1: G_UseTargets2(menu, player, menu->target2); break;
@@ -1605,6 +1604,8 @@ void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
 		return;
 	self->genericValue1 = level.time + 800;
 
+	G_UseTargets2(self, activator, self->GenericStrings[7]);
+
 	if (self->spawnflags & 4) {
 		if (activator->client->Lmd.lmdMenu.entityNum == 0
 		&& activator->client->ps.groundEntityNum != ENTITYNUM_NONE)
@@ -1633,7 +1634,7 @@ void lmd_terminal_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
 		Disp(activator, msg);
 	}
 
-	G_UseTargets2(self, activator, self->GenericStrings[7]);
+	
 }
 
 

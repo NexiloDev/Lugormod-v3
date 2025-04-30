@@ -6,7 +6,7 @@
 [![C](https://img.shields.io/badge/C-00599C?style=flat-square&logo=c)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B)](https://en.wikipedia.org/wiki/C%2B%2B)
 [![CMake](https://img.shields.io/badge/CMake-064F8C?style=flat-square&logo=cmake)](https://cmake.org/)
-[![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2%2B-blue?style=flat-square)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![License: GPLv2](https://img.shields.io/badge/License-GPL%20v2-blue?style=flat-square)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 
 Lugormod v3 is a server-side modification for *Star Wars Jedi Knight: Jedi Academy*, enhancing multiplayer gameplay with RPG-style mechanics, map-building capabilities, and extensive server customization. This is the latest iteration of the Lugormod series, actively developed by the Nexilo development team.
 

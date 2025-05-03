@@ -547,11 +547,19 @@ struct gclient_s {
 			qboolean stoppedPressingUsing;
 			qboolean stoppedPressingForward;
 			qboolean stoppedPressingBackward;
+			qboolean stoppedPressingLeft;
+			qboolean stoppedPressingRight;
+			qboolean stoppedPressingAttack;
+			qboolean stoppedPressingAltAttack;
 
-			int messageCharsVisible;   // wie viele Zeichen der Message sichtbar sind
-			int choicesVisible;        // wie viele Choices sichtbar sind
-			int nextUpdateTime;        // nächstes Update in ms
-			qboolean menuActive;       // ob ein Menü-Effekt läuft
+			int messageCharsVisible;
+			int choicesVisible;
+			int nextUpdateTime;
+			qboolean menuActive;
+			int treeIndex;
+			int skillIndex;
+			int lastServerTime;
+			unsigned int engageTime;
 		} lmdMenu;
 	}Lmd;
 	unsigned int lastTargetUse;

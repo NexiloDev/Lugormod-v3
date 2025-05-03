@@ -342,6 +342,7 @@ struct gentity_s {
 		char *group;
 		struct UseReq_s{
 			int profession;
+			int sideAcc;
 			int level;
 			int levelMax;
 			int authLevel;

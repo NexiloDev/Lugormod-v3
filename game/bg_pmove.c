@@ -12504,8 +12504,8 @@ void PmoveSingle (pmove_t *pmove) {
 			return;
 		}
 	}
-
-	if (pm->ps->pm_type == PM_FREEZE) {
+	
+	if (pm->ps->pm_type == PM_FREEZE && g_entities[pm->ps->clientNum].client->Lmd.lmdMenu.entityNum == 0) {
 		return;		// no movement at all
 	}
 
@@ -13095,6 +13095,13 @@ void Pmove (pmove_t *pmove) {
 		pmove->cmd.rightmove = 0;
 		pmove->cmd.upmove = 0;
 		pmove->cmd.buttons = 0;
+	}
+
+	if (g_entities[pmove->ps->clientNum].client && g_entities[pmove->ps->clientNum].client->Lmd.lmdMenu.entityNum != 0)
+	{
+		pmove->cmd.forwardmove = 0;
+		pmove->cmd.upmove = 0;
+		pmove->cmd.rightmove = 0;
 	}
 
 	pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount+1) & ((1<<PS_PMOVEFRAMECOUNTBITS)-1);

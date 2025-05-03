@@ -4878,6 +4878,8 @@ extern void lmd_menu_key(gentity_t *player, usercmd_t *cmd);
 extern void lmd_menu_show(gentity_t *player, gentity_t *menu);
 extern void lmd_menu_exit(gentity_t *player);
 extern void lmd_menu_update(gentity_t *player);
+extern void lmd_skillmenu_key(gentity_t *player, usercmd_t *cmd, gentity_t *menu);
+extern void lmd_skillmenu_show(gentity_t *player, gentity_t *menu);
 void G_RunFrame( int levelTime ) {
 	int			i;
 	gentity_t	       *ent;
@@ -5611,17 +5613,40 @@ ContinueThink:
 				WP_ForcePowersUpdate(ent, &ent->client->pers.cmd );
 				WP_SaberPositionUpdate(ent, &ent->client->pers.cmd);
 				WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
-				if (ent->client->Lmd.lmdMenu.entityNum != 0) {
+				
+				if (ent->client->Lmd.lmdMenu.entityNum != 0)
+				{
 					gentity_t *menu = &g_entities[ent->client->Lmd.lmdMenu.entityNum];
-					if (menu && menu->inuse) {
-						lmd_menu_update(ent);
-						lmd_menu_show(ent, menu);
-						lmd_menu_key(ent, &ent->client->pers.cmd);
-					} else {
+					if (menu && menu->inuse)
+					{
+						if (ent->client->pers.cmd.serverTime > ent->client->Lmd.lmdMenu.lastServerTime)
+						{
+							if (menu->classname && Q_stricmp(menu->classname, "lmd_trainer") == 0)
+							{
+								if (level.time >= ent->client->Lmd.lmdMenu.nextUpdateTime)
+								{
+									lmd_skillmenu_show(ent, menu);
+									ent->client->Lmd.lmdMenu.nextUpdateTime = level.time + 1000;
+								}
+								
+								lmd_skillmenu_key(ent, &ent->client->pers.cmd, menu);
+							}
+							else
+							{
+								lmd_menu_update(ent);
+								lmd_menu_show(ent, menu);
+								lmd_menu_key(ent, &ent->client->pers.cmd);
+							}
+
+							ent->client->Lmd.lmdMenu.lastServerTime = ent->client->pers.cmd.serverTime;
+							
+						}
+					}
+					else
+					{
 						lmd_menu_exit(ent);
 					}
 				}
-
 
 			}
 

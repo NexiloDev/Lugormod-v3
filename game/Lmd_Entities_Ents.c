@@ -1670,7 +1670,7 @@ void lmd_menu_update(gentity_t* player)
         }
     }
 
-    if (player->client->Lmd.lmdMenu.messageCharsVisible >= (int)strlen(menu->message))
+    if (menu->message && player->client->Lmd.lmdMenu.messageCharsVisible >= (int)strlen(menu->message))
     {
         if (player->client->Lmd.lmdMenu.choicesVisible < menu->count)
         {
@@ -1689,7 +1689,7 @@ void lmd_menu_update(gentity_t* player)
         }
     }
 
-    if (player->client->Lmd.lmdMenu.messageCharsVisible >= (int)strlen(menu->message) &&
+    if (menu->message && player->client->Lmd.lmdMenu.messageCharsVisible >= (int)strlen(menu->message) &&
         player->client->Lmd.lmdMenu.choicesVisible >= menu->count)
     {
         player->client->Lmd.lmdMenu.menuActive = qfalse;
@@ -3183,8 +3183,8 @@ const entityInfoData_t lmd_trainer_spawnflags[] = {
 };
 
 const entityInfoData_t lmd_trainer_keys[] = {
-    {"color1", "Movement speed.  Default 100."},
-    {"color2", "Damage to inflict when blocked."},
+    {"Color1", "Color code used for non selected items."},
+    {"Color2", "Color code used tor Instructions and Highlights."},
     {"targetname", "Triggered when."},
     {NULL, NULL}
 };
@@ -3197,7 +3197,9 @@ entityInfo_t lmd_trainer_info = {
 
 void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
 {
-    if (!activator || !activator->client) return;
+    if (!activator || !activator->client || !activator->client->pers.Lmd.account
+        || activator->client->Lmd.lmdMenu.entityNum != 0
+        || activator->client->ps.groundEntityNum == ENTITYNUM_NONE) return;
 
     activator->client->Lmd.lmdMenu.engageTime = level.time;
     activator->client->Lmd.lmdMenu.entityNum = self->s.number;
@@ -3228,8 +3230,8 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
 
 void lmd_trainer(gentity_t* self)
 {
-    G_SpawnString("color1", "^5", &self->Lmd.color);
-    G_SpawnString("color2", "^3", &self->Lmd.color);
+    G_SpawnString("color1", "^3", &self->Lmd.color);
+    G_SpawnString("color2", "^5", &self->Lmd.color2);
     self->use = lmd_trainer_use;
     self->classname = "lmd_trainer";
 }
@@ -3246,8 +3248,8 @@ void lmd_skillmenu_show(gentity_t* player, gentity_t* menu)
     int selectionIndex = 0;
     int skillCount = 0;
 
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^5";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^3";
+    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
+    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
 
@@ -3309,7 +3311,7 @@ void lmd_skillmenu_show(gentity_t* player, gentity_t* menu)
 
     Q_strcat(msg, sizeof(msg),
              va("%sAttack = Rank Up\n"
-                "%sAlt Attack = Rank Down\n", colorNormal, colorNormal)
+                "%sAlt Attack = Rank Down\n", colorHighlight, colorHighlight)
     );
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
@@ -3342,6 +3344,7 @@ void lmd_skillmenu_tryLevelChange(gentity_t* player, qboolean down)
             if (counter == selection)
             {
                 Cmd_SkillSelect_Level(player, PlayerAcc_Prof_GetProfession(player), &tree->subSkills.skill[s], down);
+                G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/movers/switches/switch1.mp3"));
                 return;
             }
             counter++;
@@ -3387,7 +3390,7 @@ void lmd_skillmenu_key(gentity_t* player, usercmd_t* cmd)
             player->client->Lmd.lmdMenu.skillIndex < totalSkills)
         {
             player->client->Lmd.lmdMenu.skillIndex--;
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/nav.wav"));
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
             updateMenu = qtrue;
         }
 
@@ -3404,7 +3407,7 @@ void lmd_skillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex < totalSkills - 1)
         {
             player->client->Lmd.lmdMenu.skillIndex++;
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/nav.wav"));
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingRight = qfalse;
@@ -3420,7 +3423,7 @@ void lmd_skillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex >= 2)
         {
             player->client->Lmd.lmdMenu.skillIndex -= 2;
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/nav.wav"));
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -3435,13 +3438,13 @@ void lmd_skillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex + 2 < totalItems)
         {
             player->client->Lmd.lmdMenu.skillIndex += 2;
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/nav.wav"));
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
             updateMenu = qtrue;
         }
         else
         {
-            player->client->Lmd.lmdMenu.skillIndex = totalItems - 1; // Jump to Exit
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/nav.wav"));
+            player->client->Lmd.lmdMenu.skillIndex = totalItems - 1;
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -3483,9 +3486,8 @@ void lmd_skillmenu_key(gentity_t* player, usercmd_t* cmd)
     {
         if (player->client->Lmd.lmdMenu.skillIndex == totalSkills)
         {
-            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/cancel.wav"));
+            G_Sound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
             lmd_menu_exit(player);
-            updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
     }

@@ -1065,6 +1065,12 @@ void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
 		return;
 	}
 
+	if (ent->client->ps.weaponTime > 0 || ent->client->ps.saberInFlight)
+	{
+		Disp(ent, "^3Can't use this while attacking!");
+		return;
+	}
+
 	if (lmd_set_saber_duels.integer == 0 && ent->client->ps.duelInProgress)
 	{
 		Disp(ent, "^3Can't use this in a duel!");

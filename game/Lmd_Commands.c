@@ -1056,6 +1056,7 @@ Lugormod
 ==================
 */
 extern void forceSaber(gentity_t *ent, char* saber1, char* saber2);
+extern vmCvar_t lmd_set_saber_duels;
 void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
 	char arg[2][64];
 	qboolean invalid = qfalse;
@@ -1064,9 +1065,22 @@ void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
 		return;
 	}
 
+	if (lmd_set_saber_duels.integer == 0 && ent->client->ps.duelInProgress)
+	{
+		Disp(ent, "^3Can't use this in a duel!");
+		return;
+	}
+
 	if (ent->client->Lmd.setSaber.delayTime >= level.time)
 	{
 		Disp(ent, "^3Already in use. Please wait!");
+		return;
+	}
+
+	if (ent->client->Lmd.setSaber.cooldownTime >= level.time)
+	{
+		const unsigned int remainingMs = ent->client->Lmd.setSaber.cooldownTime - level.time;
+		Disp(ent, va("^3On cooldown for ^5%d.%d ^3more seconds.", remainingMs / 1000, (remainingMs % 1000) / 100));
 		return;
 	}
 

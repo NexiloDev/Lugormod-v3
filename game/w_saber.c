@@ -8281,7 +8281,19 @@ void WP_SaberPositionUpdate( gentity_t *self, usercmd_t *ucmd )
 		}
 		else
 		{
-			self->client->ps.fd.saberDrawAnimLevel = self->client->ps.fd.saberAnimLevel;
+			if (self->client->ps.fd.saberAnimLevel == SS_DESANN)
+			{
+				self->client->ps.fd.saberDrawAnimLevel = SS_STRONG;
+			}
+			else if (self->client->ps.fd.saberAnimLevel == SS_TAVION)
+			{
+				self->client->ps.fd.saberDrawAnimLevel = SS_FAST;
+			}
+			else
+			{
+				self->client->ps.fd.saberDrawAnimLevel = self->client->ps.fd.saberAnimLevel;	
+			}
+			
 		}
 	}
 

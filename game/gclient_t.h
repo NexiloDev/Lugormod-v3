@@ -546,6 +546,27 @@ struct gclient_s {
 			qboolean openAgain;
 		} setSaber;
 		
+    struct 
+		{
+			int entityNum;
+			unsigned int selection;
+			qboolean stoppedPressingUsing;
+			qboolean stoppedPressingForward;
+			qboolean stoppedPressingBackward;
+			qboolean stoppedPressingLeft;
+			qboolean stoppedPressingRight;
+			qboolean stoppedPressingAttack;
+			qboolean stoppedPressingAltAttack;
+
+			int messageCharsVisible;
+			int choicesVisible;
+			int nextUpdateTime;
+			qboolean menuActive;
+			int treeIndex;
+			int skillIndex;
+			int lastServerTime;
+			unsigned int engageTime;
+		} lmdMenu;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

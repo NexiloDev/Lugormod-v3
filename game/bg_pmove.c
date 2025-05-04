@@ -12504,8 +12504,8 @@ void PmoveSingle (pmove_t *pmove) {
 			return;
 		}
 	}
-
-	if (pm->ps->pm_type == PM_FREEZE) {
+	
+	if (pm->ps->pm_type == PM_FREEZE && g_entities[pm->ps->clientNum].client->Lmd.lmdMenu.entityNum == 0) {
 		return;		// no movement at all
 	}
 
@@ -13056,13 +13056,21 @@ void Pmove (pmove_t *pmove) {
 	int i;
 	for (i = 0;i < 8;i++) {
 		if (pmove->ps->fd.forcePowerLevel[i] & 4) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS]|=(1 << i);
+			// Turn the "extra force bit" flag ON for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS] |= (1 << i);
+		} else {
+			// Turn the "extra force bit" flag OFF for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS] &= ~(1 << i);
 		}
 	}
 
 	for (i = 8;i < 16;i++) {
 		if (pmove->ps->fd.forcePowerLevel[i] & 4) {
-			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2]|=(1 << (i - 8));
+			// Turn the "extra force bit" flag ON for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2] |= (1 << (i - 8));
+		} else {
+			// Turn the "extra force bit" flag OFF for the "i" skill
+			pmove->ps->stats[STAT_EXTRA_FORCE_BITS2] &= ~(1 << (i - 8));
 		}
 	}
 
@@ -13087,6 +13095,13 @@ void Pmove (pmove_t *pmove) {
 		pmove->cmd.rightmove = 0;
 		pmove->cmd.upmove = 0;
 		pmove->cmd.buttons = 0;
+	}
+
+	if (g_entities[pmove->ps->clientNum].client && g_entities[pmove->ps->clientNum].client->Lmd.lmdMenu.entityNum != 0)
+	{
+		pmove->cmd.forwardmove = 0;
+		pmove->cmd.upmove = 0;
+		pmove->cmd.rightmove = 0;
 	}
 
 	pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount+1) & ((1<<PS_PMOVEFRAMECOUNTBITS)-1);

@@ -5647,6 +5647,9 @@ ContinueThink:
 							ent->client->Lmd.lmdMenu.lastServerTime = ent->client->pers.cmd.serverTime;
 							
 						}
+
+						ent->client->ps.weaponTime = FRAMETIME;
+						ent->client->ps.forceHandExtendTime = level.time + FRAMETIME;
 					}
 					else
 					{

@@ -542,6 +542,12 @@ struct gclient_s {
 
 		struct 
 		{
+			unsigned int delayTime;
+			qboolean openAgain;
+		} setSaber;
+		
+    struct 
+		{
 			int entityNum;
 			unsigned int selection;
 			qboolean stoppedPressingUsing;

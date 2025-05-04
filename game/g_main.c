@@ -393,6 +393,9 @@ vmCvar_t lmd_rewardcr_kill;
 vmCvar_t lmd_lightning_below_level_3_range;
 vmCvar_t lmd_drain_below_level_3_range;
 
+// lumaya: SetSaber enable use time
+vmCvar_t lmd_set_saber_delay;
+
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
 
@@ -608,12 +611,15 @@ static cvarTable_t		gameCvarTable[] = {
 		"Give a player credits for killing other players.  Does not work for killing NPCs.",
 	},
 
-{ &lmd_lightning_below_level_3_range, "lmd_lightning_below_level_3_range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	{ &lmd_lightning_below_level_3_range, "lmd_lightning_below_level_3_range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force lightning below level 3.",
-},
+	},
 	{ &lmd_drain_below_level_3_range, "lmd_drain_below_level_3_range", "512", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force drain below level 3.",
-},
+	},
+	{ &lmd_set_saber_delay, "lmd_set_saber_delay", "750", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"Set the delay for /setsaber for when to be able to use saber again after swapping.",
+	},
 	//====================================================================================================
 	//====================================================================================================
 

@@ -171,6 +171,15 @@ void Lmd_PlayerThink(gentity_t *ent){
 
 	updatePenalties(ent);
 	
+	if (ent->client->Lmd.setSaber.delayTime < level.time && ent->client->Lmd.setSaber.openAgain)
+	{
+		ent->client->Lmd.setSaber.openAgain = qfalse;
+		if (ent->health > 0 &&
+			ent->client->ps.weaponTime <= 0 &&
+			ent->client->ps.saberHolstered != 0 &&
+			ent->client->ps.weapon == WP_SABER) Cmd_ToggleSaber_f(ent);
+	}
+	
 	ent->client->Lmd.thinkDelay = level.time + FRAMETIME;
 }
 

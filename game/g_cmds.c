@@ -3146,6 +3146,8 @@ void Cmd_ToggleSaber_f(gentity_t *ent){
 	if (ent->client->ps.saberLockTime >= level.time)
 		return;
 
+	if (ent->client->Lmd.setSaber.delayTime >= level.time) return;
+
 	if (ent->client && (ent->client->ps.weaponTime < 1)){
 		if (ent->client->ps.saberHolstered == 2){
 			//Saber on

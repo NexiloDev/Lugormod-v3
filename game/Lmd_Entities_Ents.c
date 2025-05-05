@@ -270,11 +270,13 @@ qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
         (activatorProf <= PROF_BOT || !(self->Lmd.UseReq.profession & (1 << (activatorProf - 3))))))
         return qfalse;
 
-    const int sideAcc = Jedi_GetSide(activator);
+    
+   
     if (self->Lmd.UseReq.sideAcc > 0)
     {
-        if (activatorProf != PROF_JEDI)
-            return qfalse;
+        if (activatorProf != PROF_JEDI) return qfalse;
+        
+        const int sideAcc = Jedi_GetSide(activator);
 
         if (self->Lmd.UseReq.sideAcc != sideAcc)
             return qfalse;

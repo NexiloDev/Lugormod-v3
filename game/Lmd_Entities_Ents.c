@@ -277,9 +277,6 @@ qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
         if (activatorProf != PROF_JEDI) return qfalse;
         
         const int sideAcc = Jedi_GetSide(activator);
-        
-        if (activatorProf != PROF_JEDI)
-            return qfalse;
 
         if (self->Lmd.UseReq.sideAcc != sideAcc)
             return qfalse;

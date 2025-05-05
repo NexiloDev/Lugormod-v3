@@ -1085,8 +1085,9 @@ void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
 
 	if (ent->client->Lmd.setSaber.cooldownTime >= level.time)
 	{
-		const unsigned int remainingMs = ent->client->Lmd.setSaber.cooldownTime - level.time;
-		Disp(ent, va("^3On cooldown for ^5%d.%d ^3more seconds.", remainingMs / 1000, (remainingMs % 1000) / 100));
+		const float remaining = (float)(ent->client->Lmd.setSaber.cooldownTime - level.time) / 1000.0f;
+		Disp(ent, va("^3On cooldown for ^5%.1f ^3more seconds.", remaining));
+
 		return;
 	}
 

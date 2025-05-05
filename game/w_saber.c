@@ -297,6 +297,7 @@ void forceSaber(gentity_t *ent, char* saber1, char* saber2)
 	
 	ent->client->Lmd.setSaber.delayTime = level.time +  lmd_set_saber_delay.integer;
 	ent->client->ps.weaponTime = lmd_set_saber_delay.integer;
+	ent->client->Lmd.setSaber.newRequest = qtrue;
 }
 
 void WP_DeactivateSaber( gentity_t *self, qboolean clearLength )

@@ -172,7 +172,7 @@ void Lmd_PlayerThink(gentity_t *ent){
 
 	updatePenalties(ent);
 	
-	if (ent->client->Lmd.setSaber.delayTime < level.time)
+	if (ent->client->Lmd.setSaber.delayTime < level.time && ent->client->Lmd.setSaber.newRequest)
 	{
 		if (ent->client->Lmd.setSaber.openAgain)
 		{
@@ -184,6 +184,7 @@ void Lmd_PlayerThink(gentity_t *ent){
 		}
 
 		ent->client->Lmd.setSaber.cooldownTime = lmd_set_saber_cooldown.integer + level.time;
+		ent->client->Lmd.setSaber.newRequest = qfalse;
 	}
 	
 	ent->client->Lmd.thinkDelay = level.time + FRAMETIME;

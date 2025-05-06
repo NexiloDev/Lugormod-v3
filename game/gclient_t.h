@@ -566,6 +566,7 @@ struct gclient_s {
 			int skillIndex;
 			int lastServerTime;
 			unsigned int engageTime;
+    		int trainerMenuMode;
 		} lmdMenu;
 	}Lmd;
 	unsigned int lastTargetUse;

@@ -880,13 +880,13 @@ void Cmd_SkillSelect_f(gentity_t *ent, int iArg){
 	Disp(ent, "^4===========================================");
 }
 
-void Cmd_ResetSkills_f (gentity_t *ent, int iArg){
+void Cmd_ResetSkills_f (gentity_t *ent, int iArg) {
 	Account_t *acc = ent->client->pers.Lmd.account;
-	int credits = 0;
-	int myCredits = PlayerAcc_GetCredits(ent);
+	// int credits = 0;
+	// int myCredits = PlayerAcc_GetCredits(ent);
 	int prof = PlayerAcc_Prof_GetProfession(ent);
 	int used;
-	
+    
 	if (!acc) {
 		return;
 	}
@@ -898,26 +898,35 @@ void Cmd_ResetSkills_f (gentity_t *ent, int iArg){
 		return;
 	}
 
+	// Credit cost system has been disabled, since we can downrank skills for free
+	/*
 	if (trap_Argc() > 1) {
-		credits = atoi(ConcatArgs(1));
+	   credits = atoi(ConcatArgs(1));
 	}
 	if (myCredits < credits) {
-		credits = myCredits;
+	   credits = myCredits;
 	}
 
 	if(used == 0) {
-		Disp(ent, "^3All your skills are already at their lowest level.");
-		return;
+	   Disp(ent, "^3All your skills are already at their lowest level.");
+	   return;
 	}
 
 	int cost = used * 200;
 
 	if (credits < cost) {
-		Disp(ent,va("^3The cost to reset your skills is ^2CR %i^3.", cost));
-		return;
+	   Disp(ent,va("^3The cost to reset your skills is ^2CR %i^3.", cost));
+	   return;
 	}
 
 	PlayerAcc_SetCredits(ent, myCredits - cost);
+	*/
+	
+	if(used == 0) {
+		Disp(ent, "^3All your skills are already at their lowest level.");
+		return;
+	}
+	
 	Accounts_Prof_ClearData(ent->client->pers.Lmd.account);
 	Professions_SetDefaultSkills(ent->client->pers.Lmd.account, prof);
 	Profession_UpdateSkillEffects(ent, prof);

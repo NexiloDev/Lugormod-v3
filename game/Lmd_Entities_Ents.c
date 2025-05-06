@@ -3186,10 +3186,12 @@ const entityInfoData_t lmd_trainer_spawnflags[] = {
 };
 
 const entityInfoData_t lmd_trainer_keys[] = {
-    {"Color1", "Color code used for non selected items."},
-    {"Color2", "Color code used for Instructions and Highlights."},
+    {"Color1", "Color code used for Instructions and Highlights."},
+    {"Color2", "Color code used for non selected items."},
     {"message", "Custom message displayed on the main menu screen."},
-    {"targetname", "Triggered when."},
+    {"targetname", "Activate the lmd_trainer when targetted."},
+    {"prof", "Professions this trainer handles (0 = all, 1 = Jedi, 2 = Merc)"},
+    {"sideAcc", "Force sides this trainer handles (0 = all, 1 = light, 2 = dark). Only matters if prof = 1."},
     {NULL, NULL}
 };
 
@@ -3200,7 +3202,6 @@ entityInfo_t lmd_trainer_info = {
 };
 
 void lmd_menu_exit(gentity_t* player);
-void lmd_skillmenu_show(gentity_t* player, gentity_t* menu);
 void lmd_filteredskillmenu_show(gentity_t* player, gentity_t* menu, int filterMode);
 void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator);
 extern profession_t *Professions[];
@@ -3210,6 +3211,11 @@ void lmd_trainer(gentity_t* self)
     G_SpawnString("color1", "^3", &self->Lmd.color);
     G_SpawnString("color2", "^5", &self->Lmd.color2);
     G_SpawnString("message", "Welcome to the Skills Trainer", &self->message);
+    
+    // Initialize new fields with defaults
+    G_SpawnInt("prof", "0", &self->Lmd.prof);
+    G_SpawnInt("sideAcc", "0", &self->Lmd.sideAcc);
+    
     self->use = lmd_trainer_use;
     self->classname = "lmd_trainer";
 }
@@ -3220,6 +3226,54 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
         || activator->client->Lmd.lmdMenu.entityNum != 0
         || activator->client->ps.groundEntityNum == ENTITYNUM_NONE) return;
 
+    // Check if player has chosen a profession
+    int playerProf = PlayerAcc_Prof_GetProfession(activator);
+    if (playerProf == PROF_NONE) {
+        // No profession, show profession selection menu
+        activator->client->Lmd.lmdMenu.engageTime = level.time;
+        activator->client->Lmd.lmdMenu.entityNum = self->s.number;
+        activator->client->Lmd.lmdMenu.selection = 0;
+        activator->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+        activator->client->Lmd.lmdMenu.menuActive = qtrue;
+        activator->client->Lmd.lmdMenu.nextUpdateTime = level.time;
+        activator->client->Lmd.lmdMenu.trainerMenuMode = 9; // New mode for profession selection
+        
+        activator->flags |= FL_GODMODE;
+        for (int j = 0; j < 2; j++) {
+            activator->client->ps.velocity[j] = 0.0f;
+        }
+        
+        G_SetAnim(activator, SETANIM_BOTH, BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+        return;
+    }
+    
+    if (self->Lmd.prof != 0) {
+        if (self->Lmd.prof == 1 && playerProf != PROF_JEDI) {
+            trap_SendServerCommand(activator->s.number, va("cp \"^3This trainer only trains Force Users.\""));
+            return;
+        }
+        else if (self->Lmd.prof == 2 && playerProf != PROF_MERC) {
+            trap_SendServerCommand(activator->s.number, va("cp \"^3This trainer only trains Mercenaries.\""));
+            return;
+        }
+    }
+    
+    if (playerProf == PROF_JEDI && self->Lmd.sideAcc != 0) {
+        int playerSide = Jedi_GetSide(activator);
+        
+        // Only check side if player has actually chosen one
+        if (playerSide != 0) {  // If they have a side
+            if (self->Lmd.sideAcc == 1 && playerSide != FORCE_LIGHTSIDE) {
+                trap_SendServerCommand(activator->s.number, va("cp \"^3This trainer only trains Jedi.\""));
+                return;
+            }
+            else if (self->Lmd.sideAcc == 2 && playerSide != FORCE_DARKSIDE) {
+                trap_SendServerCommand(activator->s.number, va("cp \"^3This trainer only trains Sith.\""));
+                return;
+            }
+        }
+    }
+    
     activator->client->Lmd.lmdMenu.engageTime = level.time;
     activator->client->Lmd.lmdMenu.entityNum = self->s.number;
     activator->client->Lmd.lmdMenu.selection = 0;
@@ -3247,6 +3301,165 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
     G_SetAnim(activator, SETANIM_BOTH, BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
 }
 
+void lmd_profselectionmenu_show(gentity_t* player, gentity_t* menu)
+{
+    if (!player || !player->client || !menu || !player->client->pers.Lmd.account)
+        return;
+
+    char msg[MAX_STRING_CHARS] = "\0";
+    
+    // INVERTED: color1 now used for highlights, color2 now used for normal text
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
+    
+    Q_strcat(msg, sizeof(msg), va("%sChoose Your Profession\n\n", colorHighlight));
+    
+    // Count available profession options
+    int profOptions = 0;
+    
+    // Only show professions that this trainer can train
+    if (menu->Lmd.prof == 0 || menu->Lmd.prof == 1) {
+        Q_strcat(msg, sizeof(msg), va("%s%sForce User\n", 
+            (player->client->Lmd.lmdMenu.selection == 0) ? colorHighlight : colorNormal,
+            (player->client->Lmd.lmdMenu.selection == 0) ? ">" : " "));
+        profOptions++;
+    }
+    
+    if (menu->Lmd.prof == 0 || menu->Lmd.prof == 2) {
+        int mercOption = (menu->Lmd.prof == 0) ? 1 : 0;
+        Q_strcat(msg, sizeof(msg), va("%s%sMercenary\n", 
+            (player->client->Lmd.lmdMenu.selection == mercOption) ? colorHighlight : colorNormal,
+            (player->client->Lmd.lmdMenu.selection == mercOption) ? ">" : " "));
+        profOptions++;
+    }
+    
+    Q_strcat(msg, sizeof(msg), va("%s%sExit\n", 
+        (player->client->Lmd.lmdMenu.selection == profOptions) ? colorHighlight : colorNormal,
+        (player->client->Lmd.lmdMenu.selection == profOptions) ? ">" : " "));
+    
+    Q_strcat(msg, sizeof(msg), va("\n%sYou must choose a profession.\n", colorNormal));
+    Q_strcat(msg, sizeof(msg), va("%sThis choice will determine your abilities.\n\n", colorNormal));
+    
+    Q_strcat(msg, sizeof(msg),
+        va("%sUse up/down to navigate\n"
+           "%sPress Use to select an option\n", colorHighlight, colorHighlight)
+    );
+    
+    trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
+}
+
+void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd)
+{
+    if (!player || !player->client || !player->client->pers.Lmd.account)
+        return;
+    
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
+        return;
+    
+    // Count available profession options
+    int profOptions = 0;
+    if (menu->Lmd.prof == 0) {
+        profOptions = 2; // Both professions
+    } else {
+        profOptions = 1; // One profession
+    }
+    
+    // Add 1 for the Cancel option
+    int totalOptions = profOptions + 1;
+    
+    qboolean up = cmd->forwardmove > 0;
+    qboolean down = cmd->forwardmove < 0;
+    qboolean updateMenu = qfalse;
+    
+    // Navigation with wrap-around
+    if (up && player->client->Lmd.lmdMenu.stoppedPressingForward)
+    {
+        if (player->client->Lmd.lmdMenu.selection > 0)
+        {
+            player->client->Lmd.lmdMenu.selection--;
+        }
+        else
+        {
+            // Wrap to bottom
+            player->client->Lmd.lmdMenu.selection = totalOptions - 1;
+        }
+        G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+        updateMenu = qtrue;
+        player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
+    }
+    else if (!up)
+    {
+        player->client->Lmd.lmdMenu.stoppedPressingForward = qtrue;
+    }
+
+    if (down && player->client->Lmd.lmdMenu.stoppedPressingBackward)
+    {
+        if (player->client->Lmd.lmdMenu.selection < totalOptions - 1)
+        {
+            player->client->Lmd.lmdMenu.selection++;
+        }
+        else
+        {
+            // Wrap to top
+            player->client->Lmd.lmdMenu.selection = 0;
+        }
+        G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+        updateMenu = qtrue;
+        player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
+    }
+    else if (!down)
+    {
+        player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
+    }
+    
+    // Handle selection
+    if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
+    {
+        // Check if Exit option was selected (last option)
+        if (player->client->Lmd.lmdMenu.selection == profOptions) {
+            // Exit selected
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            lmd_menu_exit(player);
+            trap_SendServerCommand(player->s.number, "cp \" \"");
+            return;
+        }
+        
+        int selectedProf = PROF_NONE;
+        
+        if (menu->Lmd.prof == 0) {
+            if (player->client->Lmd.lmdMenu.selection == 0) {
+                selectedProf = PROF_JEDI;
+            } else {
+                selectedProf = PROF_MERC;
+            }
+        } else {
+            if (menu->Lmd.prof == 1)
+                selectedProf = PROF_JEDI;
+            else if (menu->Lmd.prof == 2)
+                selectedProf = PROF_MERC;
+        }
+        
+        if (selectedProf != PROF_NONE) {
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/button1.mp3"));
+            Professions_ChooseProf(player, selectedProf);
+        }
+        
+        player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+        updateMenu = qtrue;
+    }
+    else if (!(cmd->buttons & BUTTON_USE))
+    {
+        player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
+    }
+
+    if (updateMenu)
+    {
+        player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
+    }
+}
+
+
 typedef struct {
     int currentLevel;
     int newLevel;
@@ -3261,8 +3474,8 @@ void lmd_levelupmenu_show(gentity_t* player, gentity_t* menu)
 
     char msg[MAX_STRING_CHARS] = "\0";
     
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
     
     int prof = PlayerAcc_Prof_GetProfession(player);
     int playerLevel = PlayerAcc_Prof_GetLevel(player);
@@ -3303,7 +3516,6 @@ void lmd_levelupmenu_show(gentity_t* player, gentity_t* menu)
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
 
-// Handle key input for level up menu
 void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
@@ -3364,9 +3576,10 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
                 PlayerAcc_Prof_SetLevel(player, playerLevel + 1);
                 trap_SendServerCommand(player->s.number, va("print \"^3You are now at level ^2%i^3.\n\"", playerLevel + 1));
                 WP_InitForcePowers(player);
-                
-                player->client->Lmd.lmdMenu.trainerMenuMode = 0;
-                player->client->Lmd.lmdMenu.selection = 0;
+
+                // lumaya: we are staying here, for now
+                //player->client->Lmd.lmdMenu.trainerMenuMode = 0;
+                //player->client->Lmd.lmdMenu.selection = 0;
             } else {
                 G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
                 player->client->Lmd.lmdMenu.trainerMenuMode = 0;
@@ -3394,23 +3607,20 @@ void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
 
     char msg[MAX_STRING_CHARS] = "\0";
     
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
     const char* menuMessage = (menu->message && *menu->message) ? menu->message : "Welcome to the Skills Trainer";
     const int prof = PlayerAcc_Prof_GetProfession(player);
-    const int sideAcc = Jedi_GetSide(player);
-
-    // Display the custom message
+    int sideAcc = -1;
+    
     Q_strcat(msg, sizeof(msg), va("%s%s\n\n", colorHighlight, menuMessage));
     
-    // Level Up - available to everyone
     Q_strcat(msg, sizeof(msg), va("%s%sLevel Up\n", 
         (player->client->Lmd.lmdMenu.selection == 0) ? colorHighlight : colorNormal,
         (player->client->Lmd.lmdMenu.selection == 0) ? ">" : " "));
     
     int currentOption = 1;
     
-    // Add profession-specific options
     if (prof == PROF_MERC)
     {
         Q_strcat(msg, sizeof(msg), va("%s%sMercenary Skills\n", 
@@ -3420,23 +3630,21 @@ void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
     }
     else if (prof == PROF_JEDI)
     {
-        // Neutral skills for Jedi profession (always)
+        sideAcc = Jedi_GetSide(player);
         Q_strcat(msg, sizeof(msg), va("%s%sNeutral Skills\n", 
             (player->client->Lmd.lmdMenu.selection == currentOption) ? colorHighlight : colorNormal,
             (player->client->Lmd.lmdMenu.selection == currentOption) ? ">" : " "));
         currentOption++;
-
-        // Jedi skills for lightside or neutral (sideAcc == 0)
-        if (sideAcc == FORCE_LIGHTSIDE || sideAcc == 0)
+        
+        if (sideAcc == FORCE_LIGHTSIDE || (sideAcc == 0 && menu->Lmd.sideAcc == FORCE_LIGHTSIDE) || (sideAcc == 0 && menu->Lmd.sideAcc == 0))
         {
             Q_strcat(msg, sizeof(msg), va("%s%sJedi Skills\n", 
                 (player->client->Lmd.lmdMenu.selection == currentOption) ? colorHighlight : colorNormal,
                 (player->client->Lmd.lmdMenu.selection == currentOption) ? ">" : " "));
             currentOption++;
         }
-
-        // Sith skills for darkside or neutral (sideAcc == 0)
-        if (sideAcc == FORCE_DARKSIDE || sideAcc == 0)
+        
+        if (sideAcc == FORCE_DARKSIDE || (sideAcc == 0 && menu->Lmd.sideAcc == FORCE_DARKSIDE) || (sideAcc == 0 && menu->Lmd.sideAcc == 0))
         {
             Q_strcat(msg, sizeof(msg), va("%s%sSith Skills\n", 
                 (player->client->Lmd.lmdMenu.selection == currentOption) ? colorHighlight : colorNormal,
@@ -3445,18 +3653,26 @@ void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
         }
     }
     
-    // Reset Skills - available to everyone
     Q_strcat(msg, sizeof(msg), va("%s%sReset Skills\n", 
         (player->client->Lmd.lmdMenu.selection == currentOption) ? colorHighlight : colorNormal,
         (player->client->Lmd.lmdMenu.selection == currentOption) ? ">" : " "));
     currentOption++;
     
-    // Exit - available to everyone
+    if (prof == PROF_MERC) {
+        Q_strcat(msg, sizeof(msg), va("%s%sSwap to Force User\n", 
+            (player->client->Lmd.lmdMenu.selection == currentOption) ? colorHighlight : colorNormal,
+            (player->client->Lmd.lmdMenu.selection == currentOption) ? ">" : " "));
+    } else if (prof == PROF_JEDI) {
+        Q_strcat(msg, sizeof(msg), va("%s%sSwap to Mercenary\n", 
+            (player->client->Lmd.lmdMenu.selection == currentOption) ? colorHighlight : colorNormal,
+            (player->client->Lmd.lmdMenu.selection == currentOption) ? ">" : " "));
+    }
+    currentOption++;
+    
     Q_strcat(msg, sizeof(msg), va("%s%sExit\n\n", 
         (player->client->Lmd.lmdMenu.selection == currentOption) ? colorHighlight : colorNormal,
         (player->client->Lmd.lmdMenu.selection == currentOption) ? ">" : " "));
     
-    // Add instructions
     Q_strcat(msg, sizeof(msg),
         va("%sUse up/down to navigate\n"
            "%sPress Use to select an option\n", colorHighlight, colorHighlight)
@@ -3465,38 +3681,149 @@ void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
 
+void lmd_swapprofmenu_show(gentity_t* player, gentity_t* menu)
+{
+    if (!player || !player->client || !menu || !player->client->pers.Lmd.account)
+        return;
+
+    char msg[MAX_STRING_CHARS] = "\0";
+    
+    // INVERTED: color1 now used for highlights, color2 now used for normal text
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
+    
+    int prof = PlayerAcc_Prof_GetProfession(player);
+    int targetProf = (prof == PROF_MERC) ? PROF_JEDI : PROF_MERC;
+    
+    Q_strcat(msg, sizeof(msg), va("%sSwap Profession Confirmation\n", colorHighlight));
+    Q_strcat(msg, sizeof(msg), va("^1WARNING: YOU WILL LOSE ALL GAINED LEVELS\n\n"));
+    
+    Q_strcat(msg, sizeof(msg), va("%sSwap from %s to %s?\n\n", 
+                                colorNormal, 
+                                Professions[prof]->name, 
+                                Professions[targetProf]->name));
+
+    Q_strcat(msg, sizeof(msg), va("%s%sYes\n", 
+        (player->client->Lmd.lmdMenu.selection == 0) ? colorHighlight : colorNormal,
+        (player->client->Lmd.lmdMenu.selection == 0) ? ">" : " "));
+        
+    Q_strcat(msg, sizeof(msg), va("%s%sNo\n\n", 
+        (player->client->Lmd.lmdMenu.selection == 1) ? colorHighlight : colorNormal,
+        (player->client->Lmd.lmdMenu.selection == 1) ? ">" : " "));
+    
+    Q_strcat(msg, sizeof(msg), va("%sUse up/down to navigate\n%sPress Use to select\n", 
+                                colorHighlight, colorHighlight));
+    
+    trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
+}
+
+void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
+{
+    if (!player || !player->client || !player->client->pers.Lmd.account)
+        return;
+        
+    int prof = PlayerAcc_Prof_GetProfession(player);
+    int targetProf = (prof == PROF_MERC) ? PROF_JEDI : PROF_MERC;
+    int totalOptions = 2; // Yes/No
+    
+    qboolean up = cmd->forwardmove > 0;
+    qboolean down = cmd->forwardmove < 0;
+    qboolean updateMenu = qfalse;
+    
+    // Handle navigation
+    if (up && player->client->Lmd.lmdMenu.stoppedPressingForward)
+    {
+        if (player->client->Lmd.lmdMenu.selection > 0)
+        {
+            player->client->Lmd.lmdMenu.selection--;
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            updateMenu = qtrue;
+        }
+        player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
+    }
+    else if (!up)
+    {
+        player->client->Lmd.lmdMenu.stoppedPressingForward = qtrue;
+    }
+
+    if (down && player->client->Lmd.lmdMenu.stoppedPressingBackward)
+    {
+        if (player->client->Lmd.lmdMenu.selection < totalOptions - 1)
+        {
+            player->client->Lmd.lmdMenu.selection++;
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            updateMenu = qtrue;
+        }
+        player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
+    }
+    else if (!down)
+    {
+        player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
+    }
+    
+    // Handle selection
+    if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
+    {
+        if (player->client->Lmd.lmdMenu.selection == 0) {
+            // "Yes" - swap profession
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/button1.mp3"));
+            
+            // Use the function provided to swap professions
+            Professions_ChooseProf(player, targetProf);
+            
+            // Return to main menu
+            player->client->Lmd.lmdMenu.trainerMenuMode = 0;
+            player->client->Lmd.lmdMenu.selection = 0;
+        } else {
+            // "No" - cancel
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            // Return to main menu
+            player->client->Lmd.lmdMenu.trainerMenuMode = 0;
+            player->client->Lmd.lmdMenu.selection = 0;
+        }
+        
+        player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+        updateMenu = qtrue;
+    }
+    else if (!(cmd->buttons & BUTTON_USE))
+    {
+        player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
+    }
+    
+    if (updateMenu)
+    {
+        player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
+    }
+}
+
 extern void Cmd_SkillSelect_Level(gentity_t* ent, int prof, profSkill_t* skill, qboolean down);
 extern int Professions_AvailableSkillPoints(Account_t *acc, int prof, profSkill_t *skill, profSkill_t **parent);
 void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
 {
-    // Add enhanced validation
     if (!player || !player->client || !menu || !menu->inuse || !player->client->pers.Lmd.account)
         return;
 
     char msg[MAX_STRING_CHARS] = "\0";
     int selectionIndex = 0;
     int skillCount = 0;
-
-    // CRITICAL: Add safer default values and null checks for color pointers
-    const char* colorNormal = "^3";  // Default first
-    if (menu->Lmd.color && menu->Lmd.color[0] != '\0') {
-        colorNormal = menu->Lmd.color;
-    }
     
-    const char* colorHighlight = "^5";  // Default first
+    const char* colorNormal = "^5";
     if (menu->Lmd.color2 && menu->Lmd.color2[0] != '\0') {
-        colorHighlight = menu->Lmd.color2;
+        colorNormal = menu->Lmd.color2;
+    }
+
+    const char* colorHighlight = "^3"; 
+    if (menu->Lmd.color && menu->Lmd.color[0] != '\0') {
+        colorHighlight = menu->Lmd.color;
     }
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
 
-    // Header with available skill points
-    Q_strcat(msg, sizeof(msg), va("%sSkills for Mercenary\n\n", colorHighlight));
-
-    // Directly list all Mercenary skills (no subcategories)
+    // lumaya: nope
+    //Q_strcat(msg, sizeof(msg), va("%sSkills for Mercenary\n\n", colorHighlight));
+    
     if (root->subSkills.count > 0 && root->subSkills.skill)
     {
-        // Display all mercenary skills directly
         for (int s = 0; s < root->subSkills.count; s++)
         {
             profSkill_t* skill = &root->subSkills.skill[s];
@@ -3507,7 +3834,7 @@ void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
             int levelp = (skill->getValue) ? skill->getValue(player->client->pers.Lmd.account, skill) : 0;
             int max = skill->levels.max;
 
-            Q_strcat(msg, sizeof(msg), va("%s%s%s (%d out of %d)\n",
+            Q_strcat(msg, sizeof(msg), va("%s%s%s %d/%d\n",
                                        color,
                                        selected ? ">" : " ",
                                        skillName,
@@ -3523,8 +3850,7 @@ void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
     Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
     
     Q_strcat(msg, sizeof(msg),
-        va("%sAttack = Rank Up\n"
-           "%sAlt Attack = Rank Down\n", colorHighlight, colorHighlight)
+        va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
 );
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
@@ -3572,14 +3898,12 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
     {
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
     }
-
-    // Handle skill level changes
+    
     if (cmd->buttons & BUTTON_ATTACK)
     {
         if (player->client->Lmd.lmdMenu.stoppedPressingAttack && 
             player->client->Lmd.lmdMenu.skillIndex < totalSkills)
         {
-            // Level up directly without subcategories
             if (player->client->Lmd.lmdMenu.skillIndex < root->subSkills.count)
             {
                 profSkill_t* skill = &root->subSkills.skill[player->client->Lmd.lmdMenu.skillIndex];
@@ -3600,7 +3924,6 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.stoppedPressingAltAttack && 
             player->client->Lmd.lmdMenu.skillIndex < totalSkills)
         {
-            // Level down directly without subcategories
             if (player->client->Lmd.lmdMenu.skillIndex < root->subSkills.count)
             {
                 profSkill_t* skill = &root->subSkills.skill[player->client->Lmd.lmdMenu.skillIndex];
@@ -3647,46 +3970,54 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
     int totalOptions = 1;
     int currentOption = 1;
     
-    // Track option indexes
     int neutralOption = -1;
     int mercOption = -1;
     int jediOption = -1;
     int sithOption = -1;
+    int swapProfOption = -1;
     int resetOption = -1;
     int exitOption = -1;
     
     const int prof = PlayerAcc_Prof_GetProfession(player);
-    const int sideAcc = Jedi_GetSide(player);
+    int sideAcc = -1;
     
     if (prof == PROF_MERC) {
         mercOption = currentOption++;
         totalOptions++;
     }
     else if (prof == PROF_JEDI) {
+        sideAcc = Jedi_GetSide(player);
         neutralOption = currentOption++;
         totalOptions++;
         
-        if (sideAcc == FORCE_LIGHTSIDE || sideAcc == 0) {
+        if (sideAcc == FORCE_LIGHTSIDE || (sideAcc == 0 && g_entities[player->client->Lmd.lmdMenu.entityNum].Lmd.sideAcc == FORCE_LIGHTSIDE) || (sideAcc == 0 && g_entities[player->client->Lmd.lmdMenu.entityNum].Lmd.sideAcc == 0))
+        {
             jediOption = currentOption++;
             totalOptions++;
         }
         
-        if (sideAcc == FORCE_DARKSIDE || sideAcc == 0) {
+        if (sideAcc == FORCE_DARKSIDE || (sideAcc == 0 && g_entities[player->client->Lmd.lmdMenu.entityNum].Lmd.sideAcc == FORCE_DARKSIDE) || (sideAcc == 0 && g_entities[player->client->Lmd.lmdMenu.entityNum].Lmd.sideAcc == 0))
+        {
             sithOption = currentOption++;
             totalOptions++;
         }
     }
     
-    // Reset Skills and Exit are available to everyone
+    // Reset option first
     resetOption = currentOption++;
+    totalOptions++;
+
+    // Add swap profession option second
+    swapProfOption = currentOption++;
+    totalOptions++;
+
     exitOption = currentOption;
     totalOptions += 2;
     
     qboolean up = cmd->forwardmove > 0;
     qboolean down = cmd->forwardmove < 0;
     qboolean updateMenu = qfalse;
-
-    // Handle navigation
+    
     if (up && player->client->Lmd.lmdMenu.stoppedPressingForward)
     {
         if (player->client->Lmd.lmdMenu.selection > 0)
@@ -3755,8 +4086,14 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
             }
         }
         
+        // Swap Profession
+        if (player->client->Lmd.lmdMenu.selection == swapProfOption) {
+            player->client->Lmd.lmdMenu.selection = 0; 
+            player->client->Lmd.lmdMenu.trainerMenuMode = 8; // Swap profession menu (new menu mode)
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/button1.mp3"));
+        }
         // Reset Skills (available to everyone)
-        if (player->client->Lmd.lmdMenu.selection == resetOption) {
+        else if (player->client->Lmd.lmdMenu.selection == resetOption) {
             player->client->Lmd.lmdMenu.selection = 0; 
             player->client->Lmd.lmdMenu.trainerMenuMode = 7; // Reset skills menu
             G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/button1.mp3"));
@@ -3782,7 +4119,6 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
     }
 }
 
-// Show specific Jedi skills menu
 void lmd_jediskillmenu_show(gentity_t* player, gentity_t* menu)
 {
     if (!player || !player->client || !menu || !player->client->pers.Lmd.account)
@@ -3792,27 +4128,24 @@ void lmd_jediskillmenu_show(gentity_t* player, gentity_t* menu)
     int selectionIndex = 0;
     int skillCount = 0;
 
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
 
-    Q_strcat(msg, sizeof(msg), va("%sJedi Skills Menu\n\n", colorHighlight));
+    // lumaya: nope
+    //Q_strcat(msg, sizeof(msg), va("%sJedi Skills Menu\n\n", colorHighlight));
 
     for (int t = 0; t < root->subSkills.count; t++)
     {
         profSkill_t* tree = &root->subSkills.skill[t];
         const char* treeName = tree->name ? tree->name : "Unknown";
-
-        // Only show Jedi skills
+        
         if (Q_stricmp(treeName, "Jedi") != 0)
             continue;
 
-        Q_strcat(msg, sizeof(msg), va("\n%s%s:\n", "^4", treeName));
-
         if (tree->subSkills.count > 0 && tree->subSkills.skill)
         {
-            // Show one skill per line
             for (int s = 0; s < tree->subSkills.count; s++)
             {
                 profSkill_t* skill = &tree->subSkills.skill[s];
@@ -3840,14 +4173,12 @@ void lmd_jediskillmenu_show(gentity_t* player, gentity_t* menu)
     Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
 
     Q_strcat(msg, sizeof(msg),
-            va("%sAttack = Rank Up\n"
-               "%sAlt Attack = Rank Down\n", colorHighlight, colorHighlight)
+            va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
     );
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
 
-// Show specific Sith skills menu
 void lmd_sithskillmenu_show(gentity_t* player, gentity_t* menu)
 {
     if (!player || !player->client || !menu || !player->client->pers.Lmd.account)
@@ -3856,28 +4187,25 @@ void lmd_sithskillmenu_show(gentity_t* player, gentity_t* menu)
     char msg[MAX_STRING_CHARS] = "\0";
     int selectionIndex = 0;
     int skillCount = 0;
-
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
 
-    Q_strcat(msg, sizeof(msg), va("%sSith Skills Menu\n\n", colorHighlight));
+    // lumaya: nope
+    //Q_strcat(msg, sizeof(msg), va("%sSith Skills Menu\n\n", colorHighlight));
 
     for (int t = 0; t < root->subSkills.count; t++)
     {
         profSkill_t* tree = &root->subSkills.skill[t];
         const char* treeName = tree->name ? tree->name : "Unknown";
-
-        // Only show Sith skills
+        
         if (Q_stricmp(treeName, "Sith") != 0)
             continue;
 
-        Q_strcat(msg, sizeof(msg), va("\n%s%s:\n", "^1", treeName));
-
         if (tree->subSkills.count > 0 && tree->subSkills.skill)
         {
-            // Show one skill per line
             for (int s = 0; s < tree->subSkills.count; s++)
             {
                 profSkill_t* skill = &tree->subSkills.skill[s];
@@ -3905,8 +4233,7 @@ void lmd_sithskillmenu_show(gentity_t* player, gentity_t* menu)
     Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
 
     Q_strcat(msg, sizeof(msg),
-            va("%sAttack = Rank Up\n"
-               "%sAlt Attack = Rank Down\n", colorHighlight, colorHighlight)
+            va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
     );
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
@@ -3927,11 +4254,11 @@ void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd)
         profSkill_t* tree = &root->subSkills.skill[t];
         const char* treeName = tree->name ? tree->name : "Unknown";
 
-        if (player->client->Lmd.lmdMenu.trainerMenuMode == 3) { // Jedi skills
+        if (player->client->Lmd.lmdMenu.trainerMenuMode == 3) {
             if (Q_stricmp(treeName, "Jedi") != 0) {
                 continue;
             }
-        } else if (player->client->Lmd.lmdMenu.trainerMenuMode == 4) { // Sith skills
+        } else if (player->client->Lmd.lmdMenu.trainerMenuMode == 4) {
             if (Q_stricmp(treeName, "Sith") != 0) {
                 continue;
             }
@@ -4008,7 +4335,6 @@ void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex == totalSkills)
         {
             G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
-            // Go back to main menu
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
             updateMenu = qtrue;
@@ -4034,68 +4360,27 @@ void lmd_filteredskillmenu_show(gentity_t* player, gentity_t* menu, int filterMo
     char msg[MAX_STRING_CHARS] = "\0";
     int selectionIndex = 0;
     int skillCount = 0;
-
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^3";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^5";
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
-
-    // Add header based on filter mode
-    switch (filterMode) {
-        case 2: // Neutral skills
-            Q_strcat(msg, sizeof(msg), va("%sNeutral Skills Menu\n\n", colorHighlight));
-            break;
-        case 3: // Force skills (Jedi/Sith)
-            if (Jedi_GetSide(player) == FORCE_LIGHTSIDE) {
-                Q_strcat(msg, sizeof(msg), va("%sJedi Skills Menu\n\n", colorHighlight));
-            } else {
-                Q_strcat(msg, sizeof(msg), va("%sSith Skills Menu\n\n", colorHighlight));
-            }
-            break;
-        default: // All skills
-            Q_strcat(msg, sizeof(msg), va("%sSkills Menu\n\n", colorHighlight));
-            break;
-    }
 
     for (int t = 0; t < root->subSkills.count; t++)
     {
         profSkill_t* tree = &root->subSkills.skill[t];
         const char* treeName = tree->name ? tree->name : "Unknown";
-
-        // Apply filters based on menu mode
-        if (filterMode == 2) { // Neutral skills
+        
+        if (filterMode == 2) {
             if (!Q_stricmp(treeName, "Saber") || 
                 !Q_stricmp(treeName, "Jedi") || 
                 !Q_stricmp(treeName, "Sith")) {
                 continue;
             }
-        } else if (filterMode == 3) { // Force skills
-            if (Jedi_GetSide(player) == FORCE_LIGHTSIDE) {
-                if (Q_stricmp(treeName, "Jedi") != 0) {
-                    continue;
-                }
-            } else if (Jedi_GetSide(player) == FORCE_DARKSIDE) {
-                if (Q_stricmp(treeName, "Sith") != 0) {
-                    continue;
-                }
-            }
-        } else {
-            // Standard filter from original code
-            if (!Q_stricmp(treeName, "Saber") ||
-                (Jedi_GetSide(player) == FORCE_LIGHTSIDE && !Q_stricmp(treeName, "Sith")) ||
-                (Jedi_GetSide(player) == FORCE_DARKSIDE && !Q_stricmp(treeName, "Jedi")))
-            {
-                continue;
-            }
         }
-
-        Q_strcat(msg, sizeof(msg), va("\n%s%s:\n",
-                                     !Q_stricmp(treeName, "Jedi") ? "^4" : !Q_stricmp(treeName, "Sith") ? "^1" : "^5",
-                                     treeName));
 
         if (tree->subSkills.count > 0 && tree->subSkills.skill)
         {
-            // Show one skill per line instead of two
             for (int s = 0; s < tree->subSkills.count; s++)
             {
                 profSkill_t* skill = &tree->subSkills.skill[s];
@@ -4123,96 +4408,25 @@ void lmd_filteredskillmenu_show(gentity_t* player, gentity_t* menu, int filterMo
     Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
 
     Q_strcat(msg, sizeof(msg),
-            va("%sAttack = Rank Up\n"
-               "%sAlt Attack = Rank Down\n", colorHighlight, colorHighlight)
+            va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
     );
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
 
-void lmd_skillmenu_show(gentity_t* player, gentity_t* menu)
-{
-    if (!player || !player->client || !menu || !player->client->pers.Lmd.account)
-        return;
-
-    char msg[MAX_STRING_CHARS] = "\0";
-    int selectionIndex = 0;
-    int skillCount = 0;
-
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
-
-    profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
-
-    Q_strcat(msg, sizeof(msg), va("%sSkills Menu\n\n", colorHighlight));
-
-    for (int t = 0; t < root->subSkills.count; t++)
-    {
-        profSkill_t* tree = &root->subSkills.skill[t];
-        const char* treeName = tree->name ? tree->name : "Unknown";
-
-        if (!Q_stricmp(treeName, "Saber") ||
-            (Jedi_GetSide(player) == FORCE_LIGHTSIDE && !Q_stricmp(treeName, "Sith")) ||
-            (Jedi_GetSide(player) == FORCE_DARKSIDE && !Q_stricmp(treeName, "Jedi")))
-        {
-            continue;
-        }
-
-        Q_strcat(msg, sizeof(msg), va("\n%s%s:\n",
-                                      !Q_stricmp(treeName, "Jedi") ? "^4" : !Q_stricmp(treeName, "Sith") ? "^1" : "^5",
-                                      treeName));
-
-        if (tree->subSkills.count > 0 && tree->subSkills.skill)
-        {
-            // Show one skill per line instead of two
-            for (int s = 0; s < tree->subSkills.count; s++)
-            {
-                profSkill_t* skill = &tree->subSkills.skill[s];
-                qboolean selected = (player->client->Lmd.lmdMenu.skillIndex == selectionIndex);
-                const char* color = selected ? colorHighlight : colorNormal;
-
-                const char* skillName = skill->name ? skill->name : "Unnamed";
-                int levelp = (skill->getValue) ? skill->getValue(player->client->pers.Lmd.account, skill) : 0;
-                int max = skill->levels.max;
-
-                Q_strcat(msg, sizeof(msg), va("%s%s%s %d/%d\n",
-                                            color,
-                                            selected ? ">" : " ",
-                                            skillName,
-                                            levelp,
-                                            max));
-                selectionIndex++;
-                skillCount++;
-            }
-        }
-    }
-
-    qboolean selectedExit = (player->client->Lmd.lmdMenu.skillIndex == skillCount);
-    const char* exitColor = selectedExit ? colorHighlight : colorNormal;
-    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
-
-    Q_strcat(msg, sizeof(msg),
-             va("%sAttack = Rank Up\n"
-                "%sAlt Attack = Rank Down\n", colorHighlight, colorHighlight)
-    );
-
-    trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
-}
 void lmd_skillmenu_tryLevelChange(gentity_t* player, qboolean down)
 {
     int selection = player->client->Lmd.lmdMenu.skillIndex;
     int counter = 0;
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
-
-    // Different filtering based on menu mode
+    
     for (int t = 0; t < root->subSkills.count; t++)
     {
         profSkill_t* tree = &root->subSkills.skill[t];
         const char* treeName = tree->name ? tree->name : "Unknown";
-
-        // Apply the right filter based on menu mode
-        if (player->client->Lmd.lmdMenu.trainerMenuMode == 2) { // Neutral skills only
+        
+        if (player->client->Lmd.lmdMenu.trainerMenuMode == 2) {
             if (!Q_stricmp(treeName, "Saber") || 
                 !Q_stricmp(treeName, "Jedi") || 
                 !Q_stricmp(treeName, "Sith")) {
@@ -4248,135 +4462,6 @@ void lmd_skillmenu_tryLevelChange(gentity_t* player, qboolean down)
     }
 }
 
-void lmd_skillmenu_key(gentity_t* player, usercmd_t* cmd)
-{
-    if (!player || !player->client || !player->client->pers.Lmd.account)
-        return;
-
-    int totalSkills = 0;
-    profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
-
-    // Count only skills that are actually displayed
-    for (int t = 0; t < root->subSkills.count; t++)
-    {
-        profSkill_t* tree = &root->subSkills.skill[t];
-        const char* treeName = tree->name ? tree->name : "Unknown";
-
-        // Skip skills based on menu mode
-        if (player->client->Lmd.lmdMenu.trainerMenuMode == 2) { // Neutral skills
-            if (!Q_stricmp(treeName, "Saber") || 
-                !Q_stricmp(treeName, "Jedi") || 
-                !Q_stricmp(treeName, "Sith")) {
-                continue;
-            }
-        } else if (player->client->Lmd.lmdMenu.trainerMenuMode == 3) { // Force skills
-            if (Jedi_GetSide(player) == FORCE_LIGHTSIDE) {
-                if (Q_stricmp(treeName, "Jedi") != 0) {
-                    continue;
-                }
-            } else if (Jedi_GetSide(player) == FORCE_DARKSIDE) {
-                if (Q_stricmp(treeName, "Sith") != 0) {
-                    continue;
-                }
-            }
-        } else { // Standard filter
-            if (!Q_stricmp(treeName, "Saber") ||
-                (Jedi_GetSide(player) == FORCE_LIGHTSIDE && !Q_stricmp(treeName, "Sith")) ||
-                (Jedi_GetSide(player) == FORCE_DARKSIDE && !Q_stricmp(treeName, "Jedi")))
-            {
-                continue;
-            }
-        }
-
-        totalSkills += tree->subSkills.count;
-    }
-    int totalItems = totalSkills + 1; // +1 for Exit option
-
-    qboolean up = cmd->forwardmove > 0;
-    qboolean down = cmd->forwardmove < 0;
-    qboolean updateMenu = qfalse;
-
-    // Only use up/down navigation, remove left/right
-    if (up && player->client->Lmd.lmdMenu.stoppedPressingForward)
-    {
-        if (player->client->Lmd.lmdMenu.skillIndex > 0)
-        {
-            player->client->Lmd.lmdMenu.skillIndex--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
-            updateMenu = qtrue;
-        }
-        player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
-    }
-    else if (!up)
-    {
-        player->client->Lmd.lmdMenu.stoppedPressingForward = qtrue;
-    }
-
-    if (down && player->client->Lmd.lmdMenu.stoppedPressingBackward)
-    {
-        if (player->client->Lmd.lmdMenu.skillIndex < totalItems - 1)
-        {
-            player->client->Lmd.lmdMenu.skillIndex++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
-            updateMenu = qtrue;
-        }
-        player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
-    }
-    else if (!down)
-    {
-        player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
-    }
-
-    if (cmd->buttons & BUTTON_ATTACK)
-    {
-        if (player->client->Lmd.lmdMenu.stoppedPressingAttack)
-        {
-            lmd_skillmenu_tryLevelChange(player, qfalse);
-            player->client->Lmd.lmdMenu.stoppedPressingAttack = qfalse;
-            updateMenu = qtrue;
-        }
-    }
-    else
-    {
-        player->client->Lmd.lmdMenu.stoppedPressingAttack = qtrue;
-    }
-
-    if (cmd->buttons & BUTTON_ALT_ATTACK)
-    {
-        if (player->client->Lmd.lmdMenu.stoppedPressingAltAttack)
-        {
-            lmd_skillmenu_tryLevelChange(player, qtrue);
-            player->client->Lmd.lmdMenu.stoppedPressingAltAttack = qfalse;
-            updateMenu = qtrue;
-        }
-    }
-    else
-    {
-        player->client->Lmd.lmdMenu.stoppedPressingAltAttack = qtrue;
-    }
-
-    if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
-    {
-        if (player->client->Lmd.lmdMenu.skillIndex == totalSkills)
-        {
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
-            player->client->Lmd.lmdMenu.trainerMenuMode = 0;
-            player->client->Lmd.lmdMenu.selection = 0;
-        }
-        player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
-        updateMenu = qtrue;
-    }
-    else if (!(cmd->buttons & BUTTON_USE))
-    {
-        player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
-    }
-
-    if (updateMenu)
-    {
-        player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
-    }
-}
-
 void lmd_resetskillsmenu_show(gentity_t* player, gentity_t* menu)
 {
     if (!player || !player->client || !menu || !player->client->pers.Lmd.account)
@@ -4384,8 +4469,8 @@ void lmd_resetskillsmenu_show(gentity_t* player, gentity_t* menu)
 
     char msg[MAX_STRING_CHARS] = "\0";
     
-    const char* colorNormal = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
-    const char* colorHighlight = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
+    const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
     
     int prof = PlayerAcc_Prof_GetProfession(player);
     int used = Professions_UsedSkillPoints(player->client->pers.Lmd.account, prof, &Professions[prof]->primarySkill);
@@ -4517,9 +4602,6 @@ void lmd_menu_display(gentity_t* player)
     case 0:
         lmd_trainermenu_show(player, menu);
         break;
-    case 1:
-        lmd_skillmenu_show(player, menu);
-        break;
     case 2:
         lmd_filteredskillmenu_show(player, menu, player->client->Lmd.lmdMenu.trainerMenuMode);
         break;
@@ -4537,6 +4619,12 @@ void lmd_menu_display(gentity_t* player)
         break;
     case 7:
         lmd_resetskillsmenu_show(player, menu);
+        break;
+    case 8:
+        lmd_swapprofmenu_show(player, menu);
+        break;
+    case 9:
+        lmd_profselectionmenu_show(player, menu);
         break;
     default:
         lmd_trainermenu_show(player, menu);

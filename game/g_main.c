@@ -4884,8 +4884,6 @@ extern void lmd_menu_key(gentity_t *player, usercmd_t *cmd);
 extern void lmd_menu_show(gentity_t *player, gentity_t *menu);
 extern void lmd_menu_exit(gentity_t *player);
 extern void lmd_menu_update(gentity_t *player);
-extern void lmd_skillmenu_key(gentity_t* player, usercmd_t* cmd);
-extern void lmd_skillmenu_show(gentity_t *player, gentity_t *menu);
 extern void lmd_menu_display(gentity_t* player);
 extern void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd);
 extern void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd);
@@ -4893,7 +4891,8 @@ extern void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd);
 extern void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd);
 extern void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd);
 extern void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd);
-
+extern void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd);
 void G_RunFrame( int levelTime ) {
 	int			i;
 	gentity_t	       *ent;
@@ -5647,9 +5646,6 @@ ContinueThink:
 								case 0:
 									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 1:
-									lmd_skillmenu_key(ent, &ent->client->pers.cmd);
-									break;
 								case 2:
 									lmd_filteredskillmenu_key(ent, &ent->client->pers.cmd);
 									break;
@@ -5665,6 +5661,10 @@ ContinueThink:
 									break;
 								case 7:
 									lmd_resetskillsmenu_key(ent, &ent->client->pers.cmd);
+								case 8:
+									lmd_swapprofmenu_key(ent, &ent->client->pers.cmd);
+								case 9:
+									lmd_profselectionmenu_key(ent, &ent->client->pers.cmd);
 								default:
 									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
 									break;

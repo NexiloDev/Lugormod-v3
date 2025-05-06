@@ -1638,7 +1638,7 @@ void lmd_menu_enter(gentity_t* player, gentity_t* menu)
         player->client->ps.velocity[j] = 0.0f;
     }
 
-    G_SetAnim(player, SETANIM_BOTH, BOTH_CONSOLE1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+    G_SetAnim(player, SETANIM_BOTH, menu->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
 }
 
 
@@ -1939,6 +1939,7 @@ const entityInfoData_t lmd_terminal_keys[] = {
     {"navsnd", "Sound played for navigation."},
     {"cancelsnd", "Sound played for cancel."},
     {"targetname", "Activate the lmd_terminal when targetted."},
+    {"anim", "Animation to use (0 = console, 1 = console)."},
     NULL
 };
 
@@ -1995,6 +1996,7 @@ void lmd_terminal(gentity_t* ent)
     G_SpawnString("cancelsnd", "sound/interface/esc.mp3", &ent->Lmd.cancelsnd);
     G_SpawnInt("messageDelay", "0", &ent->Lmd.messageDelay);
     G_SpawnInt("choiceDelay", "0", &ent->Lmd.choiceDelay);
+    G_SpawnInt("anim", "0", &ent->Lmd.customIndex);
 
 
     if (ent->Lmd.spawnData && Q_stricmp(ent->classname, "t2_terminal") == 0)
@@ -3192,9 +3194,12 @@ const entityInfoData_t lmd_trainer_keys[] = {
     {"targetname", "Activate the lmd_trainer when targetted."},
     {"prof", "Professions this trainer handles (0 = all, 1 = Jedi, 2 = Merc)"},
     {"sideAcc", "Force sides this trainer handles (0 = all, 1 = light, 2 = dark). Only matters if prof = 1."},
+    {"anim", "Animation to use (0 = console, 1 = console)."},
+    {"selectsnd", "Sound played for confirmation."},
+    {"navsnd", "Sound played for navigation."},
+    {"cancelsnd", "Sound played for cancel."},
     {NULL, NULL}
 };
-
 entityInfo_t lmd_trainer_info = {
     "An interactive menu letting you level up skills and whatnot.",
     lmd_trainer_spawnflags,
@@ -3211,10 +3216,12 @@ void lmd_trainer(gentity_t* self)
     G_SpawnString("color1", "^3", &self->Lmd.color);
     G_SpawnString("color2", "^5", &self->Lmd.color2);
     G_SpawnString("message", "Welcome to the Skills Trainer", &self->message);
-    
-    // Initialize new fields with defaults
+    G_SpawnString("selectsnd", "sound/movers/switches/switch1.mp3", &self->Lmd.selectsnd);
+    G_SpawnString("navsnd", "sound/interface/menuroam.mp3", &self->Lmd.navsnd);
+    G_SpawnString("cancelsnd", "sound/interface/esc.mp3", &self->Lmd.cancelsnd);
     G_SpawnInt("prof", "0", &self->Lmd.prof);
     G_SpawnInt("sideAcc", "0", &self->Lmd.sideAcc);
+    G_SpawnInt("anim", "0", &self->Lmd.customIndex);
     
     self->use = lmd_trainer_use;
     self->classname = "lmd_trainer";
@@ -3243,7 +3250,7 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
             activator->client->ps.velocity[j] = 0.0f;
         }
         
-        G_SetAnim(activator, SETANIM_BOTH, BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+        G_SetAnim(activator, SETANIM_BOTH, self->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
         return;
     }
     
@@ -3298,7 +3305,7 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
         activator->client->ps.velocity[j] = 0.0f;
     }
 
-    G_SetAnim(activator, SETANIM_BOTH, BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+        G_SetAnim(activator, SETANIM_BOTH, self->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
 }
 
 void lmd_profselectionmenu_show(gentity_t* player, gentity_t* menu)
@@ -3384,7 +3391,7 @@ void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd)
             // Wrap to bottom
             player->client->Lmd.lmdMenu.selection = totalOptions - 1;
         }
-        G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+        G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
         updateMenu = qtrue;
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
     }
@@ -3404,7 +3411,7 @@ void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd)
             // Wrap to top
             player->client->Lmd.lmdMenu.selection = 0;
         }
-        G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+        G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
         updateMenu = qtrue;
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
     }
@@ -3419,7 +3426,7 @@ void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd)
         // Check if Exit option was selected (last option)
         if (player->client->Lmd.lmdMenu.selection == profOptions) {
             // Exit selected
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             lmd_menu_exit(player);
             trap_SendServerCommand(player->s.number, "cp \" \"");
             return;
@@ -3484,12 +3491,15 @@ void lmd_levelupmenu_show(gentity_t* player, gentity_t* menu)
     int cost = Professions_LevelCost(prof, playerLevel, 
                 Time_Now() - Accounts_Prof_GetLastLevelup(player->client->pers.Lmd.account));
     int remainingCreds = myCreds - cost;
-    
-    Q_strcat(msg, sizeof(msg), va("%sLevel Up Confirmation\n\n", colorHighlight));
-    Q_strcat(msg, sizeof(msg), va("%sCurrent Level: %i\n", colorNormal, playerLevel));
-    Q_strcat(msg, sizeof(msg), va("%sNew Level: %i\n", colorNormal, playerLevel + 1));
-    Q_strcat(msg, sizeof(msg), va("%sCost: %i credits\n", colorNormal, cost));
-    Q_strcat(msg, sizeof(msg), va("%sRemaining Credits: %i\n\n", colorNormal, remainingCreds));
+
+    if (playerLevel < 40)
+    {
+        Q_strcat(msg, sizeof(msg), va("%sLevel Up Confirmation\n\n", colorHighlight));
+        Q_strcat(msg, sizeof(msg), va("%sCurrent Level: %i\n", colorNormal, playerLevel));
+        Q_strcat(msg, sizeof(msg), va("%sNew Level: %i\n", colorNormal, playerLevel + 1));
+        Q_strcat(msg, sizeof(msg), va("%sCost: %i credits\n", colorNormal, cost));
+        Q_strcat(msg, sizeof(msg), va("%sRemaining Credits: %i\n\n", colorNormal, remainingCreds));
+    }
     
     if (remainingCreds < 0) {
         Q_strcat(msg, sizeof(msg), va("%sYou need %i more credits to level up.\n\n", 
@@ -3500,7 +3510,19 @@ void lmd_levelupmenu_show(gentity_t* player, gentity_t* menu)
             (player->client->Lmd.lmdMenu.selection == 0) ? ">" : " "));
             
         Q_strcat(msg, sizeof(msg), va("%sPress Use to go back\n", colorHighlight));
-    } else {
+    }
+    else if (playerLevel >= 40)
+    {
+        Q_strcat(msg, sizeof(msg), va("%sYou have reached the maximum level.\n\n", 
+                                   colorHighlight, -remainingCreds));
+        
+        Q_strcat(msg, sizeof(msg), va("%s%sBack\n\n", 
+            (player->client->Lmd.lmdMenu.selection == 0) ? colorHighlight : colorNormal,
+            (player->client->Lmd.lmdMenu.selection == 0) ? ">" : " "));
+            
+        Q_strcat(msg, sizeof(msg), va("%sPress Use to go back\n", colorHighlight));
+    }
+    else {
         Q_strcat(msg, sizeof(msg), va("%s%sYes\n", 
             (player->client->Lmd.lmdMenu.selection == 0) ? colorHighlight : colorNormal,
             (player->client->Lmd.lmdMenu.selection == 0) ? ">" : " "));
@@ -3520,25 +3542,62 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
         return;
-    
+
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
+        return;
+
     int prof = PlayerAcc_Prof_GetProfession(player);
     int playerLevel = PlayerAcc_Prof_GetLevel(player);
     int myCreds = PlayerAcc_GetCredits(player);
     int cost = Professions_LevelCost(prof, playerLevel, 
                 Time_Now() - Accounts_Prof_GetLastLevelup(player->client->pers.Lmd.account));
     int remainingCreds = myCreds - cost;
-    
-    int totalOptions = (remainingCreds < 0) ? 1 : 2;
+
+    const int maxLevel = 40;
     qboolean up = cmd->forwardmove > 0;
     qboolean down = cmd->forwardmove < 0;
     qboolean updateMenu = qfalse;
-    
+
+    // --- If max level is reached, only allow "Back" option ---
+    if (playerLevel >= maxLevel)
+    {
+        if ((up && player->client->Lmd.lmdMenu.stoppedPressingForward) ||
+            (down && player->client->Lmd.lmdMenu.stoppedPressingBackward)) {
+            // No selection change possible, only one item
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
+            updateMenu = qtrue;
+        }
+
+        if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
+        {
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
+            player->client->Lmd.lmdMenu.trainerMenuMode = 0;
+            player->client->Lmd.lmdMenu.selection = 0;
+            updateMenu = qtrue;
+            player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;
+        }
+        else if (!(cmd->buttons & BUTTON_USE))
+        {
+            player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
+        }
+
+        if (updateMenu)
+        {
+            player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
+        }
+        return;
+    }
+
+    // --- Normal behavior for selection navigation ---
+    int totalOptions = (remainingCreds < 0) ? 1 : 2;
+
     if (up && player->client->Lmd.lmdMenu.stoppedPressingForward)
     {
         if (player->client->Lmd.lmdMenu.selection > 0)
         {
             player->client->Lmd.lmdMenu.selection--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -3553,7 +3612,7 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.selection < totalOptions - 1)
         {
             player->client->Lmd.lmdMenu.selection++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -3562,11 +3621,11 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
     {
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
     }
-    
+
     if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
     {
         if (remainingCreds < 0) {
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
         } else {
@@ -3576,12 +3635,8 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
                 PlayerAcc_Prof_SetLevel(player, playerLevel + 1);
                 trap_SendServerCommand(player->s.number, va("print \"^3You are now at level ^2%i^3.\n\"", playerLevel + 1));
                 WP_InitForcePowers(player);
-
-                // lumaya: we are staying here, for now
-                //player->client->Lmd.lmdMenu.trainerMenuMode = 0;
-                //player->client->Lmd.lmdMenu.selection = 0;
             } else {
-                G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+                G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
                 player->client->Lmd.lmdMenu.trainerMenuMode = 0;
                 player->client->Lmd.lmdMenu.selection = 0;
             }
@@ -3593,12 +3648,13 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
     {
         player->client->Lmd.lmdMenu.stoppedPressingUsing = qtrue;
     }
-    
+
     if (updateMenu)
     {
         player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
     }
 }
+
 
 void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
 {
@@ -3721,10 +3777,16 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
         return;
+
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
+        return;
         
     int prof = PlayerAcc_Prof_GetProfession(player);
     int targetProf = (prof == PROF_MERC) ? PROF_JEDI : PROF_MERC;
     int totalOptions = 2; // Yes/No
+
+    
     
     qboolean up = cmd->forwardmove > 0;
     qboolean down = cmd->forwardmove < 0;
@@ -3736,7 +3798,7 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.selection > 0)
         {
             player->client->Lmd.lmdMenu.selection--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -3751,7 +3813,7 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.selection < totalOptions - 1)
         {
             player->client->Lmd.lmdMenu.selection++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -3776,7 +3838,7 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
             player->client->Lmd.lmdMenu.selection = 0;
         } else {
             // "No" - cancel
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             // Return to main menu
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
@@ -3817,10 +3879,10 @@ void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
         colorHighlight = menu->Lmd.color;
     }
 
-    profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
+    int prof = PlayerAcc_Prof_GetProfession(player);
 
-    // lumaya: nope
-    //Q_strcat(msg, sizeof(msg), va("%sSkills for Mercenary\n\n", colorHighlight));
+    profSkill_t* root = &Professions[prof]->primarySkill;
+
     
     if (root->subSkills.count > 0 && root->subSkills.skill)
     {
@@ -3847,11 +3909,12 @@ void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
     
     qboolean selectedExit = (player->client->Lmd.lmdMenu.skillIndex == skillCount);
     const char* exitColor = selectedExit ? colorHighlight : colorNormal;
-    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
-    
+    int availablePoints = Professions_AvailableSkillPoints(player->client->pers.Lmd.account, prof, &root->subSkills.skill[0], NULL);
+    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n", exitColor, selectedExit ? ">" : " "));
+
     Q_strcat(msg, sizeof(msg),
-        va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
-);
+            va("%sAttack (Increase) | Alt Attack (Decrease)\n"
+                "%sAvailable Points: %s%i", colorNormal, colorNormal, colorHighlight, availablePoints));
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
@@ -3859,6 +3922,10 @@ void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
 void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
+        return;
+
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
         return;
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
@@ -3874,7 +3941,7 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex > 0)
         {
             player->client->Lmd.lmdMenu.skillIndex--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -3889,7 +3956,7 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex < totalItems - 1)
         {
             player->client->Lmd.lmdMenu.skillIndex++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -3908,7 +3975,7 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
             {
                 profSkill_t* skill = &root->subSkills.skill[player->client->Lmd.lmdMenu.skillIndex];
                 Cmd_SkillSelect_Level(player, PlayerAcc_Prof_GetProfession(player), skill, qfalse);
-                G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/movers/switches/switch1.mp3"));
+                G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.selectsnd));
             }
             player->client->Lmd.lmdMenu.stoppedPressingAttack = qfalse;
             updateMenu = qtrue;
@@ -3928,7 +3995,7 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
             {
                 profSkill_t* skill = &root->subSkills.skill[player->client->Lmd.lmdMenu.skillIndex];
                 Cmd_SkillSelect_Level(player, PlayerAcc_Prof_GetProfession(player), skill, qtrue);
-                G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/movers/switches/switch1.mp3"));
+                G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.selectsnd));
             }
             player->client->Lmd.lmdMenu.stoppedPressingAltAttack = qfalse;
             updateMenu = qtrue;
@@ -3943,7 +4010,7 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
     {
         if (player->client->Lmd.lmdMenu.skillIndex == totalSkills)
         {
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
             updateMenu = qtrue;
@@ -3965,6 +4032,10 @@ extern void Cmd_ResetSkills_f (gentity_t *ent, int iArg);
 void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
+        return;
+
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
         return;
     
     int totalOptions = 1;
@@ -4012,7 +4083,7 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
     totalOptions++;
 
     exitOption = currentOption;
-    totalOptions += 2;
+    totalOptions++;
     
     qboolean up = cmd->forwardmove > 0;
     qboolean down = cmd->forwardmove < 0;
@@ -4023,7 +4094,7 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.selection > 0)
         {
             player->client->Lmd.lmdMenu.selection--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -4038,7 +4109,7 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.selection < totalOptions - 1)
         {
             player->client->Lmd.lmdMenu.selection++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -4100,7 +4171,7 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
         }
         // Exit (available to everyone)
         else if (player->client->Lmd.lmdMenu.selection == exitOption) {
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             lmd_menu_exit(player);
             trap_SendServerCommand(player->s.number, "cp \" \"");
         }
@@ -4130,8 +4201,9 @@ void lmd_jediskillmenu_show(gentity_t* player, gentity_t* menu)
 
     const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
     const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
+    const int prof = PlayerAcc_Prof_GetProfession(player);
 
-    profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
+    profSkill_t* root = &Professions[prof]->primarySkill;
 
     // lumaya: nope
     //Q_strcat(msg, sizeof(msg), va("%sJedi Skills Menu\n\n", colorHighlight));
@@ -4170,10 +4242,13 @@ void lmd_jediskillmenu_show(gentity_t* player, gentity_t* menu)
 
     qboolean selectedExit = (player->client->Lmd.lmdMenu.skillIndex == skillCount);
     const char* exitColor = selectedExit ? colorHighlight : colorNormal;
-    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
+    
+    int availablePoints = Professions_AvailableSkillPoints(player->client->pers.Lmd.account, prof, &root->subSkills.skill[0], NULL);
+    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n", exitColor, selectedExit ? ">" : " "));
 
     Q_strcat(msg, sizeof(msg),
-            va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
+            va("%sAttack (Increase) | Alt Attack (Decrease)\n"
+                "%sAvailable Points: %s%i", colorNormal, colorNormal, colorHighlight, availablePoints)
     );
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
@@ -4190,8 +4265,9 @@ void lmd_sithskillmenu_show(gentity_t* player, gentity_t* menu)
     
     const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^5";
     const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^3";
+    const int prof = PlayerAcc_Prof_GetProfession(player);
 
-    profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
+    profSkill_t* root = &Professions[prof]->primarySkill;
 
     // lumaya: nope
     //Q_strcat(msg, sizeof(msg), va("%sSith Skills Menu\n\n", colorHighlight));
@@ -4230,11 +4306,12 @@ void lmd_sithskillmenu_show(gentity_t* player, gentity_t* menu)
 
     qboolean selectedExit = (player->client->Lmd.lmdMenu.skillIndex == skillCount);
     const char* exitColor = selectedExit ? colorHighlight : colorNormal;
-    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
+    int availablePoints = Professions_AvailableSkillPoints(player->client->pers.Lmd.account, prof, &root->subSkills.skill[0], NULL);
+    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n", exitColor, selectedExit ? ">" : " "));
 
     Q_strcat(msg, sizeof(msg),
-            va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
-    );
+            va("%sAttack (Increase) | Alt Attack (Decrease)\n"
+                "%sAvailable Points: %s%i", colorNormal, colorNormal, colorHighlight, availablePoints));
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
@@ -4243,6 +4320,10 @@ void lmd_skillmenu_tryLevelChange(gentity_t* player, qboolean down);
 void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
+        return;
+
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
         return;
 
     int totalSkills = 0;
@@ -4277,7 +4358,7 @@ void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex > 0)
         {
             player->client->Lmd.lmdMenu.skillIndex--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -4292,7 +4373,7 @@ void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex < totalItems - 1)
         {
             player->client->Lmd.lmdMenu.skillIndex++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -4334,7 +4415,7 @@ void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd)
     {
         if (player->client->Lmd.lmdMenu.skillIndex == totalSkills)
         {
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
             updateMenu = qtrue;
@@ -4364,7 +4445,9 @@ void lmd_filteredskillmenu_show(gentity_t* player, gentity_t* menu, int filterMo
     const char* colorNormal = (menu->Lmd.color2 && *menu->Lmd.color2) ? menu->Lmd.color2 : "^3";
     const char* colorHighlight = (menu->Lmd.color && *menu->Lmd.color) ? menu->Lmd.color : "^5";
 
-    profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
+    const int prof = PlayerAcc_Prof_GetProfession(player);
+
+    profSkill_t* root = &Professions[prof]->primarySkill;
 
     for (int t = 0; t < root->subSkills.count; t++)
     {
@@ -4405,17 +4488,22 @@ void lmd_filteredskillmenu_show(gentity_t* player, gentity_t* menu, int filterMo
 
     qboolean selectedExit = (player->client->Lmd.lmdMenu.skillIndex == skillCount);
     const char* exitColor = selectedExit ? colorHighlight : colorNormal;
-    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n\n", exitColor, selectedExit ? ">" : " "));
+    int availablePoints = Professions_AvailableSkillPoints(player->client->pers.Lmd.account, prof, &root->subSkills.skill[0], NULL);
+    Q_strcat(msg, sizeof(msg), va("\n%s%sBack to Main Menu\n", exitColor, selectedExit ? ">" : " "));
 
     Q_strcat(msg, sizeof(msg),
-            va("%sAttack (Increase) | Alt Attack (Decrease)", colorHighlight)
-    );
+            va("%sAttack (Increase) | Alt Attack (Decrease)\n"
+                "%sAvailable Points: %s%i", colorNormal, colorNormal, colorHighlight, availablePoints));
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
 
 void lmd_skillmenu_tryLevelChange(gentity_t* player, qboolean down)
 {
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
+        return;
+    
     int selection = player->client->Lmd.lmdMenu.skillIndex;
     int counter = 0;
 
@@ -4454,7 +4542,7 @@ void lmd_skillmenu_tryLevelChange(gentity_t* player, qboolean down)
             if (counter == selection)
             {
                 Cmd_SkillSelect_Level(player, PlayerAcc_Prof_GetProfession(player), &tree->subSkills.skill[s], down);
-                G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/movers/switches/switch1.mp3"));
+                G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.selectsnd));
                 return;
             }
             counter++;
@@ -4508,6 +4596,10 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
         return;
+
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
+        return;
         
     // Check if player has any skills to reset
     int prof = PlayerAcc_Prof_GetProfession(player);
@@ -4524,7 +4616,7 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.selection > 0)
         {
             player->client->Lmd.lmdMenu.selection--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -4539,7 +4631,7 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.selection < totalOptions - 1)
         {
             player->client->Lmd.lmdMenu.selection++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -4554,7 +4646,7 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
     {
         if (used == 0) {
             // No skills to reset - only "Back" option
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             // Return to main menu
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
@@ -4569,7 +4661,7 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
                 player->client->Lmd.lmdMenu.selection = 0;
             } else {
                 // "No" - cancel
-                G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+                G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
                 // Return to main menu
                 player->client->Lmd.lmdMenu.trainerMenuMode = 0;
                 player->client->Lmd.lmdMenu.selection = 0;
@@ -4638,10 +4730,13 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
     if (!player || !player->client || !player->client->pers.Lmd.account)
         return;
 
+    gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
+    if (!menu)
+        return;
+
     int totalSkills = 0;
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
-
-    // Count only skills that are actually displayed based on filter
+    
     for (int t = 0; t < root->subSkills.count; t++)
     {
         profSkill_t* tree = &root->subSkills.skill[t];
@@ -4654,12 +4749,11 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
             continue;
         }
 
-        // Count each valid skill individually
+
         if (tree->subSkills.count > 0 && tree->subSkills.skill)
         {
             for (int s = 0; s < tree->subSkills.count; s++)
             {
-                // Only count skills that are actually visible
                 totalSkills++;
             }
         }
@@ -4676,7 +4770,7 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex > 0)
         {
             player->client->Lmd.lmdMenu.skillIndex--;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -4692,7 +4786,7 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (player->client->Lmd.lmdMenu.skillIndex < totalItems - 1)
         {
             player->client->Lmd.lmdMenu.skillIndex++;
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/menuroam.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
         }
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
@@ -4737,7 +4831,7 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
         // Check for the Back to Main Menu option being selected
         if (player->client->Lmd.lmdMenu.skillIndex == totalSkills)
         {
-            G_ClientSound(player, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+            G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
             // Go back to main menu
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;

@@ -3494,6 +3494,9 @@ void Cmd_EngageDuel_f(gentity_t *ent){
 		if(ent->client->ps.weapon != challenged->client->ps.weapon)
 			return;
 
+		if (challenged && challenged->client && challenged->client->Lmd.lmdMenu.entityNum != 0)
+			return;
+
 		//Lugormod: cannot engage if too close
 		float dist = Distance(ent->client->ps.origin, challenged->client->ps.origin);
 		if(dist < 80){

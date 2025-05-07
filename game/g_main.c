@@ -5674,10 +5674,17 @@ ContinueThink:
 							{
 								lmd_menu_update(ent);
 
-								if (level.time >= ent->client->Lmd.lmdMenu.nextUpdateTime)
+								if (ent->client->Lmd.lmdMenu.choicesVisible >= menu->count)
+								{
+									if (level.time >= ent->client->Lmd.lmdMenu.nextUpdateTime)
+									{
+										lmd_menu_show(ent, menu);
+										ent->client->Lmd.lmdMenu.nextUpdateTime = level.time + 1000;
+									}
+								}
+								else
 								{
 									lmd_menu_show(ent, menu);
-									ent->client->Lmd.lmdMenu.nextUpdateTime = level.time + 1000;
 								}
 
 								lmd_menu_key(ent, &ent->client->pers.cmd);

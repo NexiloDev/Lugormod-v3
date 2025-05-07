@@ -1832,7 +1832,6 @@ void lmd_terminal_use(gentity_t* self, gentity_t* other, gentity_t* activator)
         return;
     self->genericValue1 = level.time + 800;
 
-    G_UseTargets2(self, activator, self->GenericStrings[7]);
 
     if (self->spawnflags & 4)
     {
@@ -1840,9 +1839,14 @@ void lmd_terminal_use(gentity_t* self, gentity_t* other, gentity_t* activator)
             && activator->client->ps.groundEntityNum != ENTITYNUM_NONE)
         {
             lmd_menu_enter(activator, self);
+            G_UseTargets2(self, activator, self->GenericStrings[7]);
+
         }
         return;
     }
+
+    G_UseTargets2(self, activator, self->GenericStrings[7]);
+
 
     // Normal mode (spawnflag 1 or 2)
     char msg[MAX_STRING_CHARS] = "";
@@ -3817,7 +3821,7 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
         
     int prof = PlayerAcc_Prof_GetProfession(player);
     int targetProf = (prof == PROF_MERC) ? PROF_JEDI : PROF_MERC;
-    int totalOptions = 2; // Yes/No
+    int totalOptions = 2;
 
     
     
@@ -3825,7 +3829,6 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
     qboolean down = cmd->forwardmove < 0;
     qboolean updateMenu = qfalse;
     
-    // Handle navigation
     if (up && player->client->Lmd.lmdMenu.stoppedPressingForward)
     {
         if (player->client->Lmd.lmdMenu.selection > 0)
@@ -3856,7 +3859,6 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
     }
     
-    // Handle selection
     if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
     {
         if (player->client->Lmd.lmdMenu.selection == 0) {
@@ -3902,19 +3904,16 @@ void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
     int prof = PlayerAcc_Prof_GetProfession(player);
     profSkill_t* root = &Professions[prof]->primarySkill;
     
-    // Fixed 2-page system
-    int currentPage = player->client->Lmd.lmdMenu.currentPage; // 0 or 1
+    int currentPage = player->client->Lmd.lmdMenu.currentPage;
     int totalSkills = root->subSkills.count;
     
-    // Calculate how many skills on each page
-    int skillsOnFirstPage = 5; // First 5 skills on page 1
-    int skillsOnSecondPage = totalSkills - skillsOnFirstPage; // Remaining skills on page 2
+    int skillsOnFirstPage = 5;
+    int skillsOnSecondPage = totalSkills - skillsOnFirstPage;
     
     if (skillsOnSecondPage < 0) {
-        skillsOnSecondPage = 0; // In case there are fewer than 5 skills total
+        skillsOnSecondPage = 0;
     }
     
-    // Calculate start and end indices for current page
     int startSkill, endSkill;
     if (currentPage == 0) {
         startSkill = 0;
@@ -3925,10 +3924,8 @@ void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
         endSkill = totalSkills;
     }
     
-    // Display page info
     Q_strcat(msg, sizeof(msg), va("%sPage %s(%d/2)\n", colorInfo, colorNormal, currentPage + 1));
     
-    // Display skills for the current page
     if (root->subSkills.count > 0 && root->subSkills.skill)
     {
         for (int s = startSkill; s < endSkill; s++)
@@ -4007,11 +4004,9 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
 
     profSkill_t* root = &Professions[PlayerAcc_Prof_GetProfession(player)]->primarySkill;
     
-    // Fixed 2-page system
-    int currentPage = player->client->Lmd.lmdMenu.currentPage; // 0 or 1
+    int currentPage = player->client->Lmd.lmdMenu.currentPage;
     int totalSkills = root->subSkills.count;
     
-    // Calculate skills on current page
     int skillsOnFirstPage = 5;
     int skillsOnCurrentPage;
     int startSkill;
@@ -4026,7 +4021,6 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
         if (skillsOnCurrentPage < 0) skillsOnCurrentPage = 0;
     }
     
-    // Total menu items: skills + change page + exit
     int totalItems = skillsOnCurrentPage + 2;
 
     qboolean up = cmd->forwardmove > 0;
@@ -4072,7 +4066,6 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
         
         if (stoppedPressing)
         {
-            // Handle skill selection
             if (player->client->Lmd.lmdMenu.skillIndex < skillsOnCurrentPage)
             {
                 if (isAttack) {
@@ -4086,22 +4079,21 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
                 }
                 updateMenu = qtrue;
             }
-            // Handle page change option
+
             else if (player->client->Lmd.lmdMenu.skillIndex == skillsOnCurrentPage && (isAttack || isUse))
             {
-                // Toggle between page 0 and 1
                 player->client->Lmd.lmdMenu.currentPage = (currentPage == 0) ? 1 : 0;
-                player->client->Lmd.lmdMenu.skillIndex = 0; // Reset selection to first item
+                player->client->Lmd.lmdMenu.skillIndex = 0;
                 G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.selectsnd));
                 updateMenu = qtrue;
             }
-            // Handle exit option
+
             else if (player->client->Lmd.lmdMenu.skillIndex == skillsOnCurrentPage + 1 && (isAttack || isUse))
             {
                 G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
                 player->client->Lmd.lmdMenu.trainerMenuMode = 0;
                 player->client->Lmd.lmdMenu.selection = 0;
-                player->client->Lmd.lmdMenu.currentPage = 0; // Reset page when exiting
+                player->client->Lmd.lmdMenu.currentPage = 0;
                 updateMenu = qtrue;
             }
             
@@ -4192,11 +4184,9 @@ void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
         }
     }
     
-    // Reset option first
     resetOption = currentOption++;
     totalOptions++;
-
-    // Add swap profession option second
+    
     swapProfOption = currentOption++;
     totalOptions++;
 
@@ -4704,11 +4694,11 @@ void lmd_skillmenu_tryLevelChange(gentity_t* player, qboolean down)
                 !Q_stricmp(treeName, "Sith")) {
                 continue;
                 }
-        } else if (player->client->Lmd.lmdMenu.trainerMenuMode == 3) { // Jedi skills only
+        } else if (player->client->Lmd.lmdMenu.trainerMenuMode == 3) {
             if (Q_stricmp(treeName, "Jedi") != 0) {
                 continue;
             }
-        } else if (player->client->Lmd.lmdMenu.trainerMenuMode == 4) { // Sith skills only
+        } else if (player->client->Lmd.lmdMenu.trainerMenuMode == 4) {
             if (Q_stricmp(treeName, "Sith") != 0) {
                 continue;
             }
@@ -4774,7 +4764,6 @@ void lmd_resetskillsmenu_show(gentity_t* player, gentity_t* menu)
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
 
-// Handle key input for reset skills menu
 void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
@@ -4783,8 +4772,7 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
     gentity_t* menu = &g_entities[player->client->Lmd.lmdMenu.entityNum];
     if (!menu)
         return;
-        
-    // Check if player has any skills to reset
+    
     int prof = PlayerAcc_Prof_GetProfession(player);
     int used = Professions_UsedSkillPoints(player->client->pers.Lmd.account, prof, &Professions[prof]->primarySkill);
     
@@ -4793,7 +4781,6 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
     qboolean down = cmd->forwardmove < 0;
     qboolean updateMenu = qfalse;
     
-    // Handle navigation
     if (up && player->client->Lmd.lmdMenu.stoppedPressingForward)
     {
         if (player->client->Lmd.lmdMenu.selection > 0)
@@ -4824,28 +4811,20 @@ void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd)
         player->client->Lmd.lmdMenu.stoppedPressingBackward = qtrue;
     }
     
-    // Handle selection
     if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
     {
         if (used == 0) {
-            // No skills to reset - only "Back" option
             G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
-            // Return to main menu
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
         } else {
-            // Yes/No options
             if (player->client->Lmd.lmdMenu.selection == 0) {
-                // "Yes" - reset skills
                 G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.selectsnd));
                 Cmd_ResetSkills_f(player, 0);
-                // Return to main menu
                 player->client->Lmd.lmdMenu.trainerMenuMode = 0;
                 player->client->Lmd.lmdMenu.selection = 0;
             } else {
-                // "No" - cancel
                 G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
-                // Return to main menu
                 player->client->Lmd.lmdMenu.trainerMenuMode = 0;
                 player->client->Lmd.lmdMenu.selection = 0;
             }
@@ -4907,7 +4886,6 @@ void lmd_menu_display(gentity_t* player)
     }
 }
 
-// Handle key input for filtered skill menu (Neutral skills)
 void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)
@@ -4942,7 +4920,7 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
         }
     }
 
-    int totalItems = totalSkills + 1; // +1 for Back to Main Menu option
+    int totalItems = totalSkills + 1;
 
     qboolean up = cmd->forwardmove > 0;
     qboolean down = cmd->forwardmove < 0;
@@ -4982,7 +4960,7 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
     if (cmd->buttons & BUTTON_ATTACK)
     {
         if (player->client->Lmd.lmdMenu.stoppedPressingAttack &&
-            player->client->Lmd.lmdMenu.skillIndex < totalSkills) // Only allow skill changes when a skill is selected
+            player->client->Lmd.lmdMenu.skillIndex < totalSkills)
         {
             lmd_skillmenu_tryLevelChange(player, qfalse);
             player->client->Lmd.lmdMenu.stoppedPressingAttack = qfalse;
@@ -4997,7 +4975,7 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
     if (cmd->buttons & BUTTON_ALT_ATTACK)
     {
         if (player->client->Lmd.lmdMenu.stoppedPressingAltAttack &&
-            player->client->Lmd.lmdMenu.skillIndex < totalSkills) // Only allow skill changes when a skill is selected
+            player->client->Lmd.lmdMenu.skillIndex < totalSkills)
         {
             lmd_skillmenu_tryLevelChange(player, qtrue);
             player->client->Lmd.lmdMenu.stoppedPressingAltAttack = qfalse;
@@ -5011,14 +4989,11 @@ void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd)
 
     if (cmd->buttons & BUTTON_USE && player->client->Lmd.lmdMenu.stoppedPressingUsing)
     {
-        // Check for the Back to Main Menu option being selected
         if (player->client->Lmd.lmdMenu.skillIndex == totalSkills)
         {
             G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.cancelsnd));
-            // Go back to main menu
             player->client->Lmd.lmdMenu.trainerMenuMode = 0;
             player->client->Lmd.lmdMenu.selection = 0;
-            // Reset selection index
             player->client->Lmd.lmdMenu.skillIndex = 0;
             updateMenu = qtrue;
         }

@@ -366,6 +366,7 @@ struct gentity_s {
 		int boundsDisplayedUntil; // How long will the bounding box be displayed? (level.time + xxx)
 		char * color;
 		char * color2;
+		char * color3;
 		char * selectsnd;
 		char * navsnd;
 		char * cancelsnd;

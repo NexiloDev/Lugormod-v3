@@ -515,13 +515,16 @@ qboolean Professions_ChooseProf(gentity_t *ent, int prof){
 		return qfalse;
 	}
 
+	// lumaya: we dont take crs on prof swapping
+	/*
 	if(flags & ACCFLAGS_NOPROFCRLOSS){
 		PlayerAcc_AddFlags(ent, -ACCFLAGS_NOPROFCRLOSS);
 		Disp(ent, "^3Your free profession change has been used up.");
 	}
 	else
 		PlayerAcc_SetCredits(ent, PlayerAcc_GetCredits(ent) / 2);
-
+*/
+	
 	PlayerAcc_Prof_SetProfession(ent, prof);
 	PlayerAcc_Prof_SetLevel(ent, 1);
 

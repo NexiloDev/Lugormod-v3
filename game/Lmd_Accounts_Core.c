@@ -748,6 +748,7 @@ char* Accounts_GetTitle(Account_t *acc)
 		{
 			default:	
 			case 0:
+				return "None";
 			case 1:
 				return lmd_titleData.jedi_titles[titleIndex];
 			case 2:

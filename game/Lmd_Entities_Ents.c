@@ -3496,11 +3496,10 @@ void lmd_levelupmenu_show(gentity_t* player, gentity_t* menu)
 
     if (playerLevel < 40)
     {
-        Q_strcat(msg, sizeof(msg), va("%sLevel Up Confirmation\n\n", colorInfo));
-        Q_strcat(msg, sizeof(msg), va("%sCurrent Level: %i\n", colorNormal, playerLevel));
-        Q_strcat(msg, sizeof(msg), va("%sNew Level: %i\n", colorNormal, playerLevel + 1));
-        Q_strcat(msg, sizeof(msg), va("%sCost: %i credits\n", colorNormal, cost));
-        Q_strcat(msg, sizeof(msg), va("%sRemaining Credits: %i\n\n", colorNormal, remainingCreds));
+        Q_strcat(msg, sizeof(msg), va("%sCurrent Level: %s%i\n", colorInfo, colorNormal, playerLevel));
+        Q_strcat(msg, sizeof(msg), va("%sNew Level: %s%i\n", colorInfo, colorNormal, playerLevel + 1));
+        Q_strcat(msg, sizeof(msg), va("%sCost: %s%i credits\n", colorInfo, colorNormal, cost));
+        Q_strcat(msg, sizeof(msg), va("%sRemaining Credits: %s%i\n\n", colorInfo, colorNormal, remainingCreds));
     }
     
     if (remainingCreds < 0) {
@@ -3708,7 +3707,7 @@ void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
     } else {
         menuMessage = va("%s[%s ACCOUNT TERMINAL %s]\n"
                         "%sName: %s\n"
-                        "%sTitle: %s%s | %sLevel: %s%i",
+                        "%sTitle: %s%s%s | Level: %s%i",
                         colorInfo, colorNormal, colorInfo,
                         colorNormal, Accounts_GetName(player->client->pers.Lmd.account),
                         colorNormal, colorInfo, Accounts_GetTitle(player->client->pers.Lmd.account), 

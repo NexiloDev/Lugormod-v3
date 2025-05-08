@@ -331,6 +331,8 @@ vmCvar_t	g_powerDuelEndHealth;
 // DUEL_HEALTH
 vmCvar_t		g_showDuelHealths;
 
+vmCvar_t        g_blockspeedhack;
+
 //RoboPhred:
 vmCvar_t lmd_DataPath;
 vmCvar_t lmd_stashrate;
@@ -869,6 +871,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_showDuelHealths, "g_showDuelHealths", "0", CVAR_SERVERINFO },
 	{ &g_powerDuelStartHealth, "g_powerDuelStartHealth", "150", CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_powerDuelEndHealth, "g_powerDuelEndHealth", "90", CVAR_ARCHIVE, 0, qtrue  },
+
+	{ &g_blockspeedhack, "g_blockspeedhack", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	// Lugormod cvars:
 	{ &g_noVoteTime, "g_noVoteTime", "5", CVAR_ARCHIVE,0, qfalse, qfalse,

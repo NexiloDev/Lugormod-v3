@@ -50,6 +50,8 @@ void P_SetTwitchInfo(gclient_t	*client)
 	client->ps.painDirection ^= 1;
 }
 
+extern vmCvar_t g_mitigateHealthESP;
+
 /*
 ===============
 G_DamageFeedback
@@ -144,7 +146,40 @@ void P_DamageFeedback( gentity_t *player ) {
 		P_SetTwitchInfo(client);
 		player->pain_debounce_time = level.time + 700;
 
-		G_AddEvent( player, EV_PAIN, player->health );
+		if ( g_mitigateHealthESP.integer == 2 ) {
+			// NOTE: This prevents pain twitches on the clientside as a side-effect
+			const char *snd;
+
+			// Pick the pain sound
+			if ( player->health < 25 ) {
+				snd = "*pain25.wav";
+			} else if ( player->health < 50 ) {
+				snd = "*pain50.wav";
+			} else if ( player->health < 75 ) {
+				snd = "*pain75.wav";
+			} else {
+				snd = "*pain100.wav";
+			}
+
+			G_AddEvent( player, EV_GENERAL_SOUND, G_SoundIndex(snd) );
+		} else if ( g_mitigateHealthESP.integer == 1 ) {
+			int health;
+
+			// Pick the pain sound
+			if ( player->health < 25 ) {
+				health = 24;
+			} else if ( player->health < 50 ) {
+				health = 49;
+			} else if ( player->health < 75 ) {
+				health = 74;
+			} else {
+				health = 100;
+			}
+
+			G_AddEvent( player, EV_PAIN, health );
+		} else {
+			G_AddEvent( player, EV_PAIN, player->health );
+		}
 		client->ps.damageEvent++;
 
 		if (client->damage_armor && !client->damage_blood)

@@ -12449,7 +12449,21 @@ void PmoveSingle (pmove_t *pmove) {
 	// update the viewangles
 	PM_UpdateViewAngles( pm->ps, &pm->cmd );
 
-	AngleVectors (pm->ps->viewangles, pml.forward, pml.right, pml.up);
+#ifdef QAGAME
+	if ( g_blockspeedhack.integer )
+	{
+		float oldRoll = pm->ps->viewangles[ROLL];
+		pm->ps->viewangles[ROLL] = 0;
+		AngleVectors (pm->ps->viewangles, pml.forward, pml.right, pml.up);
+		pm->ps->viewangles[ROLL] = oldRoll;
+	}
+	else
+	{
+#endif
+		AngleVectors (pm->ps->viewangles, pml.forward, pml.right, pml.up);
+#ifdef QAGAME
+	}
+#endif
 
 	if ( pm->cmd.upmove < 10 && !(pm->ps->pm_flags & PMF_STUCK_TO_WALL)) {
 		// not holding jump

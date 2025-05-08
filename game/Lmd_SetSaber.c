@@ -1,5 +1,10 @@
 #include "Lmd_SetSaber.h"
 
+extern qboolean G_SetSaber(gentity_t *ent, int saberNum, char *saberName, qboolean siegeOverride);
+extern qboolean G_SaberModelSetup(gentity_t* ent);
+extern qboolean WP_SaberStyleValidForSaber(saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel);
+extern qboolean WP_UseFirstValidSaberStyle(saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel);
+
 extern vmCvar_t lmd_allow_set_saber;
 extern vmCvar_t lmd_set_saber_duels;
 extern vmCvar_t lmd_set_saber_delay;

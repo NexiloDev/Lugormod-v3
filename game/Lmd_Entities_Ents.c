@@ -3198,7 +3198,7 @@ const entityInfoData_t lmd_trainer_keys[] = {
     {"message", "Custom message displayed on the main menu screen. .t = title, .l = level, .n = name"},
     {"targetname", "Activate the lmd_trainer when targetted."},
     {"prof", "Professions this trainer handles (0 = all, 1 = Jedi, 2 = Merc)"},
-    {"sideAcc", "Force sides this trainer handles (0 = all, 1 = light, 2 = dark). Only matters if prof = 1."},
+    {"subprof", "Force sides this trainer handles (0 = all, 1 = light, 2 = dark). Only matters if prof = 1."},
     {"anim", "Animation to use (0 = console, 1 = console)."},
     {"selectsnd", "Sound played for confirmation."},
     {"navsnd", "Sound played for navigation."},

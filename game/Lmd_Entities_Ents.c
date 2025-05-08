@@ -3226,7 +3226,7 @@ void lmd_trainer(gentity_t* self)
     G_SpawnString("navsnd", "sound/interface/menuroam.mp3", &self->Lmd.navsnd);
     G_SpawnString("cancelsnd", "sound/interface/esc.mp3", &self->Lmd.cancelsnd);
     G_SpawnInt("prof", "0", &self->Lmd.prof);
-    G_SpawnInt("sideAcc", "0", &self->Lmd.sideAcc);
+    G_SpawnInt("subprof", "0", &self->Lmd.sideAcc);
     G_SpawnInt("anim", "0", &self->Lmd.customIndex);
     
     self->use = lmd_trainer_use;

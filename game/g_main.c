@@ -5661,10 +5661,13 @@ ContinueThink:
 									break;
 								case 7:
 									lmd_resetskillsmenu_key(ent, &ent->client->pers.cmd);
+									break;
 								case 8:
 									lmd_swapprofmenu_key(ent, &ent->client->pers.cmd);
+									break;
 								case 9:
 									lmd_profselectionmenu_key(ent, &ent->client->pers.cmd);
+									break;
 								default:
 									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
 									break;

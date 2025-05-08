@@ -544,6 +544,8 @@ struct gclient_s {
 		{
 			unsigned int delayTime;
 			qboolean openAgain;
+			unsigned int cooldownTime;
+			qboolean newRequest;
 		} setSaber;
 		
     struct 

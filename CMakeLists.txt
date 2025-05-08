@@ -153,6 +153,7 @@ set(GAME_SRC
 	game/Lmd_RandomChat.c 
 	game/Lmd_RandomSpot.c 
 	game/Lmd_Script.c 
+	game/Lmd_SetSaber.c
 	game/Lmd_StashZone.c 
 	game/Lmd_Time.c 
 	game/lmd_turret.c 

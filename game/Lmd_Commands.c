@@ -30,7 +30,6 @@ void       Jedi_Decloak    (gentity_t *self );
 void       HiScore         (gentity_t *ent, int field);
 void       HiRatio         (gentity_t* ent, int field);
 void       Cmd_Say_f       (gentity_t *ent, int mode, qboolean arg0 );
-void       Cmd_SetSaber_f  (gentity_t *ent, int iArg);
 
 extern gentity_t  *g_bestKing;
 extern int         g_bestKingScore;
@@ -1047,60 +1046,6 @@ Cmd disable
 void Cmd_Confirm_f(gentity_t *ent, int iArg);
 void Cmd_Interact_f(gentity_t *ent, int iArg);
 
-
-
-/*
-==================
-Cmd_SetSaber_f
-Lugormod
-==================
-*/
-extern void forceSaber(gentity_t *ent, char* saber1, char* saber2);
-void Cmd_SetSaber_f(gentity_t* ent, int iArg) {
-	char arg[2][64];
-	qboolean invalid = qfalse;
-
-	if (!ent || !ent->client) {
-		return;
-	}
-
-	if (ent->client->Lmd.setSaber.delayTime >= level.time)
-	{
-		Disp(ent, "^3Already in use. Please wait!");
-		return;
-	}
-
-	if (trap_Argc() == 3) {
-		for (int i = 0; i < 2; i++) {
-			trap_Argv(i + 1, arg[i], sizeof(arg[i]));
-		}
-		forceSaber(ent, arg[0], arg[1]);
-	}
-	else if (trap_Argc() == 2) {
-		trap_Argv(1, arg[0], sizeof(arg[0]));
-
-		if (!Q_stricmp(arg[0], "single")) {
-			forceSaber(ent, "kyle", "none");
-		}
-		else if (!Q_stricmp(arg[0], "duals")) {
-			forceSaber(ent, "kyle", "kyle");
-		}
-		else if (!Q_stricmp(arg[0], "staff")) {
-			forceSaber(ent, "dual_2", "none");
-		}
-		else
-		{
-			invalid = qtrue;
-		}
-	}
-	else {
-		invalid = qtrue;
-	}
-
-	if (invalid) Disp(ent, CT_B"Usage: "CT_C"/setsaber "CT_AO"<single | duals | staff> "CT_B"OR "CT_C"/setsaber "CT_AO"<saber1> <saber2>");
-
-}
-
 cmdEntry_t playerCommandEntries[] = {
 	//{"testline", "\n", Cmd_TestLine_f, 0, 1, 0, 0, 0},
 	{"actions", "List and use your current pending actions.", Cmd_Action_f, 0, qfalse, 0, 0, 0, 0},
@@ -1147,7 +1092,6 @@ cmdEntry_t playerCommandEntries[] = {
 	{"say_buddies", "Send a message to your buddies.", Cmd_Say2_f, SAY_BUDDIES, qfalse, 0, 0, 0, 0},
 	{"say_close", "Send a message to those standing close to where you are.", Cmd_Say2_f, SAY_CLOSE, qfalse, 0, 0, 0, 0},
 	//{"scanner", "Scans for players, items, and the money stash.", Cmd_TechScanner_f, 0, 0, 256, 0, PROF_TECH},
-	{"setsaber", "Set your saber type and model. Usage: "CT_C"/setsaber "CT_AO"<single | duals | staff> "CT_B"OR "CT_C"/setsaber "CT_AO"<saber1> <saber2>", Cmd_SetSaber_f, 0, qfalse, 0, 0, ~(1 << GT_FFA), PROF_JEDI},
 	{"stash", "Tells you if there is a money stash spawned, and who is holding on to it (if anyone).", Cmd_Stash_f, 0, qfalse, 0, 512 | 128, 0, 0},
 	{NULL},
 };

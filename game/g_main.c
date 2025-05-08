@@ -316,6 +316,7 @@ vmCvar_t		d_asynchronousGroupAI;
 vmCvar_t		d_slowmodeath;
 vmCvar_t		d_noIntermissionWait;
 vmCvar_t		g_mapChangeWhenScoreIsTied;
+vmCvar_t		g_mitigateHealthESP;
 
 vmCvar_t		g_spskill;
 
@@ -870,6 +871,8 @@ static cvarTable_t		gameCvarTable[] = {
 
 	// Change the map even if the score is tied?
 	{ &g_mapChangeWhenScoreIsTied, "g_mapChangeWhenScoreIsTied", "0", CVAR_ARCHIVE, 0, qfalse },
+
+	{ &g_mitigateHealthESP, "g_mitigateHealthESP", "0", CVAR_ARCHIVE, 0, qfalse },
 
 	{ &g_austrian, "g_austrian", "0", CVAR_ARCHIVE, 0, qfalse  },
 	// nmckenzie:

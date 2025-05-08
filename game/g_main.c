@@ -395,8 +395,8 @@ vmCvar_t lmd_drain_below_level_3_range;
 
 // lumaya: SetSaber enable use time
 vmCvar_t lmd_set_saber_delay;
-vmCvar_t lmd_set_saber_cooldown;
 vmCvar_t lmd_set_saber_duels;
+vmCvar_t lmd_allow_set_saber;
 
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
@@ -620,13 +620,13 @@ static cvarTable_t		gameCvarTable[] = {
 	"Set the range for force drain below level 3.",
 	},
 	{ &lmd_set_saber_delay, "lmd_set_saber_delay", "750", CVAR_ARCHIVE, 0, qtrue, qfalse,
-		"Set the delay for /setsaber for when to be able to use saber again after swapping.",
-	},
-	{ &lmd_set_saber_cooldown, "lmd_set_saber_cooldown", "5000", CVAR_ARCHIVE, 0, qtrue, qfalse,
-		"Set a cooldown for when /setsaber can be used again.",
+		"Set the delay for instant saber switch for when to be able to use saber again after swapping.",
 	},
 	{ &lmd_set_saber_duels, "lmd_set_saber_duels", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
-		"Enable/Disable /setsaber in duels.",
+		"Enable/Disable instant saber switch in duels.",
+	},
+	{ &lmd_allow_set_saber, "lmd_allow_set_saber", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"Enable/Disable instant saber switch.",
 	},
 	//====================================================================================================
 	//====================================================================================================

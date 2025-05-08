@@ -3199,7 +3199,7 @@ const entityInfoData_t lmd_trainer_keys[] = {
     {"targetname", "Activate the lmd_trainer when targetted."},
     {"prof", "Professions this trainer handles (0 = all, 1 = Jedi, 2 = Merc)"},
     {"subprof", "Force sides this trainer handles (0 = all, 1 = light, 2 = dark). Only matters if prof = 1."},
-    {"anim", "Animation to use (0 = console, 1 = console)."},
+    {"anim", "Animation to use (0 = console, 1 = talking)."},
     {"selectsnd", "Sound played for confirmation."},
     {"navsnd", "Sound played for navigation."},
     {"cancelsnd", "Sound played for cancel."},

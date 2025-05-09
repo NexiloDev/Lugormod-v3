@@ -5643,29 +5643,29 @@ ContinueThink:
 								}
 								
 								switch (ent->client->Lmd.lmdMenu.trainerMenuMode) {
-								case 0:
+								case LMD_TRAINER_MENU:
 									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 2:
+								case LMD_NEUTRAL_SKILLS_MENU:
 									lmd_filteredskillmenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 3:
-								case 4:
+								case LMD_JEDI_SKILLS_MENU:
+								case LMD_SITH_SKILLS_MENU:
 									lmd_forceskillmenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 5:
+								case LMD_MERC_SKILLS_MENU:
 									lmd_mercenaryskillmenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 6:
+								case LMD_LEVEL_UP_MENU:
 									lmd_levelupmenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 7:
+								case LMD_RESET_SKILLS_MENU:
 									lmd_resetskillsmenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 8:
+								case LMD_SWAP_PROF_MENU:
 									lmd_swapprofmenu_key(ent, &ent->client->pers.cmd);
 									break;
-								case 9:
+								case LMD_SELECT_PROF_MENU:
 									lmd_profselectionmenu_key(ent, &ent->client->pers.cmd);
 									break;
 								default:

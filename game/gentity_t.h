@@ -366,11 +366,14 @@ struct gentity_s {
 		int boundsDisplayedUntil; // How long will the bounding box be displayed? (level.time + xxx)
 		char * color;
 		char * color2;
+		char * color3;
 		char * selectsnd;
 		char * navsnd;
 		char * cancelsnd;
 		int messageDelay;
 		int choiceDelay;
+		int prof;
+		int sideAcc;
 	}Lmd;
 	//RoboPhred
 	qboolean isAutoTargeted; //we were given a targetname automatically

@@ -4896,8 +4896,15 @@ extern void lmd_menu_key(gentity_t *player, usercmd_t *cmd);
 extern void lmd_menu_show(gentity_t *player, gentity_t *menu);
 extern void lmd_menu_exit(gentity_t *player);
 extern void lmd_menu_update(gentity_t *player);
-extern void lmd_skillmenu_key(gentity_t *player, usercmd_t *cmd, gentity_t *menu);
-extern void lmd_skillmenu_show(gentity_t *player, gentity_t *menu);
+extern void lmd_menu_display(gentity_t* player);
+extern void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd);
 void G_RunFrame( int levelTime ) {
 	int			i;
 	gentity_t	       *ent;
@@ -5643,21 +5650,62 @@ ContinueThink:
 							{
 								if (level.time >= ent->client->Lmd.lmdMenu.nextUpdateTime)
 								{
-									lmd_skillmenu_show(ent, menu);
+									lmd_menu_display(ent);
 									ent->client->Lmd.lmdMenu.nextUpdateTime = level.time + 1000;
 								}
 								
-								lmd_skillmenu_key(ent, &ent->client->pers.cmd, menu);
+								switch (ent->client->Lmd.lmdMenu.trainerMenuMode) {
+								case LMD_TRAINER_MENU:
+									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_NEUTRAL_SKILLS_MENU:
+									lmd_filteredskillmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_JEDI_SKILLS_MENU:
+								case LMD_SITH_SKILLS_MENU:
+									lmd_forceskillmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_MERC_SKILLS_MENU:
+									lmd_mercenaryskillmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_LEVEL_UP_MENU:
+									lmd_levelupmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_RESET_SKILLS_MENU:
+									lmd_resetskillsmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_SWAP_PROF_MENU:
+									lmd_swapprofmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_SELECT_PROF_MENU:
+									lmd_profselectionmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								default:
+									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
+									break;
+								}
 							}
 							else
 							{
 								lmd_menu_update(ent);
-								lmd_menu_show(ent, menu);
+
+								if (ent->client->Lmd.lmdMenu.choicesVisible >= menu->count)
+								{
+									if (level.time >= ent->client->Lmd.lmdMenu.nextUpdateTime)
+									{
+										lmd_menu_show(ent, menu);
+										ent->client->Lmd.lmdMenu.nextUpdateTime = level.time + 1000;
+									}
+								}
+								else
+								{
+									lmd_menu_show(ent, menu);
+								}
+
 								lmd_menu_key(ent, &ent->client->pers.cmd);
 							}
 
 							ent->client->Lmd.lmdMenu.lastServerTime = ent->client->pers.cmd.serverTime;
-							
 						}
 
 						ent->client->ps.weaponTime = FRAMETIME;
@@ -5668,7 +5716,6 @@ ContinueThink:
 						lmd_menu_exit(ent);
 					}
 				}
-
 			}
 
 			if (g_allowNPC.integer)

@@ -611,6 +611,156 @@ void Accounts_SetTime(Account_t *acc, int value) {
 	Lmd_Accounts_Modify(acc);
 }
 
+// lumaya Titles:
+
+#define MAX_TITLE_LENGTH 32
+#define DEFAULT_TITLE "Unknown"
+#define TITLES_FILE "lugormod/prof_titles.txt"
+
+typedef struct {
+	char jedi_titles[5][MAX_TITLE_LENGTH];
+	char sith_titles[5][MAX_TITLE_LENGTH];
+	char merc_titles[5][MAX_TITLE_LENGTH];
+} LmdTitleData_t;
+
+static LmdTitleData_t lmd_titleData;
+static int lmd_titlesLoaded = 0;
+
+void Accounts_CreateDefaultTitlesFile(void)
+{
+	FILE *file = fopen(TITLES_FILE, "w");
+	if (file == NULL) {
+		G_Printf("Failed to create default titles file\n");
+		return;
+	}
+	
+	fprintf(file, "# Jedi Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n");
+	fprintf(file, "JEDI,Youngling,Jedi Padawan,Jedi Knight,Jedi Master,Grand Master\n");
+	fprintf(file, "# Sith Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n");
+	fprintf(file, "SITH,Initiate,Sith Acolyte,Sith Apprentice,Sith Warrior,Sith Lord\n");
+	fprintf(file, "# Mercenary Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n");
+	fprintf(file, "MERC,Rookie,Hired Gun,Outlaw,Bounty Hunter,Elite Enforcer\n");
+    
+	fclose(file);
+	G_Printf("Created default titles file\n");
+}
+
+int Accounts_LoadTitles(void)
+{
+    FILE *file = fopen(TITLES_FILE, "r");
+    if (file == NULL) {
+        G_Printf("Titles file not found, creating default...\n");
+        Accounts_CreateDefaultTitlesFile();
+        file = fopen(TITLES_FILE, "r");
+        if (file == NULL) {
+            G_Printf("Failed to open titles file\n");
+            return 0;
+        }
+    }
+    
+    char line[256];
+    char *token;
+    int profession = -1;
+	
+    for (int i = 0; i < 5; i++) {
+        strcpy(lmd_titleData.jedi_titles[i], DEFAULT_TITLE);
+        strcpy(lmd_titleData.sith_titles[i], DEFAULT_TITLE);
+        strcpy(lmd_titleData.merc_titles[i], DEFAULT_TITLE);
+    }
+    
+    while (fgets(line, sizeof(line), file)) {
+        if (line[0] == '#' || line[0] == '\n' || line[0] == '\r') {
+            continue;
+        }
+    	
+        line[strcspn(line, "\r\n")] = 0;
+    	
+        token = strtok(line, ",");
+        if (token == NULL) continue;
+        
+        if (strcmp(token, "JEDI") == 0) {
+            profession = 0;
+        } else if (strcmp(token, "SITH") == 0) {
+            profession = 1;
+        } else if (strcmp(token, "MERC") == 0) {
+            profession = 2;
+        } else {
+            continue;
+        }
+    	
+        for (int i = 0; i < 5; i++) {
+            token = strtok(NULL, ",");
+            if (token == NULL) break;
+            
+            if (profession == 0) {
+                strncpy(lmd_titleData.jedi_titles[i], token, MAX_TITLE_LENGTH - 1);
+                lmd_titleData.jedi_titles[i][MAX_TITLE_LENGTH - 1] = '\0';
+            } else if (profession == 1) {
+                strncpy(lmd_titleData.sith_titles[i], token, MAX_TITLE_LENGTH - 1);
+                lmd_titleData.sith_titles[i][MAX_TITLE_LENGTH - 1] = '\0';
+            } else if (profession == 2) {
+                strncpy(lmd_titleData.merc_titles[i], token, MAX_TITLE_LENGTH - 1);
+                lmd_titleData.merc_titles[i][MAX_TITLE_LENGTH - 1] = '\0';
+            }
+        }
+    }
+    
+    fclose(file);
+    lmd_titlesLoaded = 1;
+    G_Printf("Titles loaded successfully\n");
+    return 1;
+}
+
+static int GetTitleIndex(int levelp)
+{
+	if (levelp <= 9) return 0;
+	if (levelp <= 19) return 1;
+	if (levelp <= 29) return 2;
+	if (levelp <= 39) return 3;
+	return 4;
+}
+
+char* Accounts_GetTitle(Account_t *acc)
+{
+	if (acc == NULL) {
+		return DEFAULT_TITLE;
+	}
+	
+	if (!lmd_titlesLoaded) {
+		if (!Accounts_LoadTitles()) {
+			return DEFAULT_TITLE;
+		}
+	}
+    
+	int levelp = Accounts_Prof_GetLevel(acc);
+	const int profession = Accounts_Prof_GetProfession(acc);
+    
+	// idk if that happens, but let's make sure
+	if (levelp < 1) levelp = 1;
+	if (levelp > 40) levelp = 40;
+    
+	int titleIndex = GetTitleIndex(levelp);
+	
+	if (profession == PROF_JEDI)
+	{
+		const int sideAcc = Jedi_GetAccSide(acc);
+		switch (sideAcc)
+		{
+			default:	
+			case 0:
+				return "None";
+			case 1:
+				return lmd_titleData.jedi_titles[titleIndex];
+			case 2:
+				return lmd_titleData.sith_titles[titleIndex];
+		}
+	}
+	
+	if (profession == PROF_MERC) return lmd_titleData.merc_titles[titleIndex];
+	
+	return DEFAULT_TITLE;
+}
+
 int Accounts_GetFlags(Account_t *acc) {
 	if(!acc)
 		return 0;

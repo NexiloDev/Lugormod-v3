@@ -15,6 +15,13 @@
 #include "Lmd_Interact.h"
 #include "Lmd_Professions_Public.h"
 
+extern profession_t *Professions[];
+extern void Cmd_SkillSelect_Level(gentity_t* ent, int prof, profSkill_t* skill, qboolean down);
+extern int Professions_AvailableSkillPoints(Account_t *acc, int prof, profSkill_t *skill, profSkill_t **parent);
+extern int Professions_UsedSkillPoints(Account_t *acc, int prof, profSkill_t *skill);
+extern void Cmd_ResetSkills_f (gentity_t *ent, int iArg);
+extern int Jedi_GetSide(gentity_t* ent);
+
 int EntitiesInBox(const vec3_t mins, const vec3_t maxs, int* list, int maxcount, qboolean logical);
 
 //for fake body
@@ -240,8 +247,6 @@ void PlayerUsableGetKeys(gentity_t* ent)
     G_SpawnInt("requirecredits", "", &ent->Lmd.UseReq.credits);
 }
 
-char* ProfessionName(int prof);
-extern int Jedi_GetSide(gentity_t* ent);
 qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
 {
     int activatorLevel;
@@ -3214,7 +3219,6 @@ entityInfo_t lmd_trainer_info = {
 void lmd_menu_exit(gentity_t* player);
 void lmd_filteredskillmenu_show(gentity_t* player, gentity_t* menu, int filterMode);
 void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator);
-extern profession_t *Professions[];
 
 void lmd_trainer(gentity_t* self)
 {
@@ -3357,6 +3361,11 @@ void lmd_profselectionmenu_show(gentity_t* player, gentity_t* menu)
     
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
 }
+
+extern qboolean Professions_ChooseProf(gentity_t *ent, int prof);
+extern int Professions_LevelCost(int prof, int level, int time);
+extern int Accounts_Prof_GetLastLevelup(Account_t *acc);
+char* Accounts_GetTitle(Account_t *acc);
 
 void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd)
 {
@@ -3886,8 +3895,6 @@ void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd)
     }
 }
 
-extern void Cmd_SkillSelect_Level(gentity_t* ent, int prof, profSkill_t* skill, qboolean down);
-extern int Professions_AvailableSkillPoints(Account_t *acc, int prof, profSkill_t *skill, profSkill_t **parent);
 void lmd_mercenaryskillmenu_show(gentity_t* player, gentity_t* menu)
 {
     if (!player || !player->client || !menu || !menu->inuse || !player->client->pers.Lmd.account)
@@ -4138,7 +4145,7 @@ void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd)
         player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
     }
 }
-extern void Cmd_ResetSkills_f (gentity_t *ent, int iArg);
+
 void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client || !player->client->pers.Lmd.account)

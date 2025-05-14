@@ -713,10 +713,10 @@ int Accounts_LoadTitles(void)
 
 static int GetTitleIndex(int levelp)
 {
-	if (levelp >= 1 && levelp <= 9) return 0;
-	if (levelp >= 10 && levelp <= 19) return 1;
-	if (levelp >= 20 && levelp <= 29) return 2;
-	if (levelp >= 30 && levelp <= 39) return 3;
+	if (levelp <= 9) return 0;
+	if (levelp <= 19) return 1;
+	if (levelp <= 29) return 2;
+	if (levelp <= 39) return 3;
 	return 4;
 }
 

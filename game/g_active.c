@@ -161,7 +161,7 @@ void P_DamageFeedback( gentity_t *player ) {
 				snd = "*pain100.wav";
 			}
 
-			G_AddEvent( player, EV_GENERAL_SOUND, G_SoundIndex(snd) );
+			G_EntitySound( player, CHAN_VOICE, G_SoundIndex(snd) );
 		} else if ( g_mitigateHealthESP.integer == 1 ) {
 			int health;
 

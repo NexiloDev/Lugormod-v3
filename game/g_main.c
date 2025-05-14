@@ -44,7 +44,7 @@ const char *verMods =
 
 #else
 
-#define LUGORMODVERSION_CORE "v3.1.0"
+#define LUGORMODVERSION_CORE "v3.1.1"
 #ifdef LMD_EXPERIMENTAL
 #define LUGORMODVERSION LUGORMODVERSION_CORE" Alpha"
 #else
@@ -331,6 +331,8 @@ vmCvar_t	g_powerDuelEndHealth;
 // nmckenzie: temporary way to show player healths in duels - some iface gfx in game would be better, of course.
 // DUEL_HEALTH
 vmCvar_t		g_showDuelHealths;
+
+vmCvar_t        g_blockspeedhack;
 
 //RoboPhred:
 vmCvar_t lmd_DataPath;
@@ -880,6 +882,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_showDuelHealths, "g_showDuelHealths", "0", CVAR_SERVERINFO },
 	{ &g_powerDuelStartHealth, "g_powerDuelStartHealth", "150", CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_powerDuelEndHealth, "g_powerDuelEndHealth", "90", CVAR_ARCHIVE, 0, qtrue  },
+
+	{ &g_blockspeedhack, "g_blockspeedhack", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	// Lugormod cvars:
 	{ &g_noVoteTime, "g_noVoteTime", "5", CVAR_ARCHIVE,0, qfalse, qfalse,

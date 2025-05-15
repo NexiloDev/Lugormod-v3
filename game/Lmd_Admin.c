@@ -783,36 +783,32 @@ void Cmd_Playerlist_f(gentity_t *ent, int iArg)
     char *str;
 
     if (trap_Argc() < 2)
-    	{
+    {
         from = 0;
         to = MAX_CLIENTS;
     }
-	else
-	{
+    else
+    {
         char arg[MAX_TOKEN_CHARS];
         trap_Argv(1, arg, sizeof(arg));
         from = ClientNumberFromString(ent, arg);
         if (from < 0 || from > MAX_CLIENTS) return;
         to = from + 1;
     }
-
-	Disp(ent, "----------------------------------------------------------------------------------------------------------------------------------");
-	Disp(ent, "Ind Player                       Mute Caps Call King Iodl Jail Credits    lvl Votes Id   Username      IP              Host");
-
+	
+    Disp(ent, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+    Disp(ent, "Ind Player                       Mute Caps Call King Iodl Jail Credits    lvl Votes Id   Username      IP              Hostname");
 
     for (i = from; i < to; i++)
     {
         pEnt = &g_entities[i];
         if (!pEnt->inuse || !pEnt->client) continue;
-    	
-        if (shade)
-            Q_strcat(dstr, sizeof(dstr), "^3");
-        else
-            Q_strcat(dstr, sizeof(dstr), "^7");
+
+        Q_strcat(dstr, sizeof(dstr), shade ? "^3" : "^7");
         shade = !shade;
-    	
+
         Q_strcat(dstr, sizeof(dstr), va("%-2i  ", i));
-    	
+
         Q_strncpyz(name, pEnt->client->pers.netname, sizeof(name));
         Q_CleanStr(name);
         if (strlen(name) > 27) name[27] = '\0';
@@ -820,54 +816,54 @@ void Cmd_Playerlist_f(gentity_t *ent, int iArg)
 
         if (pEnt->client->pers.connected != CON_CONNECTED)
         {
-        	Q_strcat(dstr, sizeof(dstr), "-----------------------------------------------------------------------------------------------------------");
-        	Disp(ent, dstr);
+            Q_strcat(dstr, sizeof(dstr), "-------------------------------------------------------------------------------------------------------------------------------------------");
+            Disp(ent, dstr);
             dstr[0] = 0;
             continue;
         }
-    	
+
         for (n = 0; n < 5; n++) {
             if (pEnt->client->pers.Lmd.persistantFlags & (1 << n))
                 Q_strcat(dstr, sizeof(dstr), "**** ");
             else
                 Q_strcat(dstr, sizeof(dstr), "     ");
         }
-    	
+
         if (pEnt->client->pers.Lmd.jailTime > level.time)
             Q_strcat(dstr, sizeof(dstr), "**** ");
         else
             Q_strcat(dstr, sizeof(dstr), "     ");
-    	
+
         Q_strcat(dstr, sizeof(dstr), va("%-10i ", PlayerAcc_GetCredits(pEnt)));
         Q_strcat(dstr, sizeof(dstr), va("%-3i ", PlayerAcc_Prof_GetLevel(pEnt)));
         Q_strcat(dstr, sizeof(dstr), va("%-5i ", pEnt->client->pers.voteCount));
         Q_strcat(dstr, sizeof(dstr), va("%-4i ", PlayerAcc_GetId(pEnt)));
-    	
+
         str = PlayerAcc_GetUsername(pEnt);
         if (!str) str = "";
         char uname[32];
         Q_strncpyz(uname, str, sizeof(uname));
         if (strlen(uname) > 12) uname[12] = '\0';
         Q_strcat(dstr, sizeof(dstr), va("%-13s ", uname));
-    	
-    	Q_strncpyz(ipstr, Lmd_IPs_IPToString(pEnt->client->sess.Lmd.ip), sizeof(ipstr));
-    	Q_strcat(dstr, sizeof(dstr), va("%-15s ", ipstr));
 
-    	host = Lmd_IPs_GetHostname(pEnt->client->sess.Lmd.ip);
-    	char hostbuf[64];
-    	Q_strncpyz(hostbuf, host ? host : "", sizeof(hostbuf));
-    	if (strlen(hostbuf) > 19) hostbuf[19] = '\0';
-    	Q_strcat(dstr, sizeof(dstr), va("%-20s", hostbuf));
-    	
+        Q_strncpyz(ipstr, Lmd_IPs_IPToString(pEnt->client->sess.Lmd.ip), sizeof(ipstr));
+        Q_strcat(dstr, sizeof(dstr), va("%-15s ", ipstr));
+
+        host = Lmd_IPs_GetHostname(pEnt->client->sess.Lmd.ip);
+        char hostbuf[64];
+        Q_strncpyz(hostbuf, host ? host : "", sizeof(hostbuf));
+        Q_strcat(dstr, sizeof(dstr), va("%-64s", hostbuf));
+
         Disp(ent, dstr);
         dstr[0] = 0;
     }
 
-	Disp(ent, "----------------------------------------------------------------------------------------------------------------------------------");
+    Disp(ent, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
     Disp(ent, va("^3Credits in the world: ^2CR %i", SumCredits()));
     Disp(ent, va("^3Credits in accounts: ^2CR %u", totalAccountCredits()));
     Disp(ent, va("^3Number of registered accounts: ^2%i", Accounts_Count()));
 }
+
 
 
 void RenamePlayer( gentity_t *ent, char *Name);

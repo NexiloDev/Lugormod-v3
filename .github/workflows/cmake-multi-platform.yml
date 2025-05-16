@@ -59,7 +59,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs').promises;
-            for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build/`) )
+            for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build/Release`) )
             {
               if ( filename.endsWith('.dll') )
               {
@@ -69,7 +69,7 @@ jobs:
                     repo: context.repo.repo,
                     release_id: ${{ github.event.release.id }},
                     name: filename,
-                    data: await fs.readFile( String.raw`${{github.workspace}}/build/` + filename )
+                    data: await fs.readFile( String.raw`${{github.workspace}}/build/Release/` + filename )
                   }
                 );
               }

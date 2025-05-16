@@ -1884,11 +1884,6 @@ void lmd_terminal_interact(gentity_t* self, gentity_t* activator)
     if (!PlayerUseableCheck(self, activator))
         return;
 
-    if (self->spawnflags & 4)
-    {
-        return;
-    }
-
     trap_Argv(1, arg1, sizeof(arg1));
     if (!arg1[0])
     {
@@ -1902,6 +1897,9 @@ void lmd_terminal_interact(gentity_t* self, gentity_t* activator)
         Disp(activator, va("^3Unknown interaction command, expected number between 1 and %i", self->count));
         return;
     }
+    
+    qboolean exitLmdMenu = self->spawnflags & 4 && activator->client && activator->client->Lmd.lmdMenu.entityNum > 0;
+    if (exitLmdMenu && i >= 1 && i <= self->count) trap_SendServerCommand(activator->s.number, "cp \" \"");
 
     switch (i)
     {
@@ -1923,6 +1921,7 @@ void lmd_terminal_interact(gentity_t* self, gentity_t* activator)
     }
     G_UseTargets2(self, activator, self->GenericStrings[8]); // global target
     Disp(activator, "^2Command successful.");
+    if (exitLmdMenu) lmd_menu_exit(activator);
 }
 
 

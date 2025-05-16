@@ -183,7 +183,6 @@ void Cmd_GrantAdmin_f (gentity_t *ent, int iArg);
 void Cmd_GrantTempAdmin_f(gentity_t *ent, int iArg);
 void Cmd_AdminInfo_f (gentity_t *ent, int iArg);
 
-void Cmd_PlayerIPs_f(gentity_t *ent, int iArg);
 void Cmd_BanIP_f(gentity_t *ent, int iArg);
 void Cmd_BanHost_f(gentity_t *ent, int iArg);
 void Cmd_RemoveBan_f(gentity_t *ent, int iArg);
@@ -784,10 +783,6 @@ qboolean	ConsoleCommand( void ) {
 	*/
 
 	//RoboPhred
-	if (Q_stricmp (cmd, "playerips") == 0) {
-		Cmd_PlayerIPs_f(NULL, 0);
-		return qtrue;
-	}
 	if (Q_stricmp (cmd, "banip") == 0) {
 		Cmd_BanIP_f(NULL, 0);
 		return qtrue;

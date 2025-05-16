@@ -3,6 +3,10 @@ name: Build
 on:
   release:
     types: [created]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "docs/*"
   pull_request:
     branches: [ "develop" ]
     paths-ignore:
@@ -45,12 +49,12 @@ jobs:
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         working-directory: ${{ github.workspace }}/build
         shell: bash
-        run: cmake --install . --config ${{ matrix.build_type }}
+        run: cmake --install . --prefix ${{github.workspace}}/build/out --config ${{ matrix.build_type }}
       - uses: 'actions/upload-artifact@v4'
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         with:
           name: ${{ github.event.release.name }}, ${{ matrix.build_type }}, ${{ matrix.arch }}
-          path: ${{github.workspace}}/build/out/*.zip
+          path: ${{github.workspace}}/build/out/*.dll
       - name: Upload Release
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         uses: actions/github-script@v6
@@ -60,7 +64,7 @@ jobs:
             const fs = require('fs').promises;
             for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build/out/`) )
             {
-              if ( filename.endsWith('.so') )
+              if ( filename.endsWith('.dll') )
               {
                 await github.rest.repos.uploadReleaseAsset(
                   {
@@ -120,12 +124,12 @@ jobs:
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
       working-directory: ${{ github.workspace }}/build
       shell: bash
-      run: cmake --install . --config ${{ matrix.build_type }}
+      run: cmake --install . --prefix ${{github.workspace}}/build/out --config ${{ matrix.build_type }}
     - uses: 'actions/upload-artifact@v4'
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
       with:
         name: ${{ github.event.release.name }}, ${{ matrix.build_type }}, ${{ matrix.arch }}
-        path: ${{github.workspace}}/build/*.zip
+        path: ${{github.workspace}}/build/*.so
     - name: Upload Release
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
       uses: actions/github-script@v6
@@ -133,9 +137,9 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs').promises;
-          for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build/`) )
+          for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build/out`) )
           {
-            if ( filename.endsWith('.dll') )
+            if ( filename.endsWith('.so') )
             {
               await github.rest.repos.uploadReleaseAsset(
                 {

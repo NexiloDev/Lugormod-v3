@@ -712,8 +712,6 @@ void Cmd_SkillSelect_Level(gentity_t *ent, int prof, profSkill_t *skill, qboolea
 		}
 		level++;
 
-		Disp(ent, va("^3The ^2%s^3 skill is now at level ^2%i^3.", skill->name, level));
-
 		int points = Professions_AvailableSkillPoints(acc, prof, skill, NULL);
 		if(points < level) {
 			Disp(ent, va("^3It takes ^2%i^3 points to level up this skill.", level));
@@ -725,6 +723,8 @@ void Cmd_SkillSelect_Level(gentity_t *ent, int prof, profSkill_t *skill, qboolea
 			Disp(ent, va("^3This skill cannot be leveled up at this time."));
 			return;
 		}
+
+		Disp(ent, va("^3The ^2%s^3 skill is now at level ^2%i^3.", skill->name, level));
 
 		if(level >= skill->levels.max) {
 			Disp(ent, "^3This skill is now at its highest level.");

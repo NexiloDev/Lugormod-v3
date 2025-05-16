@@ -1885,7 +1885,7 @@ void lmd_terminal_interact(gentity_t* self, gentity_t* activator)
         return;
 
     trap_Argv(1, arg1, sizeof(arg1));
-    if (!arg1[0] && !(self->spawnflags & 4))
+    if (!arg1[0])
     {
         lmd_terminal_use(self, activator, activator);
         return;

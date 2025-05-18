@@ -1,0 +1,27 @@
+Name: Owner
+Rank: 1
+Flags: 483 //This rank has: 1-adminchat, 2-callvote, 32-can't ignore, 64-cheats, 128-god prof, 256-botwaypoint
+
+//BITMASK VALUES
+//1-admin chat, 2-callvote, 4-save placed, 8-no spectate, 16-can follow, 
+//32-can't ignore, 64-cheats, 128-god prof, 256-botwaypoint 
+
+AccountEdit: report,1,restrict,1,
+BanHost: report,1,restrict,1,
+BlowUp: report,1,restrict,1,
+BotWpRender: report,1,restrict,1,
+DebugThrow: report,1,restrict,1,
+Dragon: report,1,restrict,1,
+FakeIp: report,1,restrict,1,
+FindIp: report,1,restrict,1,
+GrantAdmin: report,1,restrict,1,
+GrantTempAdmin: report,1,restrict,1,
+HidePing: report,1,restrict,1,
+ListIps: report,1,restrict,1,
+NewMap: report,1,restrict,1,
+NextMap: report,1,restrict,1,
+PlayerIps: report,1,restrict,1,
+RemoveAdmin: report,1,restrict,1,
+Undying: report,1,restrict,1,
+
+//End

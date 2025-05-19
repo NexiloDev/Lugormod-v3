@@ -401,6 +401,8 @@ vmCvar_t lmd_set_saber_delay;
 vmCvar_t lmd_set_saber_duels;
 vmCvar_t lmd_allow_set_saber;
 
+vmCvar_t lmd_melee_lightning_multiplier;
+
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
 
@@ -630,6 +632,9 @@ static cvarTable_t		gameCvarTable[] = {
 	},
 	{ &lmd_allow_set_saber, "lmd_allow_set_saber", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
 		"Enable/Disable instant saber switch.",
+	},
+	{ &lmd_melee_lightning_multiplier, "lmd_melee_lightning_multiplier", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"Set the multiplier for melee force lightning damage.",
 	},
 	//====================================================================================================
 	//====================================================================================================

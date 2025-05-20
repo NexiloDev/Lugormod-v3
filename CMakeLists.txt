@@ -111,7 +111,8 @@ set(GAME_SRC
 	game/Lmd_Crafting.c 
 	game/Lmd_CrashReport.c 
 	game/Lmd_Credits.c 
-	game/Lmd_Creditshunt.c 
+	game/Lmd_Creditshunt.c
+	game/Lmd_Crosshair.c  
 	game/Lmd_Data.c 
 	game/Lmd_Entities_Commands.c 
 	game/Lmd_Entities_Core.c 

@@ -1,4 +1,7 @@
-#pragma once 
+// Copyright (C) 1999-2000 Id Software, Inc.
+//
+#ifndef __Q_SHARED_H
+#define __Q_SHARED_H
 
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
@@ -7,6 +10,62 @@
 #define Q3_SCRIPT_DIR	"scripts"
 
 #define MAX_TEAMNAME 32
+
+//================= COMPILER-SPECIFIC DEFINES ===========================
+
+#ifdef Q3_VM
+#define TRAP_PTR(trap) (&trap)
+#define TRAP_NAME(trap) (trap)
+#define TRAP_PROTO(type, trap) type trap
+#else
+#define OJK_API_SUPPORT
+#define TRAP_PTR(trap) (trap)
+#define TRAP_NAME(trap) (trap##_Legacy)
+#define TRAP_PROTO(type, trap) extern type (*trap)
+#endif
+
+#if defined __LCC__
+
+#define Q_INLINE
+#define QDECL
+#define LIBEXPORT
+#define Q_NORETURN
+#define Q_PTR_NORETURN
+#define q_unreachable()
+#define __attribute__(x)
+
+#elif defined _MSC_VER							// Microsoft Visual C++
+
+#define Q_INLINE __inline
+#define	QDECL	__cdecl
+#define LIBEXPORT __declspec(dllexport)
+#define Q_NORETURN __declspec(noreturn)
+#define Q_PTR_NORETURN // MSVC doesn't support noreturn function pointers
+#define q_unreachable() abort()
+#define __attribute__(x)
+
+#elif (defined __GNUC__ || defined __clang__)	// GCC & Clang
+
+#define Q_INLINE inline
+#define QDECL
+#define LIBEXPORT __attribute__((visibility("default")))
+#define Q_NORETURN __attribute__((noreturn))
+#define Q_PTR_NORETURN Q_NORETURN
+#define q_unreachable() __builtin_unreachable()
+
+#else											// Any ANSI C compiler
+
+#define Q_INLINE inline
+#define QDECL
+#define LIBEXPORT
+#define Q_NORETURN
+#define Q_PTR_NORETURN
+#define q_unreachable() abort()
+#define __attribute__(x)
+
+#endif
+
+//=============================================================
 
 #include "../qcommon/disablewarnings.h"
 
@@ -25,7 +84,6 @@
 #define VALIDATEP( a )	if ( a == NULL ) {	assert(0);	return NULL;	}
 
 #define VALIDSTRING( a )	( ( a != 0 ) && ( a[0] != 0 ) )
-
 
 /*
 #define G2_EHNANCEMENTS
@@ -47,6 +105,14 @@ extern int g_Ghoul2Allocations;
 extern int g_G2ServerAlloc;
 extern int g_G2ClientAlloc;
 extern int g_G2AllocServer;
+#endif
+
+#ifdef LMD_MEMORY_DEBUG
+#define _CRTDBG_MAP_ALLOC
+#endif
+
+#ifdef LMD_MEMORY_DEBUG
+#include <crtdbg.h>
 #endif
 
 /**********************************************************************
@@ -71,14 +137,18 @@ extern int g_G2AllocServer;
 
 #define assert(exp)     ((void)0)
 
-#define min(x,y) ((x)<(y)?(x):(y))
-#define max(x,y) ((x)>(y)?(x):(y))
+#if !defined(VM_STDINT)
+    #define VM_STDINT
+    typedef unsigned char uint8_t;
+    typedef unsigned short uint16_t;
+    typedef unsigned int uint32_t;
+
+    typedef signed char int8_t;
+    typedef signed short int16_t;
+    typedef signed int int32_t;
+#endif
 
 #else
-
-#ifdef LMD_MEMORY_DEBUG
-#define _CRTDBG_MAP_ALLOC
-#endif
 
 #include <assert.h>
 #include <math.h>
@@ -89,37 +159,12 @@ extern int g_G2AllocServer;
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
+#include <stdint.h>
 
-#ifdef LMD_MEMORY_DEBUG
-#include <crtdbg.h>
 #endif
 
-// Special min treatment for Xbox C++ version
-
-#ifdef _XBOX
 #define min(x,y) ((x)<(y)?(x):(y))
 #define max(x,y) ((x)>(y)?(x):(y))
-
-#define tvector(T) std::vector< T >
-#define tdeque(T) std::deque< T >
-
-#define tlist(T) std::list< T >
-#define tslist(T) std::slist< T >
-
-#define tset(T) std::set< T, std::less< T > >
-#define tmultiset(T) std::multiset< T, std::less< T > >
-
-#define tcset(T,C) std::set< T, C >
-#define tcmultiset(T,C) std::multiset< T, C >
-
-#define tmap(K,T) std::map< K, T, std::less< K > >
-#define tmultimap(K,T) std::multimap< K, T, std::less< K > >
-
-#define tcmap(K,T,C) std::map< K, T, C >
-#define tcmultimap(K,T,C) std::multimap< K, T, C >
-#endif
-
-#endif
 
 #ifdef _WIN32
 
@@ -142,8 +187,6 @@ extern int g_G2AllocServer;
 
 // for windows fastcall option
 
-#define	QDECL
-
 short   ShortSwap (short l);
 int		LongSwap (int l);
 float	FloatSwap (const float *f);
@@ -153,9 +196,6 @@ float	FloatSwap (const float *f);
 #ifdef WIN32
 
 #define	MAC_STATIC
-
-#undef QDECL
-#define	QDECL	__cdecl
 
 // buildstring will be incorporated into the version string
 #ifdef NDEBUG
@@ -172,7 +212,7 @@ float	FloatSwap (const float *f);
 #endif
 #endif
 
-#define ID_INLINE __inline 
+#define ID_INLINE __inline
 
 static ID_INLINE short BigShort( short l) { return ShortSwap(l); }
 #define LittleShort
@@ -193,7 +233,7 @@ static ID_INLINE float BigFloat(const float *l) { FloatSwap(l); }
 #define __cdecl
 #define __declspec(x)
 #define stricmp strcasecmp
-#define ID_INLINE inline 
+#define ID_INLINE inline
 
 #ifdef __ppc__
 #define CPUSTRING	"MacOSX-ppc"
@@ -204,31 +244,6 @@ static ID_INLINE float BigFloat(const float *l) { FloatSwap(l); }
 #endif
 
 #define	PATH_SEP	'/'
-
-#define __rlwimi(out, in, shift, maskBegin, maskEnd) asm("rlwimi %0,%1,%2,%3,%4" : "=r" (out) : "r" (in), "i" (shift), "i" (maskBegin), "i" (maskEnd))
-#define __dcbt(addr, offset) asm("dcbt %0,%1" : : "b" (addr), "r" (offset))
-
-static inline unsigned int __lwbrx(register void *addr, register int offset) {
-    register unsigned int word;
-    
-    asm("lwbrx %0,%2,%1" : "=r" (word) : "r" (addr), "b" (offset));
-    return word;
-}
-
-static inline unsigned short __lhbrx(register void *addr, register int offset) {
-    register unsigned short halfword;
-    
-    asm("lhbrx %0,%2,%1" : "=r" (halfword) : "r" (addr), "b" (offset));
-    return halfword;
-}
-
-static inline float __fctiw(register float f) {
-    register float fi;
-    
-    asm("fctiw %0,%1" : "=f" (fi) : "f" (f));
-
-    return fi;
-}
 
 #define BigShort
 static inline short LittleShort(short l) { return ShortSwap(l); }
@@ -244,11 +259,9 @@ static inline float LittleFloat (const float l) { return FloatSwap(&l); }
 #ifdef __MACOS__
 
 #include <MacTypes.h>
-//#ifdef __cplusplus //should be defined
-//#include "exports.h" //Lugormod just trying to get things to work
-//#endif
 #define	MAC_STATIC
-#define ID_INLINE inline 
+#define ID_INLINE inline
+
 #define	CPUSTRING	"MacOS-PPC"
 
 #define	PATH_SEP ':'
@@ -262,18 +275,7 @@ static inline int LittleLong (int l) { return LongSwap(l); }
 #define BigFloat
 static inline float LittleFloat (const float l) { return FloatSwap(&l); }
 
-//Lugormod these were not in stdclib for some reason.
-#ifndef Q3_VM
-typedef int cmp_t(const void *, const void *);
-void qsort(void *a, size_t n, size_t es, cmp_t *cmp);
-#endif //Q3_VM
-/* They did this in the SDK for MAC but I don't get it.
-#define min(X, Y)  ((X) < (Y) ? (X) : (Y))
-#define max(X, Y)  ((X) > (Y) ? (X) : (Y))
-#define strupr		Q_strupr
-#define strnicmp	Q_stricmpn
-*/
-#endif //__MACOS__
+#endif
 
 //======================= LINUX DEFINES =================================
 
@@ -329,7 +331,7 @@ inline static float LittleFloat (const float *l) { return FloatSwap(l); }
 #define stricmp strcasecmp
 
 #define MAC_STATIC
-#define ID_INLINE inline 
+#define ID_INLINE inline
 
 #ifdef __i386__
 #define CPUSTRING       "freebsd-i386"
@@ -367,23 +369,15 @@ static float LittleFloat (const float *l) { return FloatSwap(l); }
 
 typedef unsigned char 		byte;
 typedef unsigned short		word;
-//RoboPhred
-#ifndef __linux__
 typedef unsigned long		ulong;
-#endif
 
-//typedef enum {qfalse, qtrue} qboolean;
-//typedef int qboolean;                //Arghhh!!!
-//const qboolean qfalse = 0;              //Ugly, very ugly
-//const qboolean qtrue  = 1;               //but I have to.
-#define	qboolean	int  //don't want strict type checking on the qboolean
-#define qfalse          0
-#define qtrue           1
+typedef enum {qfalse, qtrue}	qboolean;
 
-#ifdef _XBOX
-define	qboolean	int  //don't want strict type checking on the qboolean
-
-#endif
+typedef union {
+	float f;
+	int i;
+	unsigned int ui;
+} floatint_t;
 
 typedef int		qhandle_t;
 typedef int		thandle_t; //rwwRMG - inserted
@@ -393,7 +387,7 @@ typedef int		fileHandle_t;
 typedef int		clipHandle_t;
 
 #ifndef NULL
-#define NULL 0//((void *)0)
+#define NULL ((void *)0)
 #endif
 
 #define	MAX_QINT			0x7fffffff
@@ -421,7 +415,6 @@ typedef int		clipHandle_t;
 
 
 #define	MAX_QPATH			64		// max length of a quake game pathname
-//#define         MAX_QPATH                       1024   //Experiment let's go high on this. Didn't help at all. Maybe I have to restart server ?
 #ifdef PATH_MAX
 #define MAX_OSPATH			PATH_MAX
 #else
@@ -440,6 +433,8 @@ typedef enum {
 	EXEC_APPEND			// add to end of the command buffer (normal case)
 } cbufExec_t;
 
+
+#define ARRAY_LEN(x) (sizeof (x) / sizeof( *(x) ))
 
 //
 // these aren't needed by any of the VMs.  put in another header?
@@ -463,10 +458,7 @@ enum WL_e {
 	WL_DEBUG
 };
 
-//RoboPhred: nothing uses this.
-#if 0
 extern float forceSpeedLevels[4];
-#endif
 
 // print levels from renderer (FIXME: set up for game / cgame?)
 typedef enum {
@@ -531,10 +523,6 @@ typedef enum {
 #define UI_INVERSE		0x00002000
 #define UI_PULSE		0x00004000
 
-#if defined(_DEBUG) && !defined(BSPC) && !defined(_XBOX)
-	#define HUNK_DEBUG
-#endif
-
 typedef enum {
 	h_high,
 	h_low,
@@ -545,13 +533,6 @@ void *Hunk_Alloc( int size, ha_pref preference );
 
 void Com_Memset (void* dest, const int val, const size_t count);
 void Com_Memcpy (void* dest, const void* src, const size_t count);
-
-//RoboPhred: linux broke this.
-#ifndef __linux
-//[OverflowProtection]
-int Q_vsnprintf( char *dest, int size, const char *fmt, va_list argptr );
-//[/OverflowProtection]
-#endif
 
 #define CIN_system	1
 #define CIN_loop	2
@@ -615,8 +596,7 @@ typedef enum {
 
 
 
-//typedef 
-enum
+typedef enum
 {
 	SABER_RED,
 	SABER_ORANGE,
@@ -626,11 +606,9 @@ enum
 	SABER_PURPLE,
 	NUM_SABER_COLORS
 
-};
-typedef int saber_colors_t;
+} saber_colors_t;
 
-//typedef 
-enum
+typedef enum
 {
 	FP_FIRST = 0,//marker
 	FP_HEAL = 0,//instant
@@ -652,8 +630,7 @@ enum
 	FP_SABER_DEFENSE,
 	FP_SABERTHROW,
 	NUM_FORCE_POWERS
-};
-typedef int forcePowers_t;
+} forcePowers_t;
 
 typedef enum
 {
@@ -673,7 +650,7 @@ typedef enum
 	NUM_SABERS
 } saberType_t;
 
-typedef struct 
+typedef struct
 {
 	// Actual trail stuff
 	int		inAction;	// controls whether should we even consider starting one
@@ -687,7 +664,7 @@ typedef struct
 
 	// Marks stuff
 	qboolean	haveOldPos[2];
-	vec3_t		oldPos[2];		
+	vec3_t		oldPos[2];
 	vec3_t		oldNormal[2];	// store this in case we don't have a connect-the-dots situation
 							//	..then we'll need the normal to project a mark blob onto the impact point
 } saberTrail_t;
@@ -709,8 +686,8 @@ typedef struct
 	int			hitWallDebounceTime;
 	int			storageTime;
 	int			extendDebounce;
-        float           unscaledRadius; //Lugormod
-        float           unscaledLengthMax; //Lugoromd
+    float       unscaledRadius;     //Lugormod
+    float       unscaledLengthMax;  //Lugoromd
 } bladeInfo_t;
 #define MAX_BLADES 8
 
@@ -816,10 +793,10 @@ typedef struct
 	float		animSpeedScale;				//1.0 - plays normal attack animations faster/slower
 
 	//done in both cgame and game (BG code)
-	int	kataMove;				//LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time 
-	int	lungeAtkMove;			//LS_INVALID - if set, player will execute this move when they crouch+fwd+attack 
-	int	jumpAtkUpMove;			//LS_INVALID - if set, player will execute this move when they jump+attack 
-	int	jumpAtkFwdMove;			//LS_INVALID - if set, player will execute this move when they jump+fwd+attack 
+	int	kataMove;				//LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time
+	int	lungeAtkMove;			//LS_INVALID - if set, player will execute this move when they crouch+fwd+attack
+	int	jumpAtkUpMove;			//LS_INVALID - if set, player will execute this move when they jump+attack
+	int	jumpAtkFwdMove;			//LS_INVALID - if set, player will execute this move when they jump+fwd+attack
 	int	jumpAtkBackMove;		//LS_INVALID - if set, player will execute this move when they jump+back+attack
 	int	jumpAtkRightMove;		//LS_INVALID - if set, player will execute this move when they jump+rightattack
 	int	jumpAtkLeftMove;		//LS_INVALID - if set, player will execute this move when they jump+left+attack
@@ -836,7 +813,7 @@ typedef struct
 	int			bladeStyle2Start;			//0 - if set, blades from this number and higher use the following values (otherwise, they use the normal values already set)
 
 	//***The following can be different for the extra blades - not setting them individually defaults them to the value for the whole saber (and first blade)***
-	
+
 	//===PRIMARY BLADES=====================
 	//done in cgame (client-side code)
 	int			trailStyle;					//0 - default (0) is normal, 1 is a motion blur and 2 is no trail at all (good for real-sword type mods)
@@ -858,7 +835,7 @@ typedef struct
 	float		splashRadius;				//0 - radius of splashDamage
 	int			splashDamage;				//0 - amount of splashDamage, 100% at a distance of 0, 0% at a distance = splashRadius
 	float		splashKnockback;			//0 - amount of splashKnockback, 100% at a distance of 0, 0% at a distance = splashRadius
-	
+
 	//===SECONDARY BLADES===================
 	//done in cgame (client-side code)
 	int			trailStyle2;				//0 - default (0) is normal, 1 is a motion blur and 2 is no trail at all (good for real-sword type mods)
@@ -885,15 +862,14 @@ typedef struct
 } saberInfo_t;
 #define MAX_SABERS 2
 
-//typedef 
-enum
+typedef enum
 {
 	FORCE_LEVEL_0,
 	FORCE_LEVEL_1,
 	FORCE_LEVEL_2,
 	FORCE_LEVEL_3,
 	NUM_FORCE_POWER_LEVELS
-};
+} forcePowerLevels_t;
 
 #define	FORCE_LEVEL_4 (FORCE_LEVEL_3+1)
 #define	FORCE_LEVEL_5 (FORCE_LEVEL_4+1)
@@ -955,7 +931,7 @@ typedef struct
 	int startFrame;
 	int endFrame;
 
-	int collisionType; // 1 = from a fall, 0 from effectors, this will be going away soon, hence no enum 
+	int collisionType; // 1 = from a fall, 0 from effectors, this will be going away soon, hence no enum
 
 	qboolean CallRagDollBegin; // a return value, means that we are now begininng ragdoll and the NPC stuff needs to happen
 
@@ -1010,8 +986,7 @@ enum sharedEIKMoveState
 };
 
 //material stuff needs to be shared
-//typedef 
-enum //# material_e
+typedef enum //# material_e
 {
 	MAT_METAL = 0,	// scorched blue-grey metal
 	MAT_GLASS,		// not a real chunk type, just plays an effect with glass sprites
@@ -1033,8 +1008,7 @@ enum //# material_e
 
 	NUM_MATERIALS
 
-};
-typedef int material_t;
+} material_t;
 
 //rww - bot stuff that needs to be shared
 #define MAX_WPARRAY_SIZE 4096
@@ -1050,7 +1024,6 @@ typedef struct wpneighbor_s
 	int num;
 	int forceJumpTo;
 } wpneighbor_t;
-
 
 typedef struct wpobject_s
 {
@@ -1191,8 +1164,8 @@ extern	vec4_t		colorLtBlue;
 extern	vec4_t		colorDkBlue;
 
 #define Q_COLOR_ESCAPE	'^'
-// you MUST have the last bit on here about colour strings being less than or equal to 9, or taiwanese strings register as colour!!!!
-#define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= '9' && *((p)+1) >= '0' )
+// you MUST have the last bit on here about colour strings being less than 7 or taiwanese strings register as colour!!!!
+#define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
 
 
 #define COLOR_BLACK		'0'
@@ -1231,34 +1204,12 @@ extern	vec3_t	axisDefault[3];
 
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
-#ifdef _XBOX
-inline void Q_CastShort2Float(float *f, const short *s)
-{
-	*f = ((float)*s);
-}
-
-inline void Q_CastUShort2Float(float *f, const unsigned short *s)
-{
-	*f = ((float)*s);
-}
-
-inline void Q_CastShort2FloatScale(float *f, const short *s, float scale)
-{
-	*f = ((float)*s) * scale;
-}
-
-inline void Q_CastUShort2FloatScale(float *f, const unsigned short *s, float scale)
-{
-	*f = ((float)*s) * scale;
-}
-#endif // _XBOX
-
 #if idppc
 
 static inline float Q_rsqrt( float number ) {
 		float x = 0.5f * number;
                 float y;
-#ifdef __GNUC__            
+#ifdef __GNUC__
                 asm("frsqrte %0,%1" : "=f" (y) : "f" (number));
 #else
 		y = __frsqrte( number );
@@ -1266,10 +1217,10 @@ static inline float Q_rsqrt( float number ) {
 		return y * (1.5f - (x * y * y));
 	}
 
-#ifdef __GNUC__            
+#ifdef __GNUC__
 static inline float Q_fabs(float x) {
     float abs_x;
-    
+
     asm("fabs %0,%1" : "=f" (abs_x) : "f" (x));
     return abs_x;
 }
@@ -1287,127 +1238,22 @@ float Q_rsqrt( float f );		// reciprocal square root
 signed char ClampChar( int i );
 signed short ClampShort( int i );
 
-//float powf ( float x, int y );
+float Q_powf ( float x, int y );
 
 // this isn't a real cheap function to call!
 int DirToByte( vec3_t dir );
 void ByteToDir( int b, vec3_t dir );
-
-#ifdef _XBOX
-// SSE Vectorized math functions
-inline vec_t DotProduct( const vec3_t v1, const vec3_t v2 ) {
-#if defined (_XBOX)		/// use xbox stuff
-	float res;
-    __asm {
-        mov     edx, v1
-        movss   xmm1, [edx]
-        movhps  xmm1, [edx+4]
-
-        mov     edx, v2
-        movss   xmm2, [edx]
-        movhps  xmm2, [edx+4]
-
-        mulps   xmm1, xmm2
-
-        movaps  xmm0, xmm1
-
-        shufps  xmm0, xmm0, 32h
-        addps   xmm1, xmm0
-
-        shufps  xmm0, xmm0, 32h
-        addps   xmm1, xmm0
-
-        movss   [res], xmm1
-    }
-    return res;
-#else
-	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
-#endif
-}
-
-inline void VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t o ) {
-#ifdef _XBOX
-	__asm {
-        mov      ecx, veca
-        movss    xmm0, [ecx]
-        movhps   xmm0, [ecx+4]
-
-        mov      edx, vecb
-        movss    xmm1, [edx]
-        movhps   xmm1, [edx+4]
-
-        subps    xmm0, xmm1
-
-        mov      eax, o
-        movss    [eax], xmm0
-        movhps   [eax+4], xmm0
-    }
-#else
-	o[0] = veca[0]-vecb[0];
-	o[1] = veca[1]-vecb[1];
-	o[2] = veca[2]-vecb[2];
-#endif
-}
-
-inline void VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t o ) {
-#ifdef _XBOX
-  __asm {
-        mov      ecx, veca
-        movss    xmm0, [ecx]
-        movhps   xmm0, [ecx+4]
-
-        mov      edx, vecb
-        movss    xmm1, [edx]
-        movhps   xmm1, [edx+4]
-
-        addps    xmm0, xmm1
-
-        mov      eax, o
-        movss    [eax], xmm0
-        movhps   [eax+4], xmm0
-    }
-#else
-	o[0] = veca[0]+vecb[0];
-	o[1] = veca[1]+vecb[1];
-	o[2] = veca[2]+vecb[2];
-#endif
-}
-
-inline void VectorScale( const vec3_t i, vec_t scale, vec3_t o ) {
-#ifdef _XBOX
-__asm {
-        movss    xmm0, scale
-        shufps   xmm0, xmm0, 0h
-
-        mov      edx, i
-        movss    xmm1, [edx]
-        movhps   xmm1, [edx+4]
-
-        mulps    xmm0, xmm1
-
-        mov      eax, o
-        movss    [eax], xmm0
-        movhps   [eax+4], xmm0
-    }
-#else
-	o[0] = i[0]*scale;
-	o[1] = i[1]*scale;
-	o[2] = i[2]*scale;
-#endif
-}
-#endif	// _XBOX
 
 #if	1
 //rwwRMG - added math defines
 #define minimum(x,y) ((x)<(y)?(x):(y))
 #define maximum(x,y) ((x)>(y)?(x):(y))
 
-#ifndef _XBOX	// Done above to use SSE
 #define DotProduct(x,y)					((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
 #define VectorSubtract(a,b,c)			((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1],(c)[2]=(a)[2]-(b)[2])
 #define VectorAdd(a,b,c)				((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1],(c)[2]=(a)[2]+(b)[2])
 #define	VectorScale(v, s, o)			((o)[0]=(v)[0]*(s),(o)[1]=(v)[1]*(s),(o)[2]=(v)[2]*(s))
-#endif
+
 #define VectorCopy(a,b)					((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
 #define VectorCopy4(a,b)				((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 #define	VectorMA(v, s, b, o)			((o)[0]=(v)[0]+(b)[0]*(s),(o)[1]=(v)[1]+(b)[1]*(s),(o)[2]=(v)[2]+(b)[2]*(s))
@@ -1448,10 +1294,7 @@ typedef struct {
 #define VectorSet5(v,x,y,z,a,b)	((v)[0]=(x), (v)[1]=(y), (v)[2]=(z), (v)[3]=(a), (v)[4]=(b)) //rwwRMG - added
 #define Vector4Copy(a,b)		((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 
-#if defined(__linux__) || defined(MACOS_X) || defined(__MACOS__)
-#define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
-#else 
-#ifndef __LCC__
+#if defined(_MSVC_VER) && !defined(idx64) // Only do this for 32 bit Windows builds
 //pitiful attempt to reduce _ftol2 calls -rww
 static ID_INLINE void SnapVector( float *v )
 {
@@ -1475,8 +1318,7 @@ static ID_INLINE void SnapVector( float *v )
 }
 #else
 #define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
-#endif // __LCC__
-#endif // __linux__
+#endif
 
 // just in case you do't want to use the macros
 vec_t _DotProduct( const vec3_t v1, const vec3_t v2 );
@@ -1501,68 +1343,16 @@ void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 static ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
 	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2]) {
 		return 0;
-	}			
+	}
 	return 1;
 }
 
 static ID_INLINE vec_t VectorLength( const vec3_t v ) {
-#ifdef _XBOX
-	float res;
-
-	__asm {
-        mov     edx, v
-        movss   xmm1, [edx]
-        movhps  xmm1, [edx+4]
-
-        movaps  xmm2, xmm1
-
-        mulps   xmm1, xmm2
-
-        movaps  xmm0, xmm1
-
-        shufps  xmm0, xmm0, 32h
-        addps   xmm1, xmm0
-
-        shufps  xmm0, xmm0, 32h
-        addps   xmm1, xmm0
-
-        sqrtss  xmm1, xmm1
-        movss   [res], xmm1
-    }
-
-    return res;
-#else
 	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-#endif
 }
 
 static ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
-#ifdef _XBOX
-	float res;
-	__asm {
-        mov     edx, v
-        movss   xmm1, [edx]
-        movhps  xmm1, [edx+4]
-
-        movaps  xmm2, xmm1
-
-        mulps   xmm1, xmm2
-
-        movaps  xmm0, xmm1
-
-        shufps  xmm0, xmm0, 32h
-        addps   xmm1, xmm0
-
-        shufps  xmm0, xmm0, 32h
-        addps   xmm1, xmm0
-
-        movss   [res], xmm1
-    }
-
-    return res;
-#else
 	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-#endif
 }
 
 static ID_INLINE vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
@@ -1614,7 +1404,7 @@ vec_t VectorLengthSquared( const vec3_t v );
 vec_t Distance( const vec3_t p1, const vec3_t p2 );
 
 vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 );
- 
+
 void VectorNormalizeFast( vec3_t v );
 
 void VectorInverse( vec3_t v );
@@ -1635,7 +1425,7 @@ float Q_asin(float c);
 int		Q_rand( int *seed );
 float	Q_random( int *seed );
 float	Q_crandom( int *seed );
-float   Q_round (float val); //Lugormod
+float   Q_round (float val);
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
@@ -1687,11 +1477,6 @@ int		COM_GetCurrentParseLine( void );
 const char	*SkipWhitespace( const char *data, qboolean *hasNewLines );
 char	*COM_Parse( const char **data_p );
 char	*COM_ParseExt( const char **data_p, qboolean allowLineBreak );
-
-//RoboPhred
-char *COM_ParseLine( const char **data_p);
-char *COM_ParseDatastring(const char **data_p);
-
 int		COM_Compress( char *data_p );
 void	COM_ParseError( char *format, ... );
 void	COM_ParseWarning( char *format, ... );
@@ -1734,6 +1519,12 @@ void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
 
 void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
+// #if defined(_MSC_VER) && _MSC_VER < 1900
+// size_t Q_vsnprintf(char *str, size_t size, const char *format, va_list ap);
+// #else
+// #define Q_vsnprintf vsnprintf
+// #endif
+
 
 // mode parm for FS_FOpenFile
 typedef enum {
@@ -1755,13 +1546,11 @@ int Q_isprint( int c );
 int Q_islower( int c );
 int Q_isupper( int c );
 int Q_isalpha( int c );
-int Q_isnumeric(int c);
 
 // portable case insensitive compare
 int		Q_stricmp (const char *s1, const char *s2);
 int		Q_strncmp (const char *s1, const char *s2, int n);
 int		Q_stricmpn (const char *s1, const char *s2, int n);
-int		Q_stricmpname (const char *s1, const char *s2);
 char	*Q_strlwr( char *s1 );
 char	*Q_strupr( char *s1 );
 char	*Q_strrchr( const char* string, int c );
@@ -1772,17 +1561,14 @@ void	Q_strcat( char *dest, int size, const char *src );
 
 // strlen that discounts Quake color sequences
 int Q_PrintStrlen( const char *string );
-//Lugormod this only removes color codes
-char *Q_CleanStrC( char *string );
 // removes color sequences from string
 char *Q_CleanStr( char *string );
+//Lugormod this only removes color codes
+char *Q_CleanStrC( char *string );
 //Lugormod  remove everything but letters from string
 char *Q_CleanStr2( char *string );
 //Lugormod an attempt to remove tags
 char *Q_StripTags( char *string );
-
-
-qboolean Q_wordsInLine(const char *words,const char *line, char **next);
 
 //=============================================
 
@@ -1813,11 +1599,7 @@ float	LittleFloat (const float *l);
 
 void	Swap_Init (void);
 */
-
-
-//RoboPhred
-char	* QDECL va( char *format, ... );
-//char	* QDECL va(const char *format, ...);
+char	* QDECL va(char *format, ...);
 
 //=============================================
 
@@ -1833,7 +1615,7 @@ qboolean Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... );
+Q_NORETURN void	QDECL Com_Error( int level, const char *error, ... );
 void	QDECL Com_Printf( const char *msg, ... );
 
 
@@ -2011,13 +1793,12 @@ typedef struct {
 // sound channels
 // channel 0 never willingly overrides
 // other channels will allways override a playing sound on that channel
-//typedef 
-enum {
+typedef enum {
 	CHAN_AUTO,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # Auto-picks an empty channel to play sound on
 	CHAN_LOCAL,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # menu sounds, etc
-	CHAN_WEAPON,//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" 
+	CHAN_WEAPON,//## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
 	CHAN_VOICE, //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Voice sounds cause mouth animation
-	CHAN_VOICE_ATTEN, //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation but still use normal sound falloff 
+	CHAN_VOICE_ATTEN, //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation but still use normal sound falloff
 	CHAN_ITEM,  //## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
 	CHAN_BODY,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
 	CHAN_AMBIENT,//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # added for ambient sounds
@@ -2027,8 +1808,7 @@ enum {
 	CHAN_MENU1,		//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #menu stuff, etc
 	CHAN_VOICE_GLOBAL,  //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation and is broadcast, like announcer
 	CHAN_MUSIC,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #music played as a looping sound - added by BTO (VV)
-};
-typedef int soundChannel_t;
+} soundChannel_t;
 
 
 /*
@@ -2049,20 +1829,12 @@ typedef int soundChannel_t;
 //
 // per-level limits
 //
-#ifdef _XBOX
-#define MAX_CLIENTS			16
-#else
 #define	MAX_CLIENTS			32		// absolute limit
-#endif
 #define MAX_RADAR_ENTITIES	MAX_GENTITIES
 #define MAX_TERRAINS		1//32 //rwwRMG: inserted
 #define MAX_LOCATIONS		64
 
-#ifdef _XBOX
-#define	GENTITYNUM_BITS	9		// don't need to send any more
-#else
 #define	GENTITYNUM_BITS	10		// don't need to send any more
-#endif
 #define	MAX_GENTITIES	(1<<GENTITYNUM_BITS)
 
 //I am reverting. I guess. For now.
@@ -2087,10 +1859,9 @@ typedef int soundChannel_t;
 
 
 // these are also in be_aas_def.h - argh (rjr)
-//Lugormod raised them dunno if that works it doesn't
 #define	MAX_MODELS			512		// these are sent over the net as -12 bits
 #define	MAX_SOUNDS			256		// so they cannot be blindly increased
-#define MAX_ICONS			64		// max registered icons you can have per map 
+#define MAX_ICONS			64		// max registered icons you can have per map
 #define MAX_FX				64		// max effects strings, I'm hoping that 64 will be plenty
 
 #define MAX_SUB_BSP			32 //rwwRMG - added
@@ -2205,7 +1976,7 @@ typedef enum {
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
-#define	MAX_WEAPONS				19		
+#define	MAX_WEAPONS				19
 
 #define	MAX_PS_EVENTS			2
 
@@ -2488,7 +2259,6 @@ typedef struct playerState_s {
 	//rww - spare values specifically for use by mod authors.
 	//See psf_overrides.txt if you want to increase the send
 	//amount of any of these above 1 bit.
-#ifndef _XBOX
 	int			userInt1;
 	int			userInt2;
 	int			userInt3;
@@ -2497,7 +2267,6 @@ typedef struct playerState_s {
 	float		userFloat3;
 	vec3_t		userVec1;
 	vec3_t		userVec2;
-#endif
 
 #ifdef _ONEBIT_COMBO
 	int			deltaOneBits;
@@ -2529,7 +2298,7 @@ typedef struct siegePers_s
 										// walking will use different animations and
 										// won't generate footsteps
 #define	BUTTON_USE				32			// the ol' use key returns!
-#define BUTTON_FORCEGRIP		64			// 
+#define BUTTON_FORCEGRIP		64			//
 #define BUTTON_ALT_ATTACK		128
 
 #define	BUTTON_ANY				256			// any key whatsoever
@@ -2596,7 +2365,7 @@ typedef struct usercmd_s {
 	int				serverTime;
 	int				angles[3];
 	int 			buttons;
-	byte			weapon;           // weapon 
+	byte			weapon;           // weapon
 	byte			forcesel;
 	byte			invensel;
 	byte			generic_cmd;
@@ -2736,8 +2505,6 @@ typedef struct {
 // Different eTypes may use the information in different ways
 // The messages are delta compressed, so it doesn't really matter if
 // the structure size is fairly large
-#ifndef _XBOX	// First, real version for the PC, with all members 32-bits
-
 typedef struct entityState_s {
 	int		number;			// entity index
 	int		eType;			// entityType_t
@@ -2902,167 +2669,10 @@ typedef struct entityState_s {
 	vec3_t		userVec2;
 } entityState_t;
 
-#else
-// Now, XBOX version with members packed in tightly to save gobs of memory
-// This is rather confusing. All members are in 1, 2, or 4 bytes, and then
-// re-ordered within the structure to keep everything aligned.
-
-#pragma pack(push, 1)
-
-typedef struct entityState_s {
-	// Large (32-bit) fields first
-
-	int		number;			// entity index
-	int		eFlags;
-
-	trajectory_t	pos;	// for calculating position
-	trajectory_t	apos;	// for calculating angles
-
-	int		time;
-	int		time2;
-
-	vec3_t	origin;
-	vec3_t	origin2;
-
-	vec3_t	angles;
-	vec3_t	angles2;
-
-	float	speed;
-
-	int		genericenemyindex;
-
-	int		emplacedOwner;
-
-	int		constantLight;	// r + (g<<8) + (b<<16) + (intensity<<24)
-	int		forcePowersActive;
-
-	int		solid;			// for client side prediction, trap_linkentity sets this properly
-
-	byte	customRGBA[4];
-
-	int		surfacesOn; //a bitflag of corresponding surfaces from a lookup table. These surfaces will be forced on.
-	int		surfacesOff; //same as above, but forced off instead.
-
-	//I.. feel bad for doing this, but NPCs really just need to
-	//be able to control this sort of thing from the server sometimes.
-	//At least it's at the end so this stuff is never going to get sent
-	//over for anything that isn't an NPC.
-	vec3_t	boneAngles1; //angles of boneIndex1
-	vec3_t	boneAngles2; //angles of boneIndex2
-	vec3_t	boneAngles3; //angles of boneIndex3
-	vec3_t	boneAngles4; //angles of boneIndex4
-
-
-	// Now, the 16-bit members
-
-
-	word	bolt2;
-	word	trickedentindex; //0-15
-
-	word	trickedentindex2; //16-32
-	word	trickedentindex3; //33-48
-
-	word	trickedentindex4; //49-64
-	word	otherEntityNum;	// shotgun sources, etc
-
-	word	otherEntityNum2;
-	word	groundEntityNum;	// -1 = in air
-
-	short	modelindex;
-	word	clientNum;		// 0 to (MAX_CLIENTS - 1), for players and corpses
-
-	word	frame;
-	word	saberEntityNum;
-
-	word	event;			// impulse events -- muzzle flashes, footsteps, etc
-	word	owner; // so crosshair knows what it's looking at
-
-	word	powerups;		// bit flags
-	word	legsAnim;
-
-	word	torsoAnim;
-	word	forceFrame;		//if non-zero, force the anim frame
-
-	word	ragAttach; //attach to ent while ragging
-	short	iModelScale; //rww - transfer a percentage of the normal scale in a single int instead of 3 x-y-z scale values
-
-	word	lookTarget;
-	word	health;
-
-	word	maxhealth; //so I know how to draw the stupid health bar
-	word	npcSaber1;
-
-	word	npcSaber2;
-	word	boneOrient; //packed with x, y, z orientations for bone angles
-
-	//If non-0, this is the index of the vehicle a player/NPC is riding.
-	word	m_iVehicleNum;
-
-
-	// Now, the 8-bit members. These start out two bytes off, thanks to the above word
-
-
-	byte	eType;			// entityType_t
-	byte	eFlags2;		// EF2_??? used much less frequently
-
-	byte	bolt1;
-	byte	fireflag;
-	byte	activeForcePass;
-	byte	loopSound;		// constantly loop this sound
-
-	byte	loopIsSoundset; //qtrue if the loopSound index is actually a soundset index
-	byte	soundSetIndex;
-	byte	modelGhoul2;
-	byte	g2radius;
-
-	byte	modelindex2;
-	byte	saberInFlight;
-	byte	saberMove;
-	byte	isJediMaster;
-	byte	saberHolstered;//sent in only 2 bytes, should be 0, 1 or 2
-
-	byte	isPortalEnt; //this needs to be seperate for all entities I guess, which is why I couldn't reuse another value.
-	byte	eventParm;
-	byte	teamowner;
-	byte	shouldtarget;
-
-	byte	weapon;			// determines weapon and flash model, etc
-	byte	legsFlip; //set to opposite when the same anim needs restarting, sent over in only 1 bit. Cleaner and makes porting easier than having that god forsaken ANIM_TOGGLEBIT.
-	byte	torsoFlip;
-	byte	generic1;
-
-	byte	heldByClient; //can only be a client index - this client should be holding onto my arm using IK stuff.
-	byte	brokenLimbs;
-	byte	boltToPlayer; //set to index of a real client+1 to bolt the ent to that client. Must be a real client, NOT an NPC.
-	byte	hasLookTarget; //for looking at an entity's origin (NPCs and players)
-
-	//index values for each type of sound, gets the folder the sounds
-	//are in. I wish there were a better way to do this,
-	byte	csSounds_Std;
-	byte	csSounds_Combat;
-	byte	csSounds_Extra;
-	byte	csSounds_Jedi;
-
-	//Allow up to 4 PCJ lookup values to be stored here.
-	//The resolve to configstrings which contain the name of the
-	//desired bone.
-	byte	boneIndex1;
-	byte	boneIndex2;
-	byte	boneIndex3;
-	byte	boneIndex4;
-
-	byte	NPC_class; //we need to see what it is on the client for a few effects.
-	byte	alignPad[3];
-} entityState_t;
-
-#pragma pack(pop)
-
-#endif
-
 typedef enum {
 	CA_UNINITIALIZED,
 	CA_DISCONNECTED, 	// not talking to a server
-	CA_AUTHORIZING,		// not used any more, was checking cd key 
+	CA_AUTHORIZING,		// not used any more, was checking cd key
 	CA_CONNECTING,		// sending request packets to the server
 	CA_CHALLENGING,		// sending challenge packets to the server
 	CA_CONNECTED,		// netchan_t established, getting gamestate
@@ -3100,8 +2710,7 @@ typedef struct qtime_s {
 #define AS_MPLAYER			3 // (Obsolete)
 
 // cinematic states
-//typedef 
-enum {
+typedef enum {
 	FMV_IDLE,
 	FMV_PLAY,		// play
 	FMV_EOF,		// all other conditions, i.e. stop/EOF/abort
@@ -3109,33 +2718,24 @@ enum {
 	FMV_ID_IDLE,
 	FMV_LOOPED,
 	FMV_ID_WAIT
-};
-typedef int e_status;
+} e_status;
 
-//typedef 
-enum //_flag_status 
-{
+typedef enum _flag_status {
 	FLAG_ATBASE = 0,
 	FLAG_TAKEN,			// CTF
 	FLAG_TAKEN_RED,		// One Flag CTF
 	FLAG_TAKEN_BLUE,	// One Flag CTF
 	FLAG_DROPPED
-};
-typedef int flagStatus_t;
+} flagStatus_t;
 
 
 
-#ifdef _XBOX
-#define	MAX_GLOBAL_SERVERS			50
-#define	MAX_OTHER_SERVERS			16
-#else
 #define	MAX_GLOBAL_SERVERS			2048
 #define	MAX_OTHER_SERVERS			128
-#endif
 #define MAX_PINGREQUESTS			32
 #define MAX_SERVERSTATUSREQUESTS	16
 
-//RoboPhred
+// Chat Mode constants
 enum{
 	SAY_ALL = 0,
 	SAY_TEAM,
@@ -3148,15 +2748,6 @@ enum{
 
 	MAX_CHAT_MODES
 };
-/*
-#define SAY_ALL		0
-#define SAY_TEAM	1
-#define SAY_TELL	2
-#define SAY_ADMINS      3
-#define SAY_CLOSE       4
-#define SAY_BUDDIES     5
-#define SAY_CLAN        6
-*/
 
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
@@ -3165,7 +2756,7 @@ void Rand_Init(int seed);
 float flrand(float min, float max);
 int irand(int min, int max);
 int Q_irand(int value1, int value2);
-float Q_powf ( float x, int y ); //Lugormod
+float Q_powf ( float x, int y );
 
 /*
 Ghoul2 Insert Start
@@ -3177,18 +2768,16 @@ typedef struct {
 
 // For ghoul2 axis use
 
-//typedef 
-enum 
-//Eorientations
+typedef enum Eorientations
 {
-	ORIGIN = 0, 
+	ORIGIN = 0,
 	POSITIVE_X,
 	POSITIVE_Z,
 	POSITIVE_Y,
 	NEGATIVE_X,
 	NEGATIVE_Z,
 	NEGATIVE_Y
-};
+} orientations_t;
 /*
 Ghoul2 Insert End
 */
@@ -3197,10 +2786,9 @@ Ghoul2 Insert End
 // define the new memory tags for the zone, used by all modules now
 //
 #define TAGDEF(blah) TAG_ ## blah
-//typedef 
-enum {
+typedef enum {
 	#include "../qcommon/tags.h"
-};
+} memtag;
 typedef char memtag_t;
 
 //rww - conveniently toggle "gore" code, for model decals and stuff.
@@ -3233,7 +2821,7 @@ typedef struct SSkinGoreData_s
 	vec3_t			tint;					// unimplemented
 	float			impactStrength;			// unimplemented
 
-	int				shader; // shader handle 
+	int				shader; // shader handle
 
 	int				myIndex; // used internally
 
@@ -3247,7 +2835,7 @@ String ID Tables
 
 ========================================================================
 */
-#define ENUM2STRING(arg)   #arg,arg
+#define ENUM2STRING(arg)   {#arg,arg}
 typedef struct stringID_table_s
 {
 	char	*name;
@@ -3277,6 +2865,9 @@ enum {
 	FONT_LARGE,
 	FONT_SMALL2
 };
+
 //Lugormod let's put it here instead
 qboolean duelInProgress(const playerState_t *ps);
 
+
+#endif	// __Q_SHARED_H

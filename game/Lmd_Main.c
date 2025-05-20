@@ -1,5 +1,6 @@
 
 #include "g_local.h"
+#include "Lmd_Crosshair.h"
 #include "Lmd_EntityCore.h"
 #include "Lmd_SetSaber.h"
 
@@ -187,6 +188,7 @@ void Lmd_PlayerThink(gentity_t *ent){
 	}
 
 	lmd_checkSaberChanges(ent);
+	lmd_crosshairEntText(ent);
 	
 	ent->client->Lmd.thinkDelay = level.time + FRAMETIME;
 }

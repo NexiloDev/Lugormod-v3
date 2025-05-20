@@ -683,6 +683,7 @@ const entityInfoData_t lmd_propertyterminal_keys[] = {
 	{"#UKEYS", NULL},
 	{"#MODEL", NULL},
 	{"#HITBOX", NULL},
+	{"crosshairText", "Displays this text when a player looks at this entity."},
 	{"Property", "The name of the property to check access to."},
 	{"Target", "Target to fire if the user is a member of the property."},
 	{"Target2", "Target to fire if the user is not a member of the property."},

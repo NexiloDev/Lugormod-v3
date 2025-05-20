@@ -583,6 +583,15 @@ struct gclient_s {
     		int trainerMenuMode;
     		int currentPage;
 		} lmdMenu;
+
+		struct
+		{
+			int entNum;
+			unsigned int debounceTime;
+			char* text;
+		} crosshairText;
+
+		int crosshairEntNum;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

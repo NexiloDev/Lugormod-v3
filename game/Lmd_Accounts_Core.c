@@ -612,10 +612,9 @@ void Accounts_SetTime(Account_t *acc, int value) {
 }
 
 // lumaya Titles:
-
+#define TITLES_FILE "prof_titles.txt"
 #define MAX_TITLE_LENGTH 32
 #define DEFAULT_TITLE "Unknown"
-#define TITLES_FILE "lugormod/prof_titles.txt"
 
 typedef struct {
 	char jedi_titles[5][MAX_TITLE_LENGTH];
@@ -626,89 +625,93 @@ typedef struct {
 static LmdTitleData_t lmd_titleData;
 static int lmd_titlesLoaded = 0;
 
-void Accounts_CreateDefaultTitlesFile(void)
-{
-	FILE *file = fopen(TITLES_FILE, "w");
-	if (file == NULL) {
+void Accounts_CreateDefaultTitlesFile(void) {
+	fileHandle_t f;
+	const char *defaults =
+		"# Jedi Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n"
+		"JEDI,Youngling,Jedi Padawan,Jedi Knight,Jedi Master,Grand Master\n"
+		"# Sith Titles\n"
+		"SITH,Initiate,Sith Acolyte,Sith Apprentice,Sith Warrior,Sith Lord\n"
+		"# Merc Titles\n"
+		"MERC,Rookie,Hired Gun,Outlaw,Bounty Hunter,Elite Enforcer\n";
+
+	f = Lmd_Data_OpenDataFile(NULL, TITLES_FILE, FS_WRITE);
+	if (!f) {
 		G_Printf("Failed to create default titles file\n");
 		return;
 	}
-	
-	fprintf(file, "# Jedi Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n");
-	fprintf(file, "JEDI,Youngling,Jedi Padawan,Jedi Knight,Jedi Master,Grand Master\n");
-	fprintf(file, "# Sith Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n");
-	fprintf(file, "SITH,Initiate,Sith Acolyte,Sith Apprentice,Sith Warrior,Sith Lord\n");
-	fprintf(file, "# Mercenary Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n");
-	fprintf(file, "MERC,Rookie,Hired Gun,Outlaw,Bounty Hunter,Elite Enforcer\n");
-    
-	fclose(file);
+	trap_FS_Write(defaults, strlen(defaults), f);
+	trap_FS_FCloseFile(f);
 	G_Printf("Created default titles file\n");
 }
 
-int Accounts_LoadTitles(void)
-{
-    FILE *file = fopen(TITLES_FILE, "r");
-    if (file == NULL) {
-        G_Printf("Titles file not found, creating default...\n");
-        Accounts_CreateDefaultTitlesFile();
-        file = fopen(TITLES_FILE, "r");
-        if (file == NULL) {
-            G_Printf("Failed to open titles file\n");
-            return 0;
-        }
-    }
-    
-    char line[256];
-    char *token;
-    int profession = -1;
-	
-    for (int i = 0; i < 5; i++) {
-        strcpy(lmd_titleData.jedi_titles[i], DEFAULT_TITLE);
-        strcpy(lmd_titleData.sith_titles[i], DEFAULT_TITLE);
-        strcpy(lmd_titleData.merc_titles[i], DEFAULT_TITLE);
-    }
-    
-    while (fgets(line, sizeof(line), file)) {
-        if (line[0] == '#' || line[0] == '\n' || line[0] == '\r') {
-            continue;
-        }
-    	
-        line[strcspn(line, "\r\n")] = 0;
-    	
-        token = strtok(line, ",");
-        if (token == NULL) continue;
-        
-        if (strcmp(token, "JEDI") == 0) {
-            profession = 0;
-        } else if (strcmp(token, "SITH") == 0) {
-            profession = 1;
-        } else if (strcmp(token, "MERC") == 0) {
-            profession = 2;
-        } else {
-            continue;
-        }
-    	
-        for (int i = 0; i < 5; i++) {
-            token = strtok(NULL, ",");
-            if (token == NULL) break;
-            
-            if (profession == 0) {
-                strncpy(lmd_titleData.jedi_titles[i], token, MAX_TITLE_LENGTH - 1);
-                lmd_titleData.jedi_titles[i][MAX_TITLE_LENGTH - 1] = '\0';
-            } else if (profession == 1) {
-                strncpy(lmd_titleData.sith_titles[i], token, MAX_TITLE_LENGTH - 1);
-                lmd_titleData.sith_titles[i][MAX_TITLE_LENGTH - 1] = '\0';
-            } else if (profession == 2) {
-                strncpy(lmd_titleData.merc_titles[i], token, MAX_TITLE_LENGTH - 1);
-                lmd_titleData.merc_titles[i][MAX_TITLE_LENGTH - 1] = '\0';
-            }
-        }
-    }
-    
-    fclose(file);
-    lmd_titlesLoaded = 1;
-    G_Printf("Titles loaded successfully\n");
-    return 1;
+
+
+int Accounts_LoadTitles(void) {
+	char *file = Lmd_Data_AllocFileContents(TITLES_FILE);
+	if (!file) {
+		G_Printf("Titles file not found, creating default...\n");
+		Accounts_CreateDefaultTitlesFile();
+		file = Lmd_Data_AllocFileContents(TITLES_FILE);
+		if (!file) {
+			G_Printf("Failed to open titles file\n");
+			return 0;
+		}
+	}
+
+	for (int i = 0; i < 5; i++) {
+		Q_strncpyz(lmd_titleData.jedi_titles[i], DEFAULT_TITLE, MAX_TITLE_LENGTH);
+		Q_strncpyz(lmd_titleData.sith_titles[i], DEFAULT_TITLE, MAX_TITLE_LENGTH);
+		Q_strncpyz(lmd_titleData.merc_titles[i], DEFAULT_TITLE, MAX_TITLE_LENGTH);
+	}
+
+	char *line = strtok(file, "\n");
+	while (line != NULL) {
+		if (line[0] == '#' || line[0] == '\0') {
+			line = strtok(NULL, "\n");
+			continue;
+		}
+
+		char *rest = NULL;
+		char *type = strtok_s(line, ",", &rest);
+		if (!type) {
+			line = strtok(NULL, "\n");
+			continue;
+		}
+
+		char *titles[6] = {0};
+		for (int i = 0; i < 6 && rest; i++) {
+			titles[i] = strtok_s(NULL, ",", &rest);
+		}
+
+		if (!titles[0] || !titles[4]) {
+			line = strtok(NULL, "\n");
+			continue; // invalid line
+		}
+
+		char (*dest)[MAX_TITLE_LENGTH] = NULL;
+
+		if (!Q_stricmp(type, "JEDI")) dest = lmd_titleData.jedi_titles;
+		else if (!Q_stricmp(type, "SITH")) dest = lmd_titleData.sith_titles;
+		else if (!Q_stricmp(type, "MERC")) dest = lmd_titleData.merc_titles;
+		else {
+			line = strtok(NULL, "\n");
+			continue;
+		}
+
+		for (int i = 0; i < 5; i++) {
+			if (titles[i]) {
+				Q_strncpyz(dest[i], titles[i], MAX_TITLE_LENGTH);
+			}
+		}
+
+		line = strtok(NULL, "\n");
+	}
+
+	G_Free(file);
+	lmd_titlesLoaded = 1;
+	G_Printf("Titles loaded successfully\n");
+	return 1;
 }
 
 static int GetTitleIndex(int levelp)
@@ -720,44 +723,28 @@ static int GetTitleIndex(int levelp)
 	return 4;
 }
 
-char* Accounts_GetTitle(Account_t *acc)
-{
-	if (acc == NULL) {
-		return DEFAULT_TITLE;
+extern int Jedi_GetAccSide(Account_t *acc);
+char* Accounts_GetTitle(Account_t *acc) {
+	if (!acc) return DEFAULT_TITLE;
+	if (!lmd_titlesLoaded && !Accounts_LoadTitles()) return DEFAULT_TITLE;
+
+	int level = Accounts_Prof_GetLevel(acc);
+	if (level < 1) level = 1;
+	if (level > 40) level = 40;
+
+	int index = GetTitleIndex(level);
+	int prof = Accounts_Prof_GetProfession(acc);
+
+	if (prof == PROF_JEDI) {
+		int side = Jedi_GetAccSide(acc);
+		if (side == FORCE_LIGHTSIDE) return lmd_titleData.jedi_titles[index];
+		if (side == FORCE_DARKSIDE) return lmd_titleData.sith_titles[index];
+		return "None";
 	}
-	
-	if (!lmd_titlesLoaded) {
-		if (!Accounts_LoadTitles()) {
-			return DEFAULT_TITLE;
-		}
-	}
-    
-	int levelp = Accounts_Prof_GetLevel(acc);
-	const int profession = Accounts_Prof_GetProfession(acc);
-    
-	// idk if that happens, but let's make sure
-	if (levelp < 1) levelp = 1;
-	if (levelp > 40) levelp = 40;
-    
-	int titleIndex = GetTitleIndex(levelp);
-	
-	if (profession == PROF_JEDI)
-	{
-		const int sideAcc = Jedi_GetAccSide(acc);
-		switch (sideAcc)
-		{
-			default:	
-			case 0:
-				return "None";
-			case 1:
-				return lmd_titleData.jedi_titles[titleIndex];
-			case 2:
-				return lmd_titleData.sith_titles[titleIndex];
-		}
-	}
-	
-	if (profession == PROF_MERC) return lmd_titleData.merc_titles[titleIndex];
-	
+
+	if (prof == PROF_MERC)
+		return lmd_titleData.merc_titles[index];
+
 	return DEFAULT_TITLE;
 }
 

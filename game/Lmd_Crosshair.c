@@ -2,7 +2,9 @@
 
 void lmd_crosshairEntText(const gentity_t* ent)
 {
-    if (ent->client->Lmd.lmdMenu.entityNum != 0) return;
+    if (ent->client->Lmd.lmdMenu.entityNum != 0
+        || ent->client->ps.torsoAnim == 1328) // lumaya: thats the USE anim lol
+        return;
     
     const int lastEntNum = ent->client->Lmd.crosshairText.entNum;
     

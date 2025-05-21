@@ -353,7 +353,7 @@ float Force_Lightning_AbsorbPower(gentity_t *self, gentity_t *targ, const forceL
 		modPowerLevel = powerLevel;
 	return ((float)modPowerLevel) / ((float)powerLevel);
 }
-
+extern vmCvar_t lmd_melee_lightning_multiplier;
 extern void Jedi_Decloak( gentity_t *self );
 void Force_Lightning_Damage(gentity_t *self, gentity_t *target, vec3_t dir, const forceLightning_t *data) {
 
@@ -386,7 +386,7 @@ void Force_Lightning_Damage(gentity_t *self, gentity_t *target, vec3_t dir, cons
 			if ( self->client->ps.weapon == WP_MELEE && data->twohanded )
 			{//2-handed lightning
 				//jackin' 'em up, Palpatine-style
-				dmg *= 2;
+				dmg *= lmd_melee_lightning_multiplier.integer;
 			}
 			if (g_gametype.integer == GT_REBORN ) {
 				dmg *=3;

@@ -20,6 +20,9 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+# Intelij IDEs
+.idea
+
 # Roslyn cache directories
 *.ide/
 

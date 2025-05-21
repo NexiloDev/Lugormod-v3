@@ -138,7 +138,7 @@ float	Q_crandom( int *seed ) {
 
 float   Q_round (float val) 
 {
-        return (float)floor(val + 0.5f);
+        return floorf(val + 0.5f);
 }
 
 #ifdef __LCC__
@@ -146,7 +146,7 @@ float   Q_round (float val)
 int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
 	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2]) {
 		return 0;
-	}			
+	}
 	return 1;
 }
 
@@ -358,7 +358,7 @@ unsigned ColorBytes4 (float r, float g, float b, float a) {
 
 float NormalizeColor( const vec3_t in, vec3_t out ) {
 	float	max;
-	
+
 	max = in[0];
 	if ( in[1] > max ) {
 		max = in[1];
@@ -470,7 +470,7 @@ RotateAroundDirection
 */
 void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 
-	// create an arbitrary axis[1] 
+	// create an arbitrary axis[1]
 	PerpendicularVector( axis[1], axis[0] );
 
 	// rotate it around axis[0] by yaw
@@ -490,7 +490,7 @@ void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 void vectoangles( const vec3_t value1, vec3_t angles ) {
 	float	forward;
 	float	yaw, pitch;
-	
+
 	if ( value1[1] == 0 && value1[0] == 0 ) {
 		yaw = 0;
 		if ( value1[2] > 0 ) {
@@ -620,30 +620,26 @@ void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out )
 */
 float Q_rsqrt( float number )
 {
-	long i;
+	floatint_t fi;
 	float x2, y;
 	const float threehalfs = 1.5F;
 
 	x2 = number * 0.5F;
 	y  = number;
-	i  = * ( long * ) &y;						// evil floating point bit level hacking
-	i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
-	y  = * ( float * ) &i;
+	fi.f  = y;									// evil floating point bit level hacking
+	fi.i  = 0x5f3759df - ( fi.i >> 1 );			// what the fuck?
+	y  = fi.f;
 	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
 //	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
 
-#ifndef Q3_VM
-#ifdef __linux__
-	assert( !isnan(y) ); // bk010122 - FPE?
-#endif
-#endif
 	return y;
 }
 
 float Q_fabs( float f ) {
-	int tmp = * ( int * ) &f;
-	tmp &= 0x7FFFFFFF;
-	return * ( float * ) &tmp;
+	floatint_t fi;
+	fi.f = f;
+	fi.i &= 0x7FFFFFFF;
+	return fi.f;
 }
 #endif
 
@@ -772,51 +768,14 @@ void SetPlaneSignbits (cplane_t *out) {
 BoxOnPlaneSide
 
 Returns 1, 2, or 1 + 2
-
-// this is the slow, general version
-int BoxOnPlaneSide2 (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
-{
-	int		i;
-	float	dist1, dist2;
-	int		sides;
-	vec3_t	corners[2];
-
-	for (i=0 ; i<3 ; i++)
-	{
-		if (p->normal[i] < 0)
-		{
-			corners[0][i] = emins[i];
-			corners[1][i] = emaxs[i];
-		}
-		else
-		{
-			corners[1][i] = emins[i];
-			corners[0][i] = emaxs[i];
-		}
-	}
-	dist1 = DotProduct (p->normal, corners[0]) - p->dist;
-	dist2 = DotProduct (p->normal, corners[1]) - p->dist;
-	sides = 0;
-	if (dist1 >= 0)
-		sides = 1;
-	if (dist2 < 0)
-		sides |= 2;
-
-	return sides;
-}
-
 ==================
 */
-#if !( (defined __linux__ || __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
-
-#if defined __LCC__ || defined C_ONLY || !id386
-
-int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
+int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, cplane_t *p)
 {
-	float	dist1, dist2;
-	int		sides;
+	float	dist[2];
+	int		sides, b, i;
 
-// fast axial cases
+	// fast axial cases
 	if (p->type < 3)
 	{
 		if (p->dist <= emins[p->type])
@@ -826,290 +785,26 @@ int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 		return 3;
 	}
 
-// general case
-	switch (p->signbits)
+	// general case
+	dist[0] = dist[1] = 0;
+	if (p->signbits < 8) // >= 8: default case is original code (dist[0]=dist[1]=0)
 	{
-	case 0:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		break;
-	case 1:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		break;
-	case 2:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		break;
-	case 3:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		break;
-	case 4:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		break;
-	case 5:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		break;
-	case 6:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		break;
-	case 7:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		break;
-	default:
-		dist1 = dist2 = 0;		// shut up compiler
-		break;
+		for (i=0 ; i<3 ; i++)
+		{
+			b = (p->signbits >> i) & 1;
+			dist[ b] += p->normal[i]*emaxs[i];
+			dist[!b] += p->normal[i]*emins[i];
+		}
 	}
 
 	sides = 0;
-	if (dist1 >= p->dist)
+	if (dist[0] >= p->dist)
 		sides = 1;
-	if (dist2 < p->dist)
+	if (dist[1] < p->dist)
 		sides |= 2;
 
 	return sides;
 }
-#else
-#pragma warning( disable: 4035 )
-
-__declspec( naked ) int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
-{
-	static int bops_initialized;
-	static int Ljmptab[8];
-
-	__asm {
-
-		push ebx
-			
-		cmp bops_initialized, 1
-		je  initialized
-		mov bops_initialized, 1
-		
-		mov Ljmptab[0*4], offset Lcase0
-		mov Ljmptab[1*4], offset Lcase1
-		mov Ljmptab[2*4], offset Lcase2
-		mov Ljmptab[3*4], offset Lcase3
-		mov Ljmptab[4*4], offset Lcase4
-		mov Ljmptab[5*4], offset Lcase5
-		mov Ljmptab[6*4], offset Lcase6
-		mov Ljmptab[7*4], offset Lcase7
-			
-initialized:
-
-		mov edx,dword ptr[4+12+esp]
-		mov ecx,dword ptr[4+4+esp]
-		xor eax,eax
-		mov ebx,dword ptr[4+8+esp]
-		mov al,byte ptr[17+edx]
-		cmp al,8
-		jge Lerror
-		fld dword ptr[0+edx]
-		fld st(0)
-		jmp dword ptr[Ljmptab+eax*4]
-Lcase0:
-		fmul dword ptr[ebx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ebx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-		jmp LSetSides
-Lcase1:
-		fmul dword ptr[ecx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ebx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-		jmp LSetSides
-Lcase2:
-		fmul dword ptr[ebx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ecx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-		jmp LSetSides
-Lcase3:
-		fmul dword ptr[ecx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ecx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-		jmp LSetSides
-Lcase4:
-		fmul dword ptr[ebx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ebx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-		jmp LSetSides
-Lcase5:
-		fmul dword ptr[ecx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ebx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-		jmp LSetSides
-Lcase6:
-		fmul dword ptr[ebx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ecx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ecx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-		jmp LSetSides
-Lcase7:
-		fmul dword ptr[ecx]
-		fld dword ptr[0+4+edx]
-		fxch st(2)
-		fmul dword ptr[ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[4+ecx]
-		fld dword ptr[0+8+edx]
-		fxch st(2)
-		fmul dword ptr[4+ebx]
-		fxch st(2)
-		fld st(0)
-		fmul dword ptr[8+ecx]
-		fxch st(5)
-		faddp st(3),st(0)
-		fmul dword ptr[8+ebx]
-		fxch st(1)
-		faddp st(3),st(0)
-		fxch st(3)
-		faddp st(2),st(0)
-LSetSides:
-		faddp st(2),st(0)
-		fcomp dword ptr[12+edx]
-		xor ecx,ecx
-		fnstsw ax
-		fcomp dword ptr[12+edx]
-		and ah,1
-		xor ah,1
-		add cl,ah
-		fnstsw ax
-		and ah,1
-		add ah,ah
-		add cl,ah
-		pop ebx
-		mov eax,ecx
-		ret
-Lerror:
-		int 3
-	}
-}
-#pragma warning( default: 4035 )
-
-#endif
-#endif
 
 /*
 =================
@@ -1186,7 +881,7 @@ vec_t VectorNormalize( vec3_t v ) {
 		v[1] *= ilength;
 		v[2] *= ilength;
 	}
-		
+
 	return length;
 }
 
@@ -1211,7 +906,7 @@ vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
 #endif
 		VectorClear( out );
 	}
-		
+
 	return length;
 
 }
@@ -1284,7 +979,7 @@ int	PlaneTypeForNormal (vec3_t normal) {
 		return PLANE_Y;
 	if ( normal[2] == 1.0 )
 		return PLANE_Z;
-	
+
 	return PLANE_NON_AXIAL;
 }
 */
@@ -1429,12 +1124,12 @@ void NormalToLatLong( const vec3_t normal, byte bytes[2] )
 
 // This is the VC libc version of rand() without multiple seeds per thread or 12 levels
 // of subroutine calls.
-// Both calls have been designed to minimise the inherent number of float <--> int 
+// Both calls have been designed to minimise the inherent number of float <--> int
 // conversions and the additional math required to get the desired value.
 // eg the typical tint = (rand() * 255) / 32768
 // becomes tint = irand(0, 255)
 
-static unsigned long	holdrand = 0x89abcdef;
+static uint32_t holdrand = 0x89abcdef;
 
 void Rand_Init(int seed)
 {
@@ -1464,10 +1159,7 @@ int irand(int min, int max)
 {
 	int		result;
 
-	// RoboPhred: ord_mantell_rp has a lightning trigger with a wait time of 45000.
-	// I'm not sure if this is really a problem and am too lazy to figure out what will happen, but
-	// it still generates a number and thats good enough for this game.  It's tecnically a bug with the map anyway.
-	//assert((max - min) < 32768);
+	assert((max - min) < 32768);
 
 	max++;
 	holdrand = (holdrand * 214013L) + 2531011L;
@@ -1489,7 +1181,7 @@ float Q_powf ( float x, int y )
 	return r;
 }
 
-#ifdef Q3_VM 
+#ifdef Q3_VM
 //rwwRMG - needed for HandleEntityAdjustment
 double fmod( double x, double y )
 {
@@ -1589,7 +1281,7 @@ qboolean G_FindClosestPointOnLineSegment( const vec3_t start, const vec3_t end, 
 	//		      /|
 	//		  c  / |
 	//		    /  |a
-	// 	    theta  /)__|    
+	//	theta  /)__|
 	//		      b
 	//cos(theta) = b / c
 	//solve for b
@@ -1597,7 +1289,7 @@ qboolean G_FindClosestPointOnLineSegment( const vec3_t start, const vec3_t end, 
 
 	//angle between vecs end2from and end2start, should be between 0 and 90
 	theta = 90 * (1 - dot);//theta
-	
+
 	//Get length of side from End2Result using sine of theta
 	distEnd2From = VectorLength( vecEnd2From );//c
 	cos_theta = cos(DEG2RAD(theta));//cos(theta)
@@ -1606,7 +1298,7 @@ qboolean G_FindClosestPointOnLineSegment( const vec3_t start, const vec3_t end, 
 	//Extrapolate to find result
 	VectorNormalize( vecEnd2Start );
 	VectorMA( end, distEnd2Result, vecEnd2Start, result );
-	
+
 	//perpendicular intersection is between the 2 endpoints
 	return qtrue;
 }
@@ -1656,7 +1348,7 @@ float G_PointDistFromLineSegment( const vec3_t start, const vec3_t end, const ve
 	//		      /|
 	//		  c  / |
 	//		    /  |a
-	//	    theta  /)__|    
+	//	theta  /)__|
 	//		      b
 	//cos(theta) = b / c
 	//solve for b

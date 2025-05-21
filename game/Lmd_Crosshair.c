@@ -2,6 +2,8 @@
 
 void lmd_crosshairEntText(const gentity_t* ent)
 {
+    if (ent->client->Lmd.lmdMenu.entityNum != 0) return;
+    
     const int lastEntNum = ent->client->Lmd.crosshairText.entNum;
     
     const int tracedEntNum = ent->client->Lmd.crosshairEntNum;

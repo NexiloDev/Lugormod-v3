@@ -8,6 +8,7 @@
 #include "Lmd_Accounts_Stats.h"
 
 #include "Lmd_Commands_Auths.h"
+#include "Lmd_Crosshair.h"
 #include "Lmd_Professions.h"
 #include "Lmd_Prof_Merc.h"
 
@@ -4659,9 +4660,12 @@ void ClientEndFrame( gentity_t *ent ) {
 
 	SendPendingPredictableEvents( &ent->client->ps );
 
+	lmd_crosshairEntTrace(ent);
+
 	// set the bit for the reachability area the client is currently in
 	//	i = trap_AAS_PointReachabilityAreaIndex( ent->client->ps.origin );
 	//	ent->client->areabits[i >> 3] |= 1 << (i & 7);
+
 }
 
 

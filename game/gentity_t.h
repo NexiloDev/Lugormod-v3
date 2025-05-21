@@ -374,6 +374,7 @@ struct gentity_s {
 		int choiceDelay;
 		int prof;
 		int sideAcc;
+		char * crosshairText;
 	}Lmd;
 	//RoboPhred
 	qboolean isAutoTargeted; //we were given a targetname automatically

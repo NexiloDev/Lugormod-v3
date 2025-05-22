@@ -219,7 +219,7 @@ char* GetPasswordByIndex(const char* index)
 	return "";
 }
 
-extern char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, const char* message);
+extern char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message);
 char* Accounts_Custom_GetValue(Account_t *acc, char *key);
 void Send_Target_Print(gentity_t *ent, int targ) {
 

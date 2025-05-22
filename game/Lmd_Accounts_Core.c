@@ -724,7 +724,8 @@ static int GetTitleIndex(int levelp)
 }
 
 extern int Jedi_GetAccSide(Account_t *acc);
-char* Accounts_GetTitle(Account_t *acc) {
+char* Accounts_GetTitle(Account_t *acc)
+{
 	if (!acc) return DEFAULT_TITLE;
 	if (!lmd_titlesLoaded && !Accounts_LoadTitles()) return DEFAULT_TITLE;
 

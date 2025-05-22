@@ -558,7 +558,7 @@ void misc_model_breakable_touch (gentity_t *self, gentity_t *other, trace_t *tra
 	G_UseTargets(self, other);
 }
 
-extern char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, const char* message);
+extern char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message);
 
 void misc_model_breakable_use (gentity_t *self, gentity_t *other, gentity_t *activator){
 	if (self->genericValue10 > level.time) {

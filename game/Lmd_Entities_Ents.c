@@ -1540,8 +1540,48 @@ void lmd_door(gentity_t* ent)
     }
 }
 
+extern char* Accounts_GetTitle(Account_t *acc);
+char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message)
+{
+    if (!player || !player->client) return message;
+    
+    static char processedMessage[MAX_STRING_CHARS];
+    const char* playerName = player->client->pers.Lmd.account ? Accounts_GetName(player->client->pers.Lmd.account) : player->client->pers.netname;
+    const char* playerTitle = player->client->pers.Lmd.account ? Accounts_GetTitle(player->client->pers.Lmd.account) : "None";
+    int playerLevel = player->client->pers.Lmd.account ? PlayerAcc_Prof_GetLevel(player) : 0;
+    
+    processedMessage[0] = '\0';
+    
+    int msgLen = strlen(message);
+    
+    for (int i = 0; i < msgLen; i++) {
+        if (message[i] == '.' && i + 1 < msgLen) {
+            switch (message[i + 1]) {
+            case 'n':
+                Q_strcat(processedMessage, sizeof(processedMessage), playerName);
+                i++;
+                break;
+            case 'l':
+                Q_strcat(processedMessage, sizeof(processedMessage), va("%i", playerLevel));
+                i++;
+                break;
+            case 't':
+                Q_strcat(processedMessage, sizeof(processedMessage), playerTitle);
+                i++;
+                break;
+            default:
+                strncat(processedMessage, &message[i], 1);
+                break;
+            }
+        } else {
+            strncat(processedMessage, &message[i], 1);
+        }
+    }
+    
+    return processedMessage;
+}
 
-char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, const char* message);
+
 void lmd_menu_show(gentity_t* player, gentity_t* menu)
 {
     char msg[MAX_STRING_CHARS] = "";
@@ -3396,7 +3436,6 @@ void lmd_profselectionmenu_show(gentity_t* player, gentity_t* menu)
 extern qboolean Professions_ChooseProf(gentity_t *ent, int prof);
 extern int Professions_LevelCost(int prof, int level, int time);
 extern int Accounts_Prof_GetLastLevelup(Account_t *acc);
-char* Accounts_GetTitle(Account_t *acc);
 
 void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd)
 {
@@ -3695,47 +3734,6 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
         player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
     }
 }
-
-char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message)
-{
-    if (!player || !player->client) return message;
-    
-    static char processedMessage[MAX_STRING_CHARS];
-    const char* playerName = player->client->pers.Lmd.account ? Accounts_GetName(player->client->pers.Lmd.account) : player->client->pers.netname;
-    const char* playerTitle = player->client->pers.Lmd.account ? Accounts_GetTitle(player->client->pers.Lmd.account) : "None";
-    int playerLevel = player->client->pers.Lmd.account ? PlayerAcc_Prof_GetLevel(player) : 0;
-    
-    processedMessage[0] = '\0';
-    
-    int msgLen = strlen(message);
-    
-    for (int i = 0; i < msgLen; i++) {
-        if (message[i] == '.' && i + 1 < msgLen) {
-            switch (message[i + 1]) {
-            case 'n':
-                Q_strcat(processedMessage, sizeof(processedMessage), playerName);
-                i++;
-                break;
-            case 'l':
-                Q_strcat(processedMessage, sizeof(processedMessage), va("%i", playerLevel));
-                i++;
-                break;
-            case 't':
-                Q_strcat(processedMessage, sizeof(processedMessage), playerTitle);
-                i++;
-                break;
-            default:
-                strncat(processedMessage, &message[i], 1);
-                break;
-            }
-        } else {
-            strncat(processedMessage, &message[i], 1);
-        }
-    }
-    
-    return processedMessage;
-}
-
 
 void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
 {

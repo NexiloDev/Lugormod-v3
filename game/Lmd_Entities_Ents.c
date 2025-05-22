@@ -1540,6 +1540,48 @@ void lmd_door(gentity_t* ent)
     }
 }
 
+extern char* Accounts_GetTitle(Account_t *acc);
+char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message)
+{
+    if (!player || !player->client) return message;
+    
+    static char processedMessage[MAX_STRING_CHARS];
+    const char* playerName = player->client->pers.Lmd.account ? Accounts_GetName(player->client->pers.Lmd.account) : player->client->pers.netname;
+    const char* playerTitle = player->client->pers.Lmd.account ? Accounts_GetTitle(player->client->pers.Lmd.account) : "None";
+    int playerLevel = player->client->pers.Lmd.account ? PlayerAcc_Prof_GetLevel(player) : 0;
+    
+    processedMessage[0] = '\0';
+    
+    int msgLen = strlen(message);
+    
+    for (int i = 0; i < msgLen; i++) {
+        if (message[i] == '.' && i + 1 < msgLen) {
+            switch (message[i + 1]) {
+            case 'n':
+                Q_strcat(processedMessage, sizeof(processedMessage), playerName);
+                i++;
+                break;
+            case 'l':
+                Q_strcat(processedMessage, sizeof(processedMessage), va("%i", playerLevel));
+                i++;
+                break;
+            case 't':
+                Q_strcat(processedMessage, sizeof(processedMessage), playerTitle);
+                i++;
+                break;
+            default:
+                strncat(processedMessage, &message[i], 1);
+                break;
+            }
+        } else {
+            strncat(processedMessage, &message[i], 1);
+        }
+    }
+    
+    return processedMessage;
+}
+
+
 void lmd_menu_show(gentity_t* player, gentity_t* menu)
 {
     char msg[MAX_STRING_CHARS] = "";
@@ -1597,6 +1639,8 @@ void lmd_menu_show(gentity_t* player, gentity_t* menu)
     {
         Q_strcat(msg, sizeof(msg), va("  %sCancel\n", menu->Lmd.color2));
     }
+    
+    strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(player, msg));
 
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
@@ -1863,7 +1907,12 @@ void lmd_terminal_use(gentity_t* self, gentity_t* other, gentity_t* activator)
     char msg[MAX_STRING_CHARS] = "";
     int i;
     if (self->message)
-        Q_strcat(msg, sizeof(msg), va("%s\n^5==============================\n", self->message));
+    {
+        strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(activator, self->message));
+        Q_strcat(msg, sizeof(msg), va("\n^5==============================\n", msg));
+    }
+
+    
 
     for (i = 0; i < self->count; i++)
     {
@@ -2177,7 +2226,11 @@ void lmd_rentterminal_examine(gentity_t* self, gentity_t* activator)
     int min;
 
     if (self->message)
-        Disp(activator, self->message); //send this as a seperate disp, in case the msg makes us hit MAX_STRING_CHARS
+    {
+        char msgt[MAX_STRING_CHARS] = "";
+        strcpy_s(msgt, sizeof(msgt), lmd_trainermenu_processMessagePlaceholders(activator, self->message));
+        Disp(activator, msgt); //send this as a seperate disp, in case the msg makes us hit MAX_STRING_CHARS
+    }
 
     if (self->timestamp)
     {
@@ -2271,7 +2324,10 @@ void lmd_rentterminal_use(gentity_t* self, gentity_t* other, gentity_t* activato
     char msg[MAX_STRING_CHARS] = "";
     int sec = 0, min = 0;
     if (self->message)
-        Q_strcat(msg, sizeof(msg), va("%s\n", self->message));
+    {
+        strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(activator, self->message));
+        Q_strcat(msg, sizeof(msg), va("\n", msg));
+    }
 
     Q_strcat(msg, sizeof(msg), "^3This is a rentable terminal.\n");
     if (self->timestamp > 0)
@@ -2314,7 +2370,10 @@ void lmd_rentterminal_think(gentity_t* ent)
         {
             char msg[MAX_STRING_CHARS] = "";
             if (ent->message)
-                Q_strncpyz(msg, va("%s\n", ent->message), sizeof(msg));
+            {
+                strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(ent->activator, ent->message));
+                Q_strncpyz(msg, va("%s\n", msg), sizeof(msg));
+            }
             Q_strcat(msg, sizeof(msg), va("^3You have ^2%i^3 seconds left.", timeLeft));
             trap_SendServerCommand(ent->activator->s.number, va("cp \"%s\"", msg));
         }
@@ -2325,7 +2384,10 @@ void lmd_rentterminal_think(gentity_t* ent)
             {
                 char msg[MAX_STRING_CHARS] = "";
                 if (ent->message)
-                    Q_strncpyz(msg, va("%s\n", ent->message), sizeof(msg));
+                {
+                    strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(ent->activator, ent->message));
+                    Q_strncpyz(msg, va("%s\n", msg), sizeof(msg));
+                }
                 Q_strcat(msg, sizeof(msg), "^1Your rent has expired.");
                 trap_SendServerCommand(ent->activator->s.number, va("cp \"%s\"", msg));
             }
@@ -3374,7 +3436,6 @@ void lmd_profselectionmenu_show(gentity_t* player, gentity_t* menu)
 extern qboolean Professions_ChooseProf(gentity_t *ent, int prof);
 extern int Professions_LevelCost(int prof, int level, int time);
 extern int Accounts_Prof_GetLastLevelup(Account_t *acc);
-char* Accounts_GetTitle(Account_t *acc);
 
 void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd)
 {
@@ -3673,45 +3734,6 @@ void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd)
         player->client->Lmd.lmdMenu.nextUpdateTime = level.time;
     }
 }
-
-char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, const char* message) {
-    static char processedMessage[MAX_STRING_CHARS];
-    Account_t* acc = player->client->pers.Lmd.account;
-    const char* playerName = Accounts_GetName(acc);
-    const char* playerTitle = Accounts_GetTitle(acc);
-    int playerLevel = PlayerAcc_Prof_GetLevel(player);
-    
-    processedMessage[0] = '\0';
-    
-    int msgLen = strlen(message);
-    
-    for (int i = 0; i < msgLen; i++) {
-        if (message[i] == '.' && i + 1 < msgLen) {
-            switch (message[i + 1]) {
-            case 'n':
-                Q_strcat(processedMessage, sizeof(processedMessage), playerName);
-                i++;
-                break;
-            case 'l':
-                Q_strcat(processedMessage, sizeof(processedMessage), va("%i", playerLevel));
-                i++;
-                break;
-            case 't':
-                Q_strcat(processedMessage, sizeof(processedMessage), playerTitle);
-                i++;
-                break;
-            default:
-                strncat(processedMessage, &message[i], 1);
-                break;
-            }
-        } else {
-            strncat(processedMessage, &message[i], 1);
-        }
-    }
-    
-    return processedMessage;
-}
-
 
 void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
 {

@@ -219,6 +219,7 @@ char* GetPasswordByIndex(const char* index)
 	return "";
 }
 
+extern char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, const char* message);
 char* Accounts_Custom_GetValue(Account_t *acc, char *key);
 void Send_Target_Print(gentity_t *ent, int targ) {
 
@@ -255,6 +256,8 @@ void Send_Target_Print(gentity_t *ent, int targ) {
 			strncpy(buf, va("%s%s%s", buf, GetPasswordByIndex(ent->target2), ptr + 3), MAX_STRING_CHARS);
 		}
 	}
+
+	strncpy_s(buf, sizeof(buf), lmd_trainermenu_processMessagePlaceholders(ent->activator, buf), MAX_STRING_CHARS);
 
 	if(buf[0] == '@' && buf[1] != '@') { //Ufo: fixed, was buf[1] == '@' and it didn't happen at all
 		trap_SendServerCommand(targ, va("cps \"%s\"", buf));

@@ -375,6 +375,7 @@ struct gentity_s {
 		int prof;
 		int sideAcc;
 		char * crosshairText;
+		int crosshairTextRange;
 	}Lmd;
 	//RoboPhred
 	qboolean isAutoTargeted; //we were given a targetname automatically

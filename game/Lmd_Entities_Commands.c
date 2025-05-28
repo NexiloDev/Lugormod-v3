@@ -1622,6 +1622,7 @@ int Lmdp_Grabbed_Set(gentity_t* player, gentity_t* ent, int mode, qboolean msg, 
 		ent->s.eFlags &= ~EF_CLIENTSMOOTH;
 		VectorClear(ent->Lmd.grabOffset);
 
+		player->client->Lmd.grabbing = qfalse;
 		if (msg)
 			Disp(player, "^3Entity ^2%i ^3dropped.", ent->s.number);
 	}
@@ -1659,6 +1660,8 @@ int Lmdp_Grabbed_Set(gentity_t* player, gentity_t* ent, int mode, qboolean msg, 
 		ent->s.eFlags |= EF_CLIENTSMOOTH;
 		VectorCopy(offset, ent->Lmd.grabOffset);
 
+		player->client->Lmd.grabbing = qtrue;
+		
 		if (msg)
 			Disp(player, "^3Entity ^2%i ^3grabbed.", ent->s.number);
 	}

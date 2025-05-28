@@ -2185,6 +2185,8 @@ qboolean Merc_CheckHook (gentity_t *ent);
 void Merc_DrawHook (gentity_t *ent);
 void Merc_Unhook (gentity_t *ent);
 float Merc_SpeedFactor(gentity_t *ent);
+extern void Cmd_GrabOffsetDec_f(gentity_t* player);
+extern void Cmd_GrabOffsetInc_f(gentity_t* player);
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t	*client;
 	pmove_t		pm;
@@ -4002,10 +4004,10 @@ void ClientThink_real( gentity_t *ent ) {
 				ForceSpeed(ent, 0);
 				break;
 			case GENCMD_FORCE_THROW:
-				ForceThrow(ent, qfalse);
+				ent->client->Lmd.grabbing ? Cmd_GrabOffsetInc_f(ent) : ForceThrow(ent, qfalse);
 				break;
 			case GENCMD_FORCE_PULL:
-				ForceThrow(ent, qtrue);
+				ent->client->Lmd.grabbing ? Cmd_GrabOffsetDec_f(ent) : ForceThrow(ent, qtrue);
 				break;
 			case GENCMD_FORCE_DISTRACT:
 				ForceTelepathy(ent);

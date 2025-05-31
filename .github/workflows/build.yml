@@ -46,7 +46,6 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build
-        shell: pwsh
         run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS
 
       - name: Install
@@ -54,7 +53,9 @@ jobs:
         run: cmake --install ${{ github.workspace }}\${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} --prefix ${{ env.RESOURCES_DIR }}\GameData
 
       - name: Create zip archive of resources
-        run: zip -r "${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}.zip" ${{ env.RESOURCES_DIR }}
+        if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
+        shell: pwsh
+        run: Compress-Archive -Path ${{ env.RESOURCES_DIR }}\* -DestinationPath "${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}.zip"
 
       - name: Upload artifact
         uses: 'actions/upload-artifact@v4'

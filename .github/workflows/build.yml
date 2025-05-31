@@ -46,23 +46,22 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build
-        shell: bash
-        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS 2>&1 | tee ${{ env.BUNDLE_DIR }}/compile.log
+        shell: pwsh
+        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS
 
       - name: Install
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        shell: bash
-        run: cmake --install ${{ github.workspace }}/${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} --prefix ${{ env.RESOURCES_DIR }}/GameData
+        run: cmake --install ${{ github.workspace }}\${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} --prefix ${{ env.RESOURCES_DIR }}\GameData
 
       - name: Create zip archive of resources
-        run: zip -r "${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}.zip" ${{ env.RESOURCES_DIR }}
+        run: zip -r "${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}.zip" ${{ env.RESOURCES_DIR }}
 
       - name: Upload artifact
         uses: 'actions/upload-artifact@v4'
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         with:
           name: Lugormod ${{ github.event.release.name }} )${{ matrix.build_type }}) - ${{ runner.os }} ${{ matrix.arch }}
-          path: ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip
+          path: ${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip
 
       - name: Upload Release
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
@@ -81,7 +80,7 @@ jobs:
                     repo: context.repo.repo,
                     release_id: ${{ github.event.release.id }},
                     name: filename,
-                    data: await fs.readFile('${{ env.BUNDLE_DIR }}/' + filename )
+                    data: await fs.readFile('${{ env.BUNDLE_DIR }}\' + filename )
                   }
                 );
               }

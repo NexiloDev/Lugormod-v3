@@ -16,23 +16,23 @@ vec4_t		colorYellow	= {1, 1, 0, 1};
 vec4_t		colorMagenta= {1, 0, 1, 1};
 vec4_t		colorCyan	= {0, 1, 1, 1};
 vec4_t		colorWhite	= {1, 1, 1, 1};
-vec4_t		colorLtGrey	= {0.75, 0.75, 0.75, 1};
-vec4_t		colorMdGrey	= {0.5, 0.5, 0.5, 1};
-vec4_t		colorDkGrey	= {0.25, 0.25, 0.25, 1};
+vec4_t		colorLtGrey	= {0.75f, 0.75f, 0.75f, 1};
+vec4_t		colorMdGrey	= {0.5f, 0.5f, 0.5f, 1};
+vec4_t		colorDkGrey	= {0.25f, 0.25f, 0.25f, 1};
 
 vec4_t		colorLtBlue	= {0.367f, 0.261f, 0.722f, 1};
 vec4_t		colorDkBlue	= {0.199f, 0.0f,   0.398f, 1};
 
 vec4_t	g_color_table[8] =
 	{
-	{0.0, 0.0, 0.0, 1.0},
-	{1.0, 0.0, 0.0, 1.0},
-	{0.0, 1.0, 0.0, 1.0},
-	{1.0, 1.0, 0.0, 1.0},
-	{0.0, 0.0, 1.0, 1.0},
-	{0.0, 1.0, 1.0, 1.0},
-	{1.0, 0.0, 1.0, 1.0},
-	{1.0, 1.0, 1.0, 1.0},
+	{0.0f, 0.0f, 0.0f, 1.0f},
+	{1.0f, 0.0f, 0.0f, 1.0f},
+	{0.0f, 1.0f, 0.0f, 1.0f},
+	{1.0f, 1.0f, 0.0f, 1.0f},
+	{0.0f, 0.0f, 1.0f, 1.0f},
+	{0.0f, 1.0f, 1.0f, 1.0f},
+	{1.0f, 0.0f, 1.0f, 1.0f},
+	{1.0f, 1.0f, 1.0f, 1.0f},
 	};
 
 
@@ -133,10 +133,10 @@ float	Q_random( int *seed ) {
 }
 
 float	Q_crandom( int *seed ) {
-	return 2.0 * ( Q_random( seed ) - 0.5 );
+	return 2.0f * ( Q_random( seed ) - 0.5f );
 }
 
-float   Q_round (float val) 
+float   Q_round (const float val)
 {
         return floorf(val + 0.5f);
 }
@@ -281,41 +281,38 @@ void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
 
 //=======================================================
 
-signed char ClampChar( int i ) {
+signed char ClampChar(const int i ) {
 	if ( i < -128 ) {
 		return -128;
 	}
 	if ( i > 127 ) {
 		return 127;
 	}
-	return i;
+	return (signed char) i;
 }
 
-signed short ClampShort( int i ) {
+signed short ClampShort(const int i ) {
 	if ( i < -32768 ) {
 		return -32768;
 	}
 	if ( i > 0x7fff ) {
 		return 0x7fff;
 	}
-	return i;
+	return (signed short) i;
 }
 
 
 // this isn't a real cheap function to call!
-int DirToByte( vec3_t dir ) {
-	int		i, best;
-	float	d, bestd;
-
+int DirToByte( const vec3_t dir ) {
 	if ( !dir ) {
 		return 0;
 	}
 
-	bestd = 0;
-	best = 0;
-	for (i=0 ; i<NUMVERTEXNORMALS ; i++)
+	float bestd = 0;
+	int best = 0;
+	for (int i = 0 ; i<NUMVERTEXNORMALS ; i++)
 	{
-		d = DotProduct (dir, bytedirs[i]);
+		const float d = DotProduct(dir, bytedirs[i]);
 		if (d > bestd)
 		{
 			bestd = d;
@@ -357,9 +354,7 @@ unsigned ColorBytes4 (float r, float g, float b, float a) {
 }
 
 float NormalizeColor( const vec3_t in, vec3_t out ) {
-	float	max;
-
-	max = in[0];
+	float max = in[0];
 	if ( in[1] > max ) {
 		max = in[1];
 	}
@@ -590,22 +585,20 @@ other perpendicular vectors
 ================
 */
 void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up) {
-	float		d;
-
-	// this rotate and negate guarantees a vector
-	// not colinear with the original
+	// this rotation and negate, guarantees a vector
+	// not co-linear with the original
 	right[1] = -forward[0];
 	right[2] = forward[1];
 	right[0] = forward[2];
 
-	d = DotProduct (right, forward);
+	const float d = DotProduct(right, forward);
 	VectorMA (right, -d, forward, right);
 	VectorNormalize (right);
 	CrossProduct (right, forward, up);
 }
 
 
-void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out )
+void VectorRotate( const vec3_t in, vec3_t matrix[3], vec3_t out )
 {
 	out[0] = DotProduct( in, matrix[0] );
 	out[1] = DotProduct( in, matrix[1] );
@@ -750,11 +743,9 @@ SetPlaneSignbits
 =================
 */
 void SetPlaneSignbits (cplane_t *out) {
-	int	bits, j;
-
 	// for fast box on planeside test
-	bits = 0;
-	for (j=0 ; j<3 ; j++) {
+	int bits = 0;
+	for (int j = 0 ; j<3 ; j++) {
 		if (out->normal[j] < 0) {
 			bits |= 1<<j;
 		}
@@ -770,37 +761,36 @@ BoxOnPlaneSide
 Returns 1, 2, or 1 + 2
 ==================
 */
-int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, cplane_t *p)
+int BoxOnPlaneSide(const vec3_t emins, const vec3_t emaxs, const cplane_t *plane)
 {
 	float	dist[2];
-	int		sides, b, i;
 
 	// fast axial cases
-	if (p->type < 3)
+	if (plane->type < 3)
 	{
-		if (p->dist <= emins[p->type])
+		if (plane->dist <= emins[plane->type])
 			return 1;
-		if (p->dist >= emaxs[p->type])
+		if (plane->dist >= emaxs[plane->type])
 			return 2;
 		return 3;
 	}
 
 	// general case
 	dist[0] = dist[1] = 0;
-	if (p->signbits < 8) // >= 8: default case is original code (dist[0]=dist[1]=0)
+	if (plane->signbits < 8) // >= 8: default case is original code (dist[0]=dist[1]=0)
 	{
-		for (i=0 ; i<3 ; i++)
+		for (int i = 0 ; i<3 ; i++)
 		{
-			b = (p->signbits >> i) & 1;
-			dist[ b] += p->normal[i]*emaxs[i];
-			dist[!b] += p->normal[i]*emins[i];
+			const int b = (plane->signbits >> i) & 1;
+			dist[ b] += plane->normal[i]*emaxs[i];
+			dist[!b] += plane->normal[i]*emins[i];
 		}
 	}
 
-	sides = 0;
-	if (dist[0] >= p->dist)
+	int sides = 0;
+	if (dist[0] >= plane->dist)
 		sides = 1;
-	if (dist[1] < p->dist)
+	if (dist[1] < plane->dist)
 		sides |= 2;
 
 	return sides;
@@ -955,9 +945,7 @@ void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out ) {
 
 
 int Q_log2( int val ) {
-	int answer;
-
-	answer = 0;
+	int answer = 0;
 	while ( ( val>>=1 ) != 0 ) {
 		answer++;
 	}
@@ -1085,7 +1073,7 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 /*
 ** NormalToLatLong
 **
-** We use two byte encoded normals in some space critical applications.
+** We use two byte encoded normals in some space-critical applications.
 ** Lat = 0 at (1,0,0) to 360 (-1,0,0), encoded in 8-bit sine table format
 ** Lng = 0 at (0,0,1) to 180 (0,0,-1), encoded in 8-bit sine table format
 **
@@ -1109,16 +1097,14 @@ void NormalToLatLong( const vec3_t normal, byte bytes[2] )
 	}
 	else
 	{
-		int	a, b;
-
-		a = (int)(RAD2DEG( (vec_t)atan2( normal[1], normal[0] ) ) * (255.0f / 360.0f ));
+		int a = (int) (RAD2DEG((vec_t)atan2( normal[1], normal[0] )) * (255.0f / 360.0f));
 		a &= 0xff;
 
-		b = (int)(RAD2DEG( (vec_t)acos( normal[2] ) ) * ( 255.0f / 360.0f ));
+		int b = (int)(RAD2DEG( (vec_t)acos( normal[2] ) ) * ( 255.0f / 360.0f ));
 		b &= 0xff;
 
 		bytes[0] = b;	// longitude
-		bytes[1] = a;	// lattitude
+		bytes[1] = a;	// latitude
 	}
 }
 

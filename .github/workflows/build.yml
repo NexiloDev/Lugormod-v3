@@ -14,6 +14,12 @@ on:
       - ".gitignore"
       - "docs/*"
 
+env:
+  BUILD_DIR: build
+  BUNDLE_DIR: ${{ github.workspace }}/build
+  RESOURCES_DIR: ${{ github.workspace }}/resources
+  ARTIFACT_NAME: Lugormod-${{ github.event.release.tag_name }}
+
 jobs:
   windows-build:
     name: Windows ${{ matrix.arch }} ${{ matrix.build_type }}
@@ -26,42 +32,48 @@ jobs:
           - arch: x86
             platform: Win32
     steps:
-      - name: Checkout Pull-Request branch
-        uses: actions/checkout@v3
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
-      - name: Create Build Environment
-        run: cmake -E make_directory ${{ github.workspace }}/build
-      - name: Configure CMake
+      - name: Checkout repository and branch
+        uses: 'actions/checkout@v4'
+
+      - name: Add `msbuild` to PATH
+        uses: 'microsoft/setup-msbuild@v1.1'
+
+      - name: Setup
         shell: bash
-        working-directory: ${{ github.workspace }}/build
         run: |
-          OPTIONS="-DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_INSTALL_PREFIX=bin"
-          cmake $GITHUB_WORKSPACE -A ${{ matrix.platform }} $OPTIONS
+          cmake -B ${{ env.BUILD_DIR }} \
+          -A ${{ matrix.platform }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
       - name: Build
-        working-directory: ${{ github.workspace }}/build
         shell: bash
-        run: cmake --build . --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS 2> >(tee "output.txt")
+        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS 2>&1 | tee ${{ env.BUNDLE_DIR }}/compile.log
+
       - name: Install
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        working-directory: ${{ github.workspace }}/build
         shell: bash
-        run: cmake --install . --config ${{ matrix.build_type }}
-      - uses: 'actions/upload-artifact@v4'
+        run: cmake --install ${{ github.workspace }}/${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} --prefix ${{ env.RESOURCES_DIR }}/GameData
+
+      - name: Create zip archive of resources
+        run: zip -r "${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}.zip" ${{ env.RESOURCES_DIR }}
+
+      - name: Upload artifact
+        uses: 'actions/upload-artifact@v4'
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         with:
-          name: ${{ github.event.release.name }}, ${{ matrix.build_type }}, ${{ matrix.arch }}
-          path: ${{github.workspace}}/build/*.dll
+          name: Lugormod ${{ github.event.release.name }} )${{ matrix.build_type }}) - ${{ runner.os }} ${{ matrix.arch }}
+          path: ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip
+
       - name: Upload Release
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        uses: actions/github-script@v6
+        uses: 'actions/github-script@v7'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs').promises;
-            for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build/Release`) )
+            for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}'))
             {
-              if ( filename.endsWith('.dll') )
+              if (filename.endsWith('.zip'))
               {
                 await github.rest.repos.uploadReleaseAsset(
                   {
@@ -69,11 +81,12 @@ jobs:
                     repo: context.repo.repo,
                     release_id: ${{ github.event.release.id }},
                     name: filename,
-                    data: await fs.readFile( String.raw`${{github.workspace}}/build/Release/` + filename )
+                    data: await fs.readFile('${{ env.BUNDLE_DIR }}/' + filename )
                   }
                 );
               }
             }
+
 
   linux-build:
     name: Linux ${{ matrix.arch }} ${{ matrix.build_type }}
@@ -86,14 +99,10 @@ jobs:
         c_compiler: [gcc]
         cpp_compiler: [g++]
     steps:
-    - name: Checkout Pull-Request branch
-      uses: actions/checkout@v4
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-    - name: Fetch Build dependencies
+    - name: Checkout repository and branch
+      uses: 'actions/checkout@v4'
+
+    - name: Fetch build dependencies
       run: |
         if [ ${{ matrix.arch }} == "x86" ]; then
           sudo dpkg --add-architecture i386
@@ -102,39 +111,42 @@ jobs:
         else
           sudo apt-get -qq update
         fi
+
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      # NOTE: might need to adapt the OPTIONS again if we want to have multiple toolchains...
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+      run: |
+        cmake -B ${{ env.BUILD_DIR }} \
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
+
     - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} -j $(nproc)  2> >(tee "output.txt")
+      run: cmake --build ${{ env.BUILD_DIR }} -j $(nproc) 2>&1 | tee ${{ env.BUNDLE_DIR }}/compile.log
+
     - name: Install
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      working-directory: ${{ github.workspace }}/build
-      shell: bash
-      run: cmake --install . --config ${{ matrix.build_type }}
-    - name: Upload artifacts
+      run: cmake --install ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} --prefix ${{ env.RESOURCES_DIR }}/GameData
+
+    - name: Create tar archive
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
+      run: tar -czvf ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}.tar.gz -C ${{ env.RESOURCES_DIR }} .
+
+    - name: Upload artifact
       uses: 'actions/upload-artifact@v4'
-      with:
-        name: ${{ github.event.release.name }}, ${{ matrix.build_type }}, ${{ matrix.arch }}
-        path: ${{github.workspace}}/build/*.so
-    - name: Upload Release
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      uses: actions/github-script@v6
+      with:
+        name: Lugormod ${{ github.event.release.name }}, ${{ matrix.build_type }}, ${{ runner.os }} ${{ matrix.arch }}
+        path:  ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz
+
+    - name: Upload Release
+      uses: 'actions/github-script@v7'
+      if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs').promises;
-          for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build`) )
+          for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}'))
           {
-            if ( filename.endsWith('.so') )
+            if (filename.endsWith('.tar.gz'))
             {
               await github.rest.repos.uploadReleaseAsset(
                 {
@@ -142,7 +154,7 @@ jobs:
                   repo: context.repo.repo,
                   release_id: ${{ github.event.release.id }},
                   name: filename,
-                  data: await fs.readFile( String.raw`${{github.workspace}}/build/` + filename )
+                  data: await fs.readFile('${{ env.BUNDLE_DIR }}/' + filename )
                 }
               );
             }

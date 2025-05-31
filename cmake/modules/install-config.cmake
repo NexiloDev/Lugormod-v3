@@ -1,11 +1,4 @@
 #============================================================================
-# Copyright (C) 2015, OpenJK contributors
-#
-# This file is part of the OpenJK source code.
-#
-# OpenJK is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,7 +9,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 #============================================================================
 
-# Subdirectories to package JK2 and JKA into
 set(JKAInstallDir "JediAcademy")
 
 # Install components
@@ -39,7 +31,7 @@ set(CPACK_COMPONENTS_ALL
         ${JKAMPCoreComponent}
         ${JKAMPClientComponent}
         ${JKAMPServerComponent}
-
+)
 set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
 # Component groups

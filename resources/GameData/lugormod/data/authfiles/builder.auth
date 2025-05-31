@@ -52,5 +52,3 @@ SpawnString: report,3,restrict,3,
 Trace: report,3,restrict,3,
 UseEnt: report,3,restrict,3,
 UseTarg: report,3,restrict,3,
-
-//End

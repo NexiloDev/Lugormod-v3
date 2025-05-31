@@ -23,5 +23,3 @@ NextMap: report,1,restrict,1,
 PlayerIps: report,1,restrict,1,
 RemoveAdmin: report,1,restrict,1,
 Undying: report,1,restrict,1,
-
-//End

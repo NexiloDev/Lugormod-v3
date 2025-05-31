@@ -16,17 +16,25 @@ Before you begin, ensure you have:
 1. Extract Files
   1. Open the downloaded Lugormod archive
   2. Extract the contents into your Jedi Academy GameData Folder
-  3. After extraction, you should have:
-     ```
-     GameData/
-     ├── lugormod/
-     │   ├── lugormod.pk3
-     │   ├── botfiles
-     │   │   ├── astupidbot.jkb
-     │   ├── botroutes
-     │   │   └── *.wnt
-     │   └ 
-     ```
+3. After extraction, you should have:
+   ```
+   GameData/
+   ├── lugormod/
+   │   ├── lugormod.pk3
+   │   ├── jampgamex86.dll | jampgamei386.so (based on your OS choice)
+   │   ├── cmdleveldefs.cfg
+   │   ├── bots.cfg
+   │   ├── botfiles
+   │   │   └── astupidbot.jkb
+   │   ├── botroutes
+   │   │   └── *.wnt
+   │   ├── data
+   │   │   ├── accounts
+   │   │   ├── authfiles
+   │   │   ├── groupentities
+   │   │   └── mapentities
+   │   └── bots.cfg
+   ```
 
 ## 🚀 Launch the Mod
 

@@ -11,7 +11,7 @@ Before you begin, ensure you have:
 - An archive utility (like WinRAR, 7-Zip, tar) to extract files from the archive
 - A recent version of OpenJK or other up to date game client
 
-## 📁 Step-by-Step Installation
+### 📁 Step-by-Step Installation
 
 1. Extract Files
   1. Open the downloaded Lugormod archive
@@ -36,7 +36,7 @@ Before you begin, ensure you have:
    │   └── bots.cfg
    ```
 
-## 🚀 Launch the Mod
+### 🚀 Launch the Mod
 
 To play Lugormod:
 

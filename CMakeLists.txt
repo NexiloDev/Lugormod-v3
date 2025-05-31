@@ -259,7 +259,7 @@ else()
 endif()
 
 add_library(GameLibrary SHARED ${GAME_SRC})
-if (FORCE_32)
+if (FORCE_32 AND NOT MSVC)
 	message("Forcing 32bit compilation")
 	set_target_properties(GameLibrary PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif()

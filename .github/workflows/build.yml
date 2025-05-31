@@ -55,7 +55,7 @@ jobs:
       - name: Create zip archive
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         shell: pwsh
-        run: Compress-Archive -Path ${{ env.RESOURCES_DIR }}\* -DestinationPath "${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}.zip"
+        run: Compress-Archive -Path ${{ env.RESOURCES_DIR }}\* -DestinationPath "${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip"
 
       - name: Upload artifact
         uses: 'actions/upload-artifact@v4'
@@ -128,7 +128,7 @@ jobs:
 
     - name: Create tar archive
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      run: tar -czvf ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}.tar.gz -C ${{ env.RESOURCES_DIR }} .
+      run: tar -czvf ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz -C ${{ env.RESOURCES_DIR }} .
 
     - name: Upload artifact
       uses: 'actions/upload-artifact@v4'

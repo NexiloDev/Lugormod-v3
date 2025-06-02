@@ -1,7 +1,6 @@
 name: Build
 
-permissions:
-  contents: write
+
 
 on:
   release:
@@ -74,19 +73,15 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs').promises;
-            for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}'))
-            {
-              if (filename.endsWith('.zip'))
-              {
-                await github.rest.repos.uploadReleaseAsset(
-                  {
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    release_id: ${{ github.event.release.id }},
-                    name: filename,
-                    data: await fs.readFile('${{ env.BUNDLE_DIR }}\' + filename )
-                  }
-                );
+            for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}')) {
+              if (filename.endsWith('.zip')) {
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: ${{ github.event.release.id }},
+                  name: filename,
+                  data: await fs.readFile('${{ env.BUNDLE_DIR }}/' + filename)
+                });
               }
             }
 
@@ -147,18 +142,14 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs').promises;
-          for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}'))
-          {
-            if (filename.endsWith('.tar.gz'))
-            {
-              await github.rest.repos.uploadReleaseAsset(
-                {
+          for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}')) {
+            if (filename.endsWith('.tar.gz')) {
+              await github.rest.repos.uploadReleaseAsset({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   release_id: ${{ github.event.release.id }},
                   name: filename,
                   data: await fs.readFile('${{ env.BUNDLE_DIR }}/' + filename )
-                }
-              );
+                });
             }
           }

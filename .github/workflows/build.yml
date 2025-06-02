@@ -73,7 +73,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const upload = require('./upload.js')
+            const upload = require('./.github/scripts/upload.js')
             await upload({github, context, core})
 
 
@@ -132,5 +132,5 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const upload = require('./upload.js')
+          const upload = require('./.github/scripts/upload.js')
           await upload({github, context, core})

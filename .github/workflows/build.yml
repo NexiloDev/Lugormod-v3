@@ -1,6 +1,7 @@
 name: Build
 
-
+permissions:
+  contents: write
 
 on:
   release:
@@ -18,8 +19,8 @@ on:
 
 env:
   BUILD_DIR: build
-  BUNDLE_DIR: ${{ github.workspace }}/build
   RESOURCES_DIR: ${{ github.workspace }}/resources
+  ARTIFACT_DIR: ${{ github.workspace }}/build
   ARTIFACT_NAME: Lugormod-${{ github.event.release.tag_name }}
 
 jobs:
@@ -57,14 +58,14 @@ jobs:
       - name: Create zip archive
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         shell: pwsh
-        run: Compress-Archive -Path ${{ env.RESOURCES_DIR }}\* -DestinationPath "${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip"
+        run: Compress-Archive -Path ${{ env.RESOURCES_DIR }}\* -DestinationPath "${{ env.ARTIFACT_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip"
 
       - name: Upload artifact
         uses: 'actions/upload-artifact@v4'
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
         with:
-          name: Lugormod ${{ github.event.release.name }} )${{ matrix.build_type }}) - ${{ runner.os }} ${{ matrix.arch }}
-          path: ${{ env.BUNDLE_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip
+          name: Lugormod ${{ github.event.release.name }} - ${{ runner.os }} ${{ matrix.arch }}
+          path: ${{ env.ARTIFACT_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip
 
       - name: Publish release files
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
@@ -72,18 +73,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs').promises;
-            for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}')) {
-              if (filename.endsWith('.zip')) {
-                await github.rest.repos.uploadReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  release_id: ${{ github.event.release.id }},
-                  name: filename,
-                  data: await fs.readFile('${{ env.BUNDLE_DIR }}/' + filename)
-                });
-              }
-            }
+            const upload = require('./upload.js')
+            await upload({github, context, core})
 
 
   linux-build:
@@ -118,7 +109,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
     - name: Build codebase
-      run: cmake --build ${{ env.BUILD_DIR }} -j $(nproc) 2>&1 | tee ${{ env.BUNDLE_DIR }}/compile.log
+      run: cmake --build ${{ env.BUILD_DIR }} -j $(nproc) 2>&1 | tee ${{ github.workspace }}/build/compile.log
 
     - name: Install binaries
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
@@ -126,14 +117,14 @@ jobs:
 
     - name: Create tar archive
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      run: tar -czvf ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz -C ${{ env.RESOURCES_DIR }} .
+      run: tar -czvf ${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz -C ${{ env.RESOURCES_DIR }} .
 
     - name: Upload artifact
       uses: 'actions/upload-artifact@v4'
       if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
       with:
-        name: Lugormod ${{ github.event.release.name }}, ${{ matrix.build_type }}, ${{ runner.os }} ${{ matrix.arch }}
-        path:  ${{ env.BUNDLE_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz
+        name: Lugormod ${{ github.event.release.name }} - ${{ runner.os }} ${{ matrix.arch }}
+        path:  ${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz
 
     - name: Publish release files
       uses: 'actions/github-script@v7'
@@ -141,15 +132,5 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const fs = require('fs').promises;
-          for (let filename of await fs.readdir('${{ env.BUNDLE_DIR }}')) {
-            if (filename.endsWith('.tar.gz')) {
-              await github.rest.repos.uploadReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  release_id: ${{ github.event.release.id }},
-                  name: filename,
-                  data: await fs.readFile('${{ env.BUNDLE_DIR }}/' + filename )
-                });
-            }
-          }
+          const upload = require('./upload.js')
+          await upload({github, context, core})

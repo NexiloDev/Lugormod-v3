@@ -1544,40 +1544,41 @@ extern char* Accounts_GetTitle(Account_t *acc);
 char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message)
 {
     if (!player || !player->client) return message;
-    
+
     static char processedMessage[MAX_STRING_CHARS];
     const char* playerName = player->client->pers.Lmd.account ? Accounts_GetName(player->client->pers.Lmd.account) : player->client->pers.netname;
     const char* playerTitle = player->client->pers.Lmd.account ? Accounts_GetTitle(player->client->pers.Lmd.account) : "None";
     int playerLevel = player->client->pers.Lmd.account ? PlayerAcc_Prof_GetLevel(player) : 0;
-    
+
     processedMessage[0] = '\0';
-    
+
     int msgLen = strlen(message);
-    
+
     for (int i = 0; i < msgLen; i++) {
-        if (message[i] == '.' && i + 1 < msgLen) {
-            switch (message[i + 1]) {
-            case 'n':
-                Q_strcat(processedMessage, sizeof(processedMessage), playerName);
-                i++;
-                break;
-            case 'l':
-                Q_strcat(processedMessage, sizeof(processedMessage), va("%i", playerLevel));
-                i++;
-                break;
-            case 't':
-                Q_strcat(processedMessage, sizeof(processedMessage), playerTitle);
-                i++;
-                break;
-            default:
-                strncat(processedMessage, &message[i], 1);
-                break;
+        if (message[i] == '\\') {
+            if (i + 3 < msgLen) {
+                if (!strncmp(&message[i + 1], "aid", 3)) {
+                    Q_strcat(processedMessage, sizeof(processedMessage), playerName);
+                    i += 3;
+                    continue;
+                }
+                if (!strncmp(&message[i + 1], "lvl", 3)) {
+                    Q_strcat(processedMessage, sizeof(processedMessage), va("%i", playerLevel));
+                    i += 3;
+                    continue;
+                }
+                if (!strncmp(&message[i + 1], "tle", 3)) {
+                    Q_strcat(processedMessage, sizeof(processedMessage), playerTitle);
+                    i += 3;
+                    continue;
+                }
             }
-        } else {
-            strncat(processedMessage, &message[i], 1);
         }
+        
+        char buf[2] = { message[i], '\0' };
+        Q_strcat(processedMessage, sizeof(processedMessage), buf);
     }
-    
+
     return processedMessage;
 }
 

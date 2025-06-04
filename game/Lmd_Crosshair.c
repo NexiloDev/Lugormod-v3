@@ -2,14 +2,21 @@
 
 void lmd_crosshairEntText(const gentity_t* ent)
 {
-    if (ent->client->Lmd.lmdMenu.entityNum != 0
+    if (!ent
+        || !ent->client
+        || ent->client->Lmd.lmdMenu.entityNum != 0
         || ent->client->ps.torsoAnim == 1328) // lumaya: thats the USE anim lol
-        return;
+            return;
     
     const int lastEntNum = ent->client->Lmd.crosshairText.entNum;
     
     const int tracedEntNum = ent->client->Lmd.crosshairEntNum;
-    const char* tracedText = (tracedEntNum != ENTITYNUM_NONE) ? g_entities[tracedEntNum].Lmd.crosshairText : NULL;
+    
+    if (tracedEntNum == ENTITYNUM_NONE || tracedEntNum >= MAX_GENTITIES)
+        return;
+    
+    const gentity_t* tracedEnt = &g_entities[tracedEntNum];
+    const char* tracedText = tracedEnt->Lmd.crosshairText;
 
     const qboolean hasNewValidText = tracedText && tracedText[0];
     const int newEntNum = hasNewValidText ? tracedEntNum : 0;
@@ -26,7 +33,8 @@ void lmd_crosshairEntText(const gentity_t* ent)
         ent->client->Lmd.crosshairText.debounceTime = 0;
     }
     
-    if (newEntNum && ent->client->Lmd.crosshairText.debounceTime < level.time)
+    if (newEntNum && ent->client->Lmd.crosshairText.debounceTime < level.time
+        && Distance(ent->client->ps.origin, tracedEnt->s.origin) <= tracedEnt->Lmd.crosshairTextRange)
     {
         trap_SendServerCommand(ent - g_entities, va("cp \"%s\n\"", tracedText));
         ent->client->Lmd.crosshairText.debounceTime = level.time + 1000;

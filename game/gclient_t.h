@@ -592,7 +592,7 @@ struct gclient_s {
 		} crosshairText;
 
 		int crosshairEntNum;
-		qboolean grabbing;
+		unsigned int grabbing;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

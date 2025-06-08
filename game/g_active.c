@@ -4004,10 +4004,10 @@ void ClientThink_real( gentity_t *ent ) {
 				ForceSpeed(ent, 0);
 				break;
 			case GENCMD_FORCE_THROW:
-				ent->client->Lmd.grabbing ? Cmd_GrabOffsetInc_f(ent) : ForceThrow(ent, qfalse);
+				ent->client->Lmd.grabbing > 0 ? Cmd_GrabOffsetInc_f(ent) : ForceThrow(ent, qfalse);
 				break;
 			case GENCMD_FORCE_PULL:
-				ent->client->Lmd.grabbing ? Cmd_GrabOffsetDec_f(ent) : ForceThrow(ent, qtrue);
+				ent->client->Lmd.grabbing > 0 ? Cmd_GrabOffsetDec_f(ent) : ForceThrow(ent, qtrue);
 				break;
 			case GENCMD_FORCE_DISTRACT:
 				ForceTelepathy(ent);

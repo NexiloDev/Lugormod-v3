@@ -42,14 +42,13 @@ jobs:
         uses: 'microsoft/setup-msbuild@v1.1'
 
       - name: Setup
-        shell: bash
         run: |
           cmake -B ${{ env.BUILD_DIR }} \
           -A ${{ matrix.platform }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build codebase
-        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS
+        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS 2>&1 | Out-File -FilePath ${{ github.workspace }}/build/compile.log
 
       - name: Install binaries
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
@@ -57,7 +56,6 @@ jobs:
 
       - name: Create zip archive
         if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        shell: pwsh
         run: Compress-Archive -Path ${{ env.RESOURCES_DIR }}\* -DestinationPath "${{ env.ARTIFACT_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip"
 
       - name: Upload artifact

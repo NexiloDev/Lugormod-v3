@@ -213,6 +213,7 @@ qboolean SpawnEntModel(gentity_t* ent, qboolean isSolid, qboolean isAnimated)
     }
 
     G_SpawnString("crosshairText", "", &ent->Lmd.crosshairText);
+    G_SpawnInt("crosshairTextRange", "9999", &ent->Lmd.crosshairTextRange);
     
     return hasModel;
 }
@@ -669,7 +670,8 @@ void use_lmd_mover(gentity_t* ent, gentity_t* other, gentity_t* activator)
 const entityInfoData_t lmd_mover_keys[] = {
     {"#MODEL", NULL},
     {"#HITBOX", NULL},
-    {"crosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
     {
         "OnDelta",
         "The movement offset when turned on.  This is a vector, and needs the x, y, and z values specified (like mins/maxs/origin and others).  This is the origin/angles the entity should be at once 'duration' completes."
@@ -1227,7 +1229,8 @@ const entityInfoData_t lmd_pwterminal_keys[] = {
     {"#UKEYS", NULL},
     {"#MODEL", NULL},
     {"#HITBOX", NULL},
-    {"crosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
     {"Message", "Text to show when used."},
     {"Password", "The correct password."},
     {"Target", "Target to fire when correct password is entered."},
@@ -1427,7 +1430,8 @@ const entityInfoData_t lmd_door_keys[] = {
         "Even if locked, this team can always open and close it just by walking up to it.  Values are: 0 - none, 1 - red, 2 - blue."
     },
     {"VehOpen", "If non-0, vehicles/players riding vehicles can open this door by getting close."},
-    {"crosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
     {NULL, NULL}
 };
 
@@ -1942,7 +1946,8 @@ const entityInfoData_t lmd_terminal_keys[] = {
     {"#UKEYS", NULL},
     {"#MODEL", NULL},
     {"#HITBOX", NULL},
-    {"crosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
     {"Message", "Message to display when used."},
     {"UseTarget", "Target to fire when the player presses the use key on this."},
     {"GlobalTarget", "Targe to fire when any command is used."},
@@ -2346,7 +2351,8 @@ const entityInfoData_t lmd_rentterminal_keys[] = {
     {"#UKEYS", NULL},
     {"#MODEL", NULL},
     {"#HITBOX", NULL},
-    {"crosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
     {"Message", "The message to be displayed when the terminal is used."},
     {"Count", "Cost to rent this terminal."},
     {"Minutes", "Number of minutes to gain when payed \'count\' number of credits."},
@@ -2776,7 +2782,8 @@ const entityInfoData_t lmd_drop_keys[] = {
         "Count",
         "Number of credits to give the player.  If this is set and no noise key is specified, then the noise key defaults to sound/interface/secret_area.wav"
     },
-    {"crosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
     {"Velocity", "Speed at which to toss this item.  Default 50."},
     {"Offset", "Offset to drop from the player if spawnflag 4 is set.  Default 64."},
     {"Angles", "Angles to launch this item at"},
@@ -3131,7 +3138,8 @@ const entityInfoData_t lmd_train_keys[] = {
     {"#UKEYS", NULL},
     {"#MODEL", NULL},
     {"#HITBOX", NULL},
-    {"crosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairText", "Displays this text when a player looks at this entity."},
+    {"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
     {"Speed", "Movement speed.  Default 100."},
     {"Dmg", "Damage to inflict when blocked."},
     {"Target", "The first path_corner to move to."},

@@ -1541,44 +1541,184 @@ void lmd_door(gentity_t* ent)
 }
 
 extern char* Accounts_GetTitle(Account_t *acc);
-char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message)
+extern char* GetPasswordByIndex(const char* index);
+char* lmd_processMessagePlaceholders(gentity_t* entity, char* message, char* target2)
 {
-    if (!player || !player->client) return message;
-
+    if (!message) return message;
+    
     static char processedMessage[MAX_STRING_CHARS];
-    const char* playerName = player->client->pers.Lmd.account ? Accounts_GetName(player->client->pers.Lmd.account) : player->client->pers.netname;
-    const char* playerTitle = player->client->pers.Lmd.account ? Accounts_GetTitle(player->client->pers.Lmd.account) : "None";
-    int playerLevel = player->client->pers.Lmd.account ? PlayerAcc_Prof_GetLevel(player) : 0;
-
     processedMessage[0] = '\0';
-
-    int msgLen = strlen(message);
-
-    for (int i = 0; i < msgLen; i++) {
-        if (message[i] == '\\') {
-            if (i + 3 < msgLen) {
-                if (!strncmp(&message[i + 1], "aid", 3)) {
-                    Q_strcat(processedMessage, sizeof(processedMessage), playerName);
-                    i += 3;
-                    continue;
+    
+    const char* entityName = NULL;
+    const char* entityTitle = NULL;
+    int entityLevel = 0;
+    
+    if (entity && entity->client)
+    {
+        entityName = entity->client->pers.Lmd.account ? 
+                    Accounts_GetName(entity->client->pers.Lmd.account) : 
+                    entity->client->pers.netname;
+        entityTitle = entity->client->pers.Lmd.account ? 
+                     Accounts_GetTitle(entity->client->pers.Lmd.account) : 
+                     "None";
+        entityLevel = entity->client->pers.Lmd.account ? 
+                     PlayerAcc_Prof_GetLevel(entity) : 0;
+    }
+    
+    int msgLen = strnlen(message, MAX_STRING_CHARS - 1);
+    for (int i = 0; i < msgLen; i++)
+    {
+        if (message[i] == '\\' || message[i] == '@')
+        {
+            qboolean placeholderFound = qfalse;
+            char prefix = message[i];
+            
+            // @accname, @level, @title, @name, @health, @armor, @customvalue, @password
+            if (prefix == '@' && i + 7 < msgLen && !strncmp(&message[i + 1], "accname", 7) && entityName)
+            {
+                Q_strcat(processedMessage, sizeof(processedMessage), entityName);
+                i += 7;
+                placeholderFound = qtrue;
+            }
+            else if (prefix == '@' && i + 5 < msgLen && !strncmp(&message[i + 1], "level", 5))
+            {
+                Q_strcat(processedMessage, sizeof(processedMessage), va("%i", entityLevel));
+                i += 5;
+                placeholderFound = qtrue;
+            }
+            else if (prefix == '@' && i + 5 < msgLen && !strncmp(&message[i + 1], "title", 5) && entityTitle)
+            {
+                Q_strcat(processedMessage, sizeof(processedMessage), entityTitle);
+                i += 5;
+                placeholderFound = qtrue;
+            }
+            else if (prefix == '@' && i + 4 < msgLen && !strncmp(&message[i + 1], "name", 4) && 
+                     entity && entity->client && entity->s.number < MAX_CLIENTS)
+            {
+                Q_strcat(processedMessage, sizeof(processedMessage), entity->client->pers.netname);
+                i += 4;
+                placeholderFound = qtrue;
+            }
+            else if (prefix == '@' && i + 6 < msgLen && !strncmp(&message[i + 1], "health", 6) && 
+                     entity && entity->client && entity->s.number < MAX_CLIENTS)
+            {
+                Q_strcat(processedMessage, sizeof(processedMessage), va("%d", entity->client->ps.stats[STAT_HEALTH]));
+                i += 6;
+                placeholderFound = qtrue;
+            }
+            else if (prefix == '@' && i + 5 < msgLen && !strncmp(&message[i + 1], "armor", 5) && 
+                     entity && entity->client && entity->s.number < MAX_CLIENTS)
+            {
+                Q_strcat(processedMessage, sizeof(processedMessage), va("%d", entity->client->ps.stats[STAT_ARMOR]));
+                i += 5;
+                placeholderFound = qtrue;
+            }
+            else if (prefix == '@' && i + 11 < msgLen && !strncmp(&message[i + 1], "customvalue", 11) && 
+                     entity && entity->client && entity->s.number < MAX_CLIENTS && target2)
+            {
+                const char* customValue = Accounts_Custom_GetValue(entity->client->pers.Lmd.account, target2);
+                if (customValue) {
+                    Q_strcat(processedMessage, sizeof(processedMessage), customValue);
                 }
-                if (!strncmp(&message[i + 1], "lvl", 3)) {
-                    Q_strcat(processedMessage, sizeof(processedMessage), va("%i", playerLevel));
-                    i += 3;
-                    continue;
+                i += 11;
+                placeholderFound = qtrue;
+            }
+            else if (prefix == '@' && i + 8 < msgLen && !strncmp(&message[i + 1], "password", 8) && 
+                     entity && entity->client && entity->s.number < MAX_CLIENTS && target2)
+            {
+                const char* password = GetPasswordByIndex(target2);
+                if (password) {
+                    Q_strcat(processedMessage, sizeof(processedMessage), password);
                 }
-                if (!strncmp(&message[i + 1], "tle", 3)) {
-                    Q_strcat(processedMessage, sizeof(processedMessage), playerTitle);
+                i += 8;
+                placeholderFound = qtrue;
+            }
+            // \aid, \lvl, \tle
+            else if (i + 3 < msgLen) {
+                if (prefix == '\\' && !strncmp(&message[i + 1], "aid", 3) && entityName)
+                {
+                    Q_strcat(processedMessage, sizeof(processedMessage), entityName);
                     i += 3;
-                    continue;
+                    placeholderFound = qtrue;
+                }
+                else if (prefix == '\\' && !strncmp(&message[i + 1], "lvl", 3))
+                {
+                    Q_strcat(processedMessage, sizeof(processedMessage), va("%i", entityLevel));
+                    i += 3;
+                    placeholderFound = qtrue;
+                }
+                else if (prefix == '\\' && !strncmp(&message[i + 1], "tle", 3) && entityTitle)
+                {
+                    Q_strcat(processedMessage, sizeof(processedMessage), entityTitle);
+                    i += 3;
+                    placeholderFound = qtrue;
                 }
             }
+            
+            // \id, \cs, \pw
+            if (!placeholderFound && entity && entity->client && 
+                entity->s.number < MAX_CLIENTS && i + 2 < msgLen)
+            {
+                
+                if (prefix == '\\' && !strncmp(&message[i + 1], "id", 2))
+                {
+                    Q_strcat(processedMessage, sizeof(processedMessage), entity->client->pers.netname);
+                    i += 2;
+                    placeholderFound = qtrue;
+                }
+                else if (prefix == '\\' && !strncmp(&message[i + 1], "cs", 2) && target2)
+                {
+                    const char* customValue = Accounts_Custom_GetValue(entity->client->pers.Lmd.account, target2);
+                    if (customValue) {
+                        Q_strcat(processedMessage, sizeof(processedMessage), customValue);
+                    }
+                    i += 2;
+                    placeholderFound = qtrue;
+                }
+                else if (prefix == '\\' && !strncmp(&message[i + 1], "pw", 2) && target2)
+                {
+                    const char* password = GetPasswordByIndex(target2);
+                    if (password)
+                    {
+                        Q_strcat(processedMessage, sizeof(processedMessage), password);
+                    }
+                    i += 2;
+                    placeholderFound = qtrue;
+                }
+            }
+            
+            // \h, \a
+            if (!placeholderFound && prefix == '\\' && entity && entity->client && 
+                entity->s.number < MAX_CLIENTS && i + 1 < msgLen)
+            {
+                
+                if (message[i + 1] == 'h' && (i + 2 >= msgLen || !isalnum(message[i + 2])))
+                {
+                    Q_strcat(processedMessage, sizeof(processedMessage), va("%d", entity->client->ps.stats[STAT_HEALTH]));
+                    i += 1;
+                    placeholderFound = qtrue;
+                }
+                else if (message[i + 1] == 'a' && (i + 2 >= msgLen || !isalnum(message[i + 2])))
+                {
+                    Q_strcat(processedMessage, sizeof(processedMessage), va("%d", entity->client->ps.stats[STAT_ARMOR]));
+                    i += 1;
+                    placeholderFound = qtrue;
+                }
+            }
+            
+            if (!placeholderFound)
+            {
+                char buf[2] = { message[i], '\0' };
+                Q_strcat(processedMessage, sizeof(processedMessage), buf);
+            }
         }
-        
-        char buf[2] = { message[i], '\0' };
-        Q_strcat(processedMessage, sizeof(processedMessage), buf);
+        else
+        {
+            char buf[2] = { message[i], '\0' };
+            Q_strcat(processedMessage, sizeof(processedMessage), buf);
+        }
     }
-
+    
     return processedMessage;
 }
 
@@ -1641,7 +1781,7 @@ void lmd_menu_show(gentity_t* player, gentity_t* menu)
         Q_strcat(msg, sizeof(msg), va("  %sCancel\n", menu->Lmd.color2));
     }
     
-    strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(player, msg));
+    strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(player, msg, NULL));
 
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
@@ -1909,7 +2049,7 @@ void lmd_terminal_use(gentity_t* self, gentity_t* other, gentity_t* activator)
     int i;
     if (self->message)
     {
-        strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(activator, self->message));
+        strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL));
         Q_strcat(msg, sizeof(msg), va("\n^5==============================\n", msg));
     }
 
@@ -2229,7 +2369,7 @@ void lmd_rentterminal_examine(gentity_t* self, gentity_t* activator)
     if (self->message)
     {
         char msgt[MAX_STRING_CHARS] = "";
-        strcpy_s(msgt, sizeof(msgt), lmd_trainermenu_processMessagePlaceholders(activator, self->message));
+        strcpy_s(msgt, sizeof(msgt), lmd_processMessagePlaceholders(activator, self->message, NULL));
         Disp(activator, msgt); //send this as a seperate disp, in case the msg makes us hit MAX_STRING_CHARS
     }
 
@@ -2326,7 +2466,7 @@ void lmd_rentterminal_use(gentity_t* self, gentity_t* other, gentity_t* activato
     int sec = 0, min = 0;
     if (self->message)
     {
-        strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(activator, self->message));
+        strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL));
         Q_strcat(msg, sizeof(msg), va("\n", msg));
     }
 
@@ -2372,7 +2512,7 @@ void lmd_rentterminal_think(gentity_t* ent)
             char msg[MAX_STRING_CHARS] = "";
             if (ent->message)
             {
-                strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(ent->activator, ent->message));
+                strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(ent->activator, ent->message, NULL));
                 Q_strncpyz(msg, va("%s\n", msg), sizeof(msg));
             }
             Q_strcat(msg, sizeof(msg), va("^3You have ^2%i^3 seconds left.", timeLeft));
@@ -2386,7 +2526,7 @@ void lmd_rentterminal_think(gentity_t* ent)
                 char msg[MAX_STRING_CHARS] = "";
                 if (ent->message)
                 {
-                    strcpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(ent->activator, ent->message));
+                    strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(ent->activator, ent->message, NULL));
                     Q_strncpyz(msg, va("%s\n", msg), sizeof(msg));
                 }
                 Q_strcat(msg, sizeof(msg), "^1Your rent has expired.");
@@ -3748,7 +3888,7 @@ void lmd_trainermenu_show(gentity_t* player, gentity_t* menu)
     const char* colorInfo = (menu->Lmd.color3 && *menu->Lmd.color3) ? menu->Lmd.color3 : "^5";
     const char* menuMessage;
     if (menu->message && *menu->message && Q_stricmp(menu->message, "") != 0) {
-        menuMessage = lmd_trainermenu_processMessagePlaceholders(player, menu->message);
+        menuMessage = lmd_processMessagePlaceholders(player, menu->message, NULL);
     } else {
         menuMessage = va("%s[%s ACCOUNT TERMINAL %s]\n"
                         "%sName: %s\n"

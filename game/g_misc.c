@@ -558,7 +558,7 @@ void misc_model_breakable_touch (gentity_t *self, gentity_t *other, trace_t *tra
 	G_UseTargets(self, other);
 }
 
-extern char* lmd_trainermenu_processMessagePlaceholders(gentity_t* player, char* message);
+extern char* lmd_processMessagePlaceholders(gentity_t* entity, char* message, char* target2);
 
 void misc_model_breakable_use (gentity_t *self, gentity_t *other, gentity_t *activator){
 	if (self->genericValue10 > level.time) {
@@ -587,7 +587,7 @@ void misc_model_breakable_use (gentity_t *self, gentity_t *other, gentity_t *act
 	if(self->message && !(self->spawnflags & 8192))
 	{
 		char msg[MAX_STRING_CHARS];
-		strncpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(activator, self->message), MAX_STRING_CHARS);
+		strncpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL), MAX_STRING_CHARS);
 		trap_SendServerCommand(activator->s.number, va("cp \"%s\"", msg));
 	}
 }
@@ -612,7 +612,7 @@ void misc_model_breakable_pay (gentity_t *self, gentity_t *other, gentity_t *act
 	if (other->client->pers.cmd.buttons & BUTTON_USE ) {
 		if (self->message) {
 			char msg[MAX_STRING_CHARS];
-			strncpy_s(msg, sizeof(msg), lmd_trainermenu_processMessagePlaceholders(activator, self->message), MAX_STRING_CHARS);
+			strncpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL), MAX_STRING_CHARS);
 			trap_SendServerCommand(other-g_entities,
 				va("cp \"%s\nUse the command \\pay on this.\nThe cost is CR %i.\"", msg,self->count));
 		} else {

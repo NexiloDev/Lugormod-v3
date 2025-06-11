@@ -42,6 +42,9 @@ void GiveCredits(gentity_t *ent, int cr, char *reason);
 int Accounts_GetCredits(Account_t *acc);
 #define PlayerAcc_GetCredits(ent) Accounts_GetCredits(ent->client->pers.Lmd.account)
 
+int Accounts_GetBounty(Account_t *acc);
+void Accounts_SetBounty(Account_t *acc, int value);
+
 void Accounts_SetCredits(Account_t *acc, int value);
 #define PlayerAcc_SetCredits(ent, value) Accounts_SetCredits(ent->client->pers.Lmd.account, value)
 

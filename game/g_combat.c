@@ -2234,6 +2234,20 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	//Lugormod remove hook entities
 	if (self->client->hook)
 		Merc_Unhook(self);
+
+	Account_t* attackerAcc = attacker->client->pers.Lmd.account;
+	Account_t* acc = self->client->pers.Lmd.account;
+	if (acc && attackerAcc)
+	{
+		const int bounty = Accounts_GetBounty(acc);
+		if (bounty)
+		{
+			Accounts_SetCredits(attackerAcc, Accounts_GetCredits(attackerAcc) + self->bounceCount);
+			Accounts_SetBounty(acc, bounty);
+			trap_SendServerCommand(-1, va("chat \"^7%s ^5has won a bounty of ^6%d ^5CR for killing ^7%s\"",
+								   Accounts_GetName(attackerAcc), bounty, Accounts_GetName(acc)));
+		}
+	}
 	
 
 	if (self->s.eType == ET_NPC && self->s.NPC_class == CLASS_VEHICLE && self->m_pVehicle &&

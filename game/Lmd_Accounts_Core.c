@@ -33,6 +33,7 @@ struct Account_s{
 	int time;
 	int score;
 	int credits;
+	int bounty;
 	int flags;
 
 	struct {
@@ -568,6 +569,18 @@ char* Accounts_NewSeccode(Account_t *acc) {
 	acc->secCode = G_NewString2(code);
 	Lmd_Accounts_Modify(acc);
 	return acc->secCode;
+}
+
+int Accounts_GetBounty(Account_t *acc)
+{
+	if(!acc) return 0;
+	return acc->bounty;
+}
+
+void Accounts_SetBounty(Account_t *acc, int value)
+{
+	if(!acc) return;
+	acc->bounty = value;
 }
 
 int Accounts_GetCredits(Account_t *acc) {

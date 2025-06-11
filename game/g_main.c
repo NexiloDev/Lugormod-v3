@@ -403,6 +403,8 @@ vmCvar_t lmd_allow_set_saber;
 
 vmCvar_t lmd_melee_lightning_multiplier;
 
+vmCvar_t lmd_min_bounty_amount;
+
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
 
@@ -635,6 +637,9 @@ static cvarTable_t		gameCvarTable[] = {
 	},
 	{ &lmd_melee_lightning_multiplier, "lmd_melee_lightning_multiplier", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
 		"Set the multiplier for melee force lightning damage.",
+	},
+	{ &lmd_min_bounty_amount, "lmd_min_bounty_amount", "1000", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"The minimum amount required to do a /bounty.",
 	},
 	//====================================================================================================
 	//====================================================================================================

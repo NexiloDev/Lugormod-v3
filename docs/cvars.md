@@ -9,6 +9,11 @@ Maximum number of users that can have the same ip.  Once this limit is reached f
 ```
 Set the multiplier for melee force lightning damage.
 ```
+## lmd_min_bounty_amount
+### Default value: 1000
+```
+The minimum amount required to do a /bounty.
+```
 ## lmd_autoBanSameIp
 ### Default value: 0
 ```

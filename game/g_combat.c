@@ -2237,7 +2237,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	Account_t* attackerAcc = attacker->client->pers.Lmd.account;
 	Account_t* acc = self->client->pers.Lmd.account;
-	if (acc && attackerAcc)
+	if (acc && attackerAcc && acc != attackerAcc)
 	{
 		const int bounty = Accounts_GetBounty(acc);
 		if (bounty)

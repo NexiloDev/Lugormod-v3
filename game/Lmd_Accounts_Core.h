@@ -44,6 +44,7 @@ int Accounts_GetCredits(Account_t *acc);
 
 int Accounts_GetBounty(Account_t *acc);
 void Accounts_SetBounty(Account_t *acc, int value);
+void Accounts_PrintBountyList(gentity_t* ent);
 
 void Accounts_SetCredits(Account_t *acc, int value);
 #define PlayerAcc_SetCredits(ent, value) Accounts_SetCredits(ent->client->pers.Lmd.account, value)

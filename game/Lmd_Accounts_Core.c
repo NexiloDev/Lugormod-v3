@@ -221,6 +221,7 @@ DataWriteResult_t Accounts_Write_Modules(void *target, char key[], int keySize, 
 	_m##_AUTO(time, ACCOUNTOFS(time), F_INT) \
 	_m##_AUTO(score, ACCOUNTOFS(score), F_INT) \
 	_m##_AUTO(credits, ACCOUNTOFS(credits), F_INT) \
+	_m##_AUTO(bounty, ACCOUNTOFS(bounty), F_INT) \
 	_m##_AUTO(flags, ACCOUNTOFS(flags), F_INT) \
 	_m##_DEFL(Accounts_Parse_Modules, Accounts_Write_Modules, NULL)
 
@@ -581,6 +582,27 @@ void Accounts_SetBounty(Account_t *acc, int value)
 {
 	if(!acc) return;
 	acc->bounty = value;
+}
+
+void Accounts_PrintBountyList(gentity_t* ent)
+{
+	qboolean found = qfalse;
+	int bounty;
+
+	for(int i = 0; i < AccList.count; i++)
+	{
+		bounty = Accounts_GetBounty(AccList.accounts[i]);
+		if (bounty > 0)
+		{
+			Disp(ent, va("^7%s ^5- ^6%d ^5CR", Accounts_GetName(AccList.accounts[i]), bounty));
+			found = qtrue;
+		}
+	}
+	
+	if (!found)
+	{
+		Disp(ent, "^5No bounties currently placed.");
+	}
 }
 
 int Accounts_GetCredits(Account_t *acc) {

@@ -249,17 +249,30 @@ void Cmd_Bounty_f(gentity_t* ent, int iArg)
 		Disp(ent, "^1You need to be logged in.");
 		return;
 	}
-	
-	if (trap_Argc() < 3)
+
+	if (trap_Argc() < 2)
 	{
-		Disp(ent, "^5Usage: /bounty <name/num> <prize>");
+		Disp(ent, "^5Usage:\n^5/bounty list\n^5/bounty name/clientNumber amount");
+		return;
+	}
+
+	char arg1[5];
+	trap_Argv(1, arg1, sizeof(arg1));
+	
+	if (!Q_stricmp(arg1, "list"))
+	{
+		Accounts_PrintBountyList(ent);
 		return;
 	}
 	
-	char arg[MAX_STRING_CHARS];
-	trap_Argv(1, arg, sizeof(arg));
+	if (trap_Argc() < 3)
+	{
+		Disp(ent, "^5Usage:\n^5/bounty list\n^5/bounty name/clientNumber amount");
+		return;
+	}
+
 	gentity_t* target = ClientFromArg(ent, 1);
-	if (!target)
+	if (!target || !target->client)
 	{
 		Disp(ent, "^1Can't find target.");
 		return;
@@ -271,29 +284,32 @@ void Cmd_Bounty_f(gentity_t* ent, int iArg)
 		Disp(ent, "^1Target not logged in.");
 		return;
 	}
-	
-	trap_Argv(2, arg, sizeof(arg));
-	const int amount = atoi(arg);
-	
+
+	char arg2[MAX_STRING_CHARS];
+	trap_Argv(2, arg2, sizeof(arg2));
+	int amount = atoi(arg2);
+
 	if (amount < lmd_min_bounty_amount.integer)
 	{
 		Disp(ent, va("^1Use a value not lower than ^3%d", lmd_min_bounty_amount.integer));
 		return;
 	}
 
-	const int credits = Accounts_GetCredits(account);
-	
+	int credits = Accounts_GetCredits(account);
 	if (credits < amount)
 	{
-		Disp(ent, "^1You cannot afford that");
+		Disp(ent, "^1You cannot afford that.");
 		return;
 	}
-
+	
 	Accounts_SetCredits(account, credits - amount);
 	Accounts_SetBounty(targAcc, Accounts_GetBounty(targAcc) + amount);
+
 	trap_SendServerCommand(-1, va("chat \"^7%s ^5placed a bounty of ^6%d ^5CR for killing ^7%s\"",
-								   Accounts_GetName(account), amount, Accounts_GetName(targAcc)));
+		Accounts_GetName(account), amount, Accounts_GetName(targAcc)));
 }
+
+
 
 qboolean isBuddy(gentity_t *ent, gentity_t *other){
 	int i;

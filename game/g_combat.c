@@ -2243,7 +2243,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		if (bounty)
 		{
 			Accounts_SetCredits(attackerAcc, Accounts_GetCredits(attackerAcc) + self->bounceCount);
-			Accounts_SetBounty(acc, bounty);
+			Accounts_SetBounty(acc, 0);
 			trap_SendServerCommand(-1, va("chat \"^7%s ^5has won a bounty of ^6%d ^5CR for killing ^7%s\"",
 								   Accounts_GetName(attackerAcc), bounty, Accounts_GetName(acc)));
 		}

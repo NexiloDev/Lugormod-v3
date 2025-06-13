@@ -2235,20 +2235,22 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (self->client->hook)
 		Merc_Unhook(self);
 
-	Account_t* attackerAcc = attacker->client->pers.Lmd.account;
-	Account_t* acc = self->client->pers.Lmd.account;
-	if (acc && attackerAcc && acc != attackerAcc)
+	if (attacker->client)
 	{
-		const int bounty = Accounts_GetBounty(acc);
-		if (bounty)
+		Account_t* attackerAcc = attacker->client->pers.Lmd.account;
+		Account_t* acc = self->client->pers.Lmd.account;
+		if (acc && attackerAcc && acc != attackerAcc)
 		{
-			Accounts_SetCredits(attackerAcc, Accounts_GetCredits(attackerAcc) + bounty);
-			Accounts_SetBounty(acc, 0);
-			trap_SendServerCommand(-1, va("chat \"^7%s ^5has won a bounty of ^6%d ^5CR for killing ^7%s\"",
-								   Accounts_GetName(attackerAcc), bounty, Accounts_GetName(acc)));
-		}
+			const int bounty = Accounts_GetBounty(acc);
+			if (bounty)
+			{
+				Accounts_SetCredits(attackerAcc, Accounts_GetCredits(attackerAcc) + bounty);
+				Accounts_SetBounty(acc, 0);
+				trap_SendServerCommand(-1, va("chat \"^7%s ^5has won a bounty of ^6%d ^5CR for killing ^7%s\"",
+									   Accounts_GetName(attackerAcc), bounty, Accounts_GetName(acc)));
+			}
+		}	
 	}
-	
 
 	if (self->s.eType == ET_NPC && self->s.NPC_class == CLASS_VEHICLE && self->m_pVehicle &&
 		!self->m_pVehicle->m_pVehicleInfo->explosionDelay &&

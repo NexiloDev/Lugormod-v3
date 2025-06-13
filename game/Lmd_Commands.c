@@ -295,6 +295,12 @@ void Cmd_Bounty_f(gentity_t* ent, int iArg)
 		return;
 	}
 
+	if (amount <= 0)
+	{
+		Disp(ent, "^1Bounty amount has to be positive.");
+		return;
+	}
+
 	int credits = Accounts_GetCredits(account);
 	if (credits < amount)
 	{

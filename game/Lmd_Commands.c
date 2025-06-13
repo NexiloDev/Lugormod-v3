@@ -238,6 +238,85 @@ Lugormod
 ==================
 */
 
+extern vmCvar_t lmd_min_bounty_amount;
+
+void Cmd_Bounty_f(gentity_t* ent, int iArg)
+{
+	Account_t* account = ent->client->pers.Lmd.account;
+
+	if (!account)
+	{
+		Disp(ent, "^1You need to be logged in.");
+		return;
+	}
+
+	if (trap_Argc() < 2)
+	{
+		Disp(ent, "^5Usage:\n^5/bounty list\n^5/bounty name/clientNumber amount");
+		return;
+	}
+
+	char arg1[5];
+	trap_Argv(1, arg1, sizeof(arg1));
+	
+	if (!Q_stricmp(arg1, "list"))
+	{
+		Accounts_PrintBountyList(ent);
+		return;
+	}
+	
+	if (trap_Argc() < 3)
+	{
+		Disp(ent, "^5Usage:\n^5/bounty list\n^5/bounty name/clientNumber amount");
+		return;
+	}
+
+	gentity_t* target = ClientFromArg(ent, 1);
+	if (!target || !target->client)
+	{
+		Disp(ent, "^1Can't find target.");
+		return;
+	}
+
+	Account_t* targAcc = target->client->pers.Lmd.account;
+	if (!targAcc)
+	{
+		Disp(ent, "^1Target not logged in.");
+		return;
+	}
+
+	char arg2[MAX_STRING_CHARS];
+	trap_Argv(2, arg2, sizeof(arg2));
+	int amount = atoi(arg2);
+
+	if (amount < lmd_min_bounty_amount.integer)
+	{
+		Disp(ent, va("^1Use a value not lower than ^3%d", lmd_min_bounty_amount.integer));
+		return;
+	}
+
+	if (amount <= 0)
+	{
+		Disp(ent, "^1Bounty amount has to be positive.");
+		return;
+	}
+
+	int credits = Accounts_GetCredits(account);
+	if (credits < amount)
+	{
+		Disp(ent, "^1You cannot afford that.");
+		return;
+	}
+	
+	Accounts_SetCredits(account, credits - amount);
+	Accounts_SetBounty(targAcc, Accounts_GetBounty(targAcc) + amount);
+
+	trap_SendServerCommand(-1, va("chat \"^7%s ^5placed a bounty of ^6%d ^5CR for killing ^7%s\"",
+		Accounts_GetName(account), amount, Accounts_GetName(targAcc)));
+}
+
+
+
 qboolean isBuddy(gentity_t *ent, gentity_t *other){
 	int i;
 	int j;
@@ -1050,6 +1129,7 @@ cmdEntry_t playerCommandEntries[] = {
 	//{"testline", "\n", Cmd_TestLine_f, 0, 1, 0, 0, 0},
 	{"actions", "List and use your current pending actions.", Cmd_Action_f, 0, qfalse, 0, 0, 0, 0},
 	{"admins", "List currently logged in admins and their level.", Cmd_AdminInfo_f, 0, qfalse, 0, 0, 0, 0},
+	{"bounty", "Put a price on someone's head.", Cmd_Bounty_f, 0, qfalse, 1, 0, 0, 0},
 	{"buddy", "Make the player your buddy.", Cmd_BuddyClient_f, 0, qfalse, 0, 0, 0, 0},
 	{"challenge", "Challenge someone to a 'special' duel. For example '\\challenge power' will challenge someone to a duel where both players have unlimited force power.", Cmd_Challenge_f, 0, qfalse, 0, 2, ~(1 << GT_FFA), 0},
 	{"chatmode", "Switches your team chat mode.  If no mode is set, the next mode in the sequence is selected.", Cmd_ChatMode_f, 0, qfalse, 0, 0, 0, 0},

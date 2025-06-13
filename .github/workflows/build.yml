@@ -42,10 +42,7 @@ jobs:
         uses: 'microsoft/setup-msbuild@v1.1'
 
       - name: Setup
-        run: |
-          cmake -B ${{ env.BUILD_DIR }} \
-          -A ${{ matrix.platform }} \
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        run: cmake -B ${{ env.BUILD_DIR }} -A ${{ matrix.platform }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build codebase
         run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS 2>&1 | Out-File -FilePath ${{ github.workspace }}/build/compile.log

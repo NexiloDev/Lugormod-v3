@@ -219,71 +219,34 @@ char* GetPasswordByIndex(const char* index)
 	return "";
 }
 
+extern char* lmd_processMessagePlaceholders(gentity_t* entity, char* message, char* target2);
 char* Accounts_Custom_GetValue(Account_t *acc, char *key);
-void Send_Target_Print(gentity_t *ent, int targ) {
-
+void Send_Target_Print(gentity_t *ent, int targ)
+{
 	char buf[MAX_STRING_CHARS];
 	strncpy(buf, ent->message, MAX_STRING_CHARS);
-	char* ptr;
-	if (ent->activator->m_pVehicle && ent->activator->m_pVehicle->m_pPilot)
-		ent->activator = (gentity_t*)ent->activator->m_pVehicle->m_pPilot;
-	if (ent->activator->s.number < MAX_CLIENTS)
-	{
-		if (ptr = strstr(buf, "\\id"))
-		{
-			*ptr = '\0';
-			strncpy(buf, va("%s%s%s", buf, ent->activator->client->pers.netname, ptr + 3), MAX_STRING_CHARS);
-		}
-		if (ptr = strstr(buf, "\\h"))
-		{
-			*ptr = '\0';
-			strncpy(buf, va("%s%d%s", buf, ent->activator->client->ps.stats[STAT_HEALTH], ptr + 2), MAX_STRING_CHARS);
-		}
-		if (ptr = strstr(buf, "\\a"))
-		{
-			*ptr = '\0';
-			strncpy(buf, va("%s%d%s", buf, ent->activator->client->ps.stats[STAT_ARMOR], ptr + 2), MAX_STRING_CHARS);
-		}
-		if (ptr = strstr(buf, "\\cs"))
-		{
-			*ptr = '\0';
-			strncpy(buf, va("%s%s%s", buf, Accounts_Custom_GetValue(ent->activator->client->pers.Lmd.account, ent->target2), ptr + 3), MAX_STRING_CHARS);
-		}
-		if (ptr = strstr(buf, "\\pw"))
-		{
-			*ptr = '\0';
-			strncpy(buf, va("%s%s%s", buf, GetPasswordByIndex(ent->target2), ptr + 3), MAX_STRING_CHARS);
-		}
+	
+	gentity_t* activator = ent->activator;
+	if (activator && activator->m_pVehicle && activator->m_pVehicle->m_pPilot) {
+		activator = (gentity_t*)activator->m_pVehicle->m_pPilot;
 	}
-
-	if(buf[0] == '@' && buf[1] != '@') { //Ufo: fixed, was buf[1] == '@' and it didn't happen at all
+	
+	char* processedMsg = lmd_processMessagePlaceholders(activator, buf, ent->target2);
+	strncpy_s(buf, sizeof(buf), processedMsg, MAX_STRING_CHARS);
+	
+	if (buf[0] == '@' && buf[1] != '@') {
 		trap_SendServerCommand(targ, va("cps \"%s\"", buf));
 	}
-	else if(ent->spawnflags & 8) {
+	else if (ent->spawnflags & 8) {
 		trap_SendServerCommand(targ, va("print \"%s\n\"", buf));
 	}
-	else if(ent->spawnflags & 16) {
+	else if (ent->spawnflags & 16) {
 		trap_SendServerCommand(targ, va("chat \"%s\"", buf));
 	}
-/*
-	else if(ent->spawnflags & 16) {
-		char msg[MAX_STRING_CHARS];
-		Q_strncpyz(msg, ent->message, sizeof(msg));
-		char *s = msg, *c = s;
-		while(c[0]) {
-			if(c[0] == '\n'){
-				c[0] = 0;
-				trap_SendServerCommand(targ, va("chat \"%s\"", s));
-				s = ++c;
-			}
-			c++;
-		}
-		if(s[0])
-			trap_SendServerCommand(targ, va("chat \"%s\"", s));
-	}
-*/
 	else
+	{
 		trap_SendServerCommand(targ, va("cp \"%s\n\"", buf));
+	}
 }
 
 void Use_Target_Print_Go (gentity_t *ent){

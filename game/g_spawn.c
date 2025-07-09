@@ -331,14 +331,20 @@ extern entityInfo_t func_plat_info;
 
 void SP_func_static (gentity_t *ent);
 extern entityInfo_t func_static_info;
+
 void SP_func_rotating (gentity_t *ent);
 extern entityInfo_t func_rotating_info;
+
 void SP_func_bobbing (gentity_t *ent);
 void SP_func_pendulum( gentity_t *ent );
 void SP_func_button (gentity_t *ent);
+
 void SP_func_door (gentity_t *ent);
 extern entityInfo_t func_door_info;
+
 void SP_func_train (gentity_t *ent);
+extern entityInfo_t func_train_info;
+
 void SP_func_timer (gentity_t *self);
 void SP_func_breakable (gentity_t *ent);
 void SP_func_glass (gentity_t *ent);
@@ -791,7 +797,7 @@ spawn_t	spawnInitValues[] = {
 	{"func_rotating", SP_func_rotating, Logical_False, &func_rotating_info},
 	{"func_bobbing", SP_func_bobbing, Logical_False},
 	{"func_pendulum", SP_func_pendulum, Logical_False},
-	{"func_train", SP_func_train, Logical_False},
+	{"func_train", SP_func_train, Logical_False, &func_train_info},
 	{"func_group", SP_info_null, Logical_False},
 	{"func_timer", SP_func_timer, Logical_False},			// rename trigger_timer?
 	{"func_breakable", SP_func_breakable, Logical_False},

@@ -8,6 +8,7 @@
 #include "Lmd_Accounts_Stats.h"
 
 #include "Lmd_Commands_Auths.h"
+#include "Lmd_Crosshair.h"
 #include "Lmd_Professions.h"
 #include "Lmd_Prof_Merc.h"
 
@@ -49,6 +50,8 @@ void P_SetTwitchInfo(gclient_t	*client)
 	client->ps.painTime = level.time;
 	client->ps.painDirection ^= 1;
 }
+
+extern vmCvar_t g_mitigateHealthESP;
 
 /*
 ===============
@@ -144,7 +147,40 @@ void P_DamageFeedback( gentity_t *player ) {
 		P_SetTwitchInfo(client);
 		player->pain_debounce_time = level.time + 700;
 
-		G_AddEvent( player, EV_PAIN, player->health );
+		if ( g_mitigateHealthESP.integer == 2 ) {
+			// NOTE: This prevents pain twitches on the clientside as a side-effect
+			const char *snd;
+
+			// Pick the pain sound
+			if ( player->health < 25 ) {
+				snd = "*pain25.wav";
+			} else if ( player->health < 50 ) {
+				snd = "*pain50.wav";
+			} else if ( player->health < 75 ) {
+				snd = "*pain75.wav";
+			} else {
+				snd = "*pain100.wav";
+			}
+
+			G_EntitySound( player, CHAN_VOICE, G_SoundIndex(snd) );
+		} else if ( g_mitigateHealthESP.integer == 1 ) {
+			int health;
+
+			// Pick the pain sound
+			if ( player->health < 25 ) {
+				health = 24;
+			} else if ( player->health < 50 ) {
+				health = 49;
+			} else if ( player->health < 75 ) {
+				health = 74;
+			} else {
+				health = 100;
+			}
+
+			G_AddEvent( player, EV_PAIN, health );
+		} else {
+			G_AddEvent( player, EV_PAIN, player->health );
+		}
 		client->ps.damageEvent++;
 
 		if (client->damage_armor && !client->damage_blood)
@@ -2149,6 +2185,8 @@ qboolean Merc_CheckHook (gentity_t *ent);
 void Merc_DrawHook (gentity_t *ent);
 void Merc_Unhook (gentity_t *ent);
 float Merc_SpeedFactor(gentity_t *ent);
+extern void Cmd_GrabOffsetDec_f(gentity_t* player);
+extern void Cmd_GrabOffsetInc_f(gentity_t* player);
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t	*client;
 	pmove_t		pm;
@@ -2601,6 +2639,9 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 	else if(client->Lmd.flags & SNF_FREEZE)
 		client->ps.pm_type = PM_FREEZE;
+	else if (client->Lmd.lmdMenu.entityNum != 0) {
+		client->ps.pm_type = PM_FREEZE;
+	}
 	else
 		client->ps.pm_type = PM_NORMAL;
 
@@ -3963,10 +4004,10 @@ void ClientThink_real( gentity_t *ent ) {
 				ForceSpeed(ent, 0);
 				break;
 			case GENCMD_FORCE_THROW:
-				ForceThrow(ent, qfalse);
+				ent->client->Lmd.grabbing > 0 ? Cmd_GrabOffsetInc_f(ent) : ForceThrow(ent, qfalse);
 				break;
 			case GENCMD_FORCE_PULL:
-				ForceThrow(ent, qtrue);
+				ent->client->Lmd.grabbing > 0 ? Cmd_GrabOffsetDec_f(ent) : ForceThrow(ent, qtrue);
 				break;
 			case GENCMD_FORCE_DISTRACT:
 				ForceTelepathy(ent);
@@ -4621,9 +4662,12 @@ void ClientEndFrame( gentity_t *ent ) {
 
 	SendPendingPredictableEvents( &ent->client->ps );
 
+	lmd_crosshairEntTrace(ent);
+
 	// set the bit for the reachability area the client is currently in
 	//	i = trap_AAS_PointReachabilityAreaIndex( ent->client->ps.origin );
 	//	ent->client->areabits[i >> 3] |= 1 << (i & 7);
+
 }
 
 

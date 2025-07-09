@@ -44,7 +44,7 @@ const char *verMods =
 
 #else
 
-#define LUGORMODVERSION_CORE "v3.0.5"
+#define LUGORMODVERSION_CORE "v3.2.0"
 #ifdef LMD_EXPERIMENTAL
 #define LUGORMODVERSION LUGORMODVERSION_CORE" Alpha"
 #else
@@ -317,6 +317,7 @@ vmCvar_t		d_asynchronousGroupAI;
 vmCvar_t		d_slowmodeath;
 vmCvar_t		d_noIntermissionWait;
 vmCvar_t		g_mapChangeWhenScoreIsTied;
+vmCvar_t		g_mitigateHealthESP;
 
 vmCvar_t		g_spskill;
 
@@ -331,6 +332,8 @@ vmCvar_t	g_powerDuelEndHealth;
 // nmckenzie: temporary way to show player healths in duels - some iface gfx in game would be better, of course.
 // DUEL_HEALTH
 vmCvar_t		g_showDuelHealths;
+
+vmCvar_t        g_blockspeedhack;
 
 //RoboPhred:
 vmCvar_t lmd_DataPath;
@@ -407,6 +410,15 @@ vmCvar_t lmd_levitateSithSound;
 vmCvar_t lmd_levitateFinish;
 vmCvar_t lmd_levitateMaxHealth;
 vmCvar_t lmd_levitateMaxForcePoints;
+
+// lumaya: SetSaber enable use time
+vmCvar_t lmd_set_saber_delay;
+vmCvar_t lmd_set_saber_duels;
+vmCvar_t lmd_allow_set_saber;
+
+vmCvar_t lmd_melee_lightning_multiplier;
+
+vmCvar_t lmd_min_bounty_amount;
 
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
@@ -623,6 +635,7 @@ static cvarTable_t		gameCvarTable[] = {
 		"Give a player credits for killing other players.  Does not work for killing NPCs.",
 	},
 
+
 { &lmd_lightningBelowLevel3Range, "lmd_lightningBelowLevel3Range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force lightning below level 3.",
 },
@@ -664,6 +677,21 @@ static cvarTable_t		gameCvarTable[] = {
 	},
 	{ &lmd_levitateMaxForcePoints, "lmd_levitateMaxForcePoints", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"The amount a Sith's FP can go up to when levitating.",
+  },
+	{ &lmd_set_saber_delay, "lmd_set_saber_delay", "750", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"Set the delay for instant saber switch for when to be able to use saber again after swapping.",
+	},
+	{ &lmd_set_saber_duels, "lmd_set_saber_duels", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"Enable/Disable instant saber switch in duels.",
+	},
+	{ &lmd_allow_set_saber, "lmd_allow_set_saber", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"Enable/Disable instant saber switch.",
+	},
+	{ &lmd_melee_lightning_multiplier, "lmd_melee_lightning_multiplier", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"Set the multiplier for melee force lightning damage.",
+	},
+	{ &lmd_min_bounty_amount, "lmd_min_bounty_amount", "1000", CVAR_ARCHIVE, 0, qtrue, qfalse,
+		"The minimum amount required to do a /bounty.",
 	},
 	//====================================================================================================
 	//====================================================================================================
@@ -908,12 +936,16 @@ static cvarTable_t		gameCvarTable[] = {
 	// Change the map even if the score is tied?
 	{ &g_mapChangeWhenScoreIsTied, "g_mapChangeWhenScoreIsTied", "0", CVAR_ARCHIVE, 0, qfalse },
 
+	{ &g_mitigateHealthESP, "g_mitigateHealthESP", "0", CVAR_ARCHIVE, 0, qfalse },
+
 	{ &g_austrian, "g_austrian", "0", CVAR_ARCHIVE, 0, qfalse  },
 	// nmckenzie:
 	// DUEL_HEALTH
 	{ &g_showDuelHealths, "g_showDuelHealths", "0", CVAR_SERVERINFO },
 	{ &g_powerDuelStartHealth, "g_powerDuelStartHealth", "150", CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_powerDuelEndHealth, "g_powerDuelEndHealth", "90", CVAR_ARCHIVE, 0, qtrue  },
+
+	{ &g_blockspeedhack, "g_blockspeedhack", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	// Lugormod cvars:
 	{ &g_noVoteTime, "g_noVoteTime", "5", CVAR_ARCHIVE,0, qfalse, qfalse,
@@ -4925,6 +4957,19 @@ void Lmd_RunFrame(void);
 void Lmd_logic_think();
 int Merc_JetpackDefuel(gentity_t *ent);
 int Merc_JetpackRefuel(gentity_t *ent);
+extern void lmd_menu_key(gentity_t *player, usercmd_t *cmd);
+extern void lmd_menu_show(gentity_t *player, gentity_t *menu);
+extern void lmd_menu_exit(gentity_t *player);
+extern void lmd_menu_update(gentity_t *player);
+extern void lmd_menu_display(gentity_t* player);
+extern void lmd_trainermenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_filteredskillmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_mercenaryskillmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_levelupmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_resetskillsmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_swapprofmenu_key(gentity_t* player, usercmd_t* cmd);
+extern void lmd_profselectionmenu_key(gentity_t* player, usercmd_t* cmd);
 void G_RunFrame( int levelTime ) {
 	int			i;
 	gentity_t	       *ent;
@@ -5661,6 +5706,85 @@ ContinueThink:
 
 				// lumaya: MediLevitate
 				lmd_meditate_levitate_update(ent);
+
+				
+				if (ent->client->Lmd.lmdMenu.entityNum != 0)
+				{
+					gentity_t *menu = &g_entities[ent->client->Lmd.lmdMenu.entityNum];
+					if (menu && menu->inuse)
+					{
+						if (ent->client->pers.cmd.serverTime > ent->client->Lmd.lmdMenu.lastServerTime)
+						{
+							if (menu->classname && Q_stricmp(menu->classname, "lmd_trainer") == 0)
+							{
+								if (level.time >= ent->client->Lmd.lmdMenu.nextUpdateTime)
+								{
+									lmd_menu_display(ent);
+									ent->client->Lmd.lmdMenu.nextUpdateTime = level.time + 1000;
+								}
+								
+								switch (ent->client->Lmd.lmdMenu.trainerMenuMode) {
+								case LMD_TRAINER_MENU:
+									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_NEUTRAL_SKILLS_MENU:
+									lmd_filteredskillmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_JEDI_SKILLS_MENU:
+								case LMD_SITH_SKILLS_MENU:
+									lmd_forceskillmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_MERC_SKILLS_MENU:
+									lmd_mercenaryskillmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_LEVEL_UP_MENU:
+									lmd_levelupmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_RESET_SKILLS_MENU:
+									lmd_resetskillsmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_SWAP_PROF_MENU:
+									lmd_swapprofmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								case LMD_SELECT_PROF_MENU:
+									lmd_profselectionmenu_key(ent, &ent->client->pers.cmd);
+									break;
+								default:
+									lmd_trainermenu_key(ent, &ent->client->pers.cmd);
+									break;
+								}
+							}
+							else
+							{
+								lmd_menu_update(ent);
+
+								if (ent->client->Lmd.lmdMenu.choicesVisible >= menu->count)
+								{
+									if (level.time >= ent->client->Lmd.lmdMenu.nextUpdateTime)
+									{
+										lmd_menu_show(ent, menu);
+										ent->client->Lmd.lmdMenu.nextUpdateTime = level.time + 1000;
+									}
+								}
+								else
+								{
+									lmd_menu_show(ent, menu);
+								}
+
+								lmd_menu_key(ent, &ent->client->pers.cmd);
+							}
+
+							ent->client->Lmd.lmdMenu.lastServerTime = ent->client->pers.cmd.serverTime;
+						}
+
+						ent->client->ps.weaponTime = FRAMETIME;
+						ent->client->ps.forceHandExtendTime = level.time + FRAMETIME;
+					}
+					else
+					{
+						lmd_menu_exit(ent);
+					}
+				}
 			}
 
 			if (g_allowNPC.integer)

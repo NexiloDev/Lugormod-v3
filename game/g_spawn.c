@@ -619,6 +619,9 @@ extern entityInfo_t lmd_toggle_info;
 void lmd_train (gentity_t *self);
 extern entityInfo_t lmd_train_info;
 
+void lmd_trainer (gentity_t *self);
+extern entityInfo_t lmd_trainer_info;
+
 void lmd_customskill(gentity_t *ent);
 extern entityInfo_t lmd_customskill_info;
 
@@ -739,6 +742,7 @@ spawn_t	spawnInitValues[] = {
 	{"t2_toggle", lmd_toggle, Logical_True},
 
 	{"lmd_train", lmd_train, Logical_False, &lmd_train_info},
+	{"lmd_trainer", lmd_trainer, Logical_False, &lmd_trainer_info},
 
 	{"lmd_customskill", lmd_customskill, Logical_True, &lmd_customskill_info},
 

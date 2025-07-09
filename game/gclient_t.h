@@ -45,6 +45,18 @@ typedef struct Account_s Account_t;
 #define	FOLLOW_ACTIVE1	-1
 #define	FOLLOW_ACTIVE2	-2
 
+// lumaya:
+
+#define LMD_TRAINER_MENU        0
+#define LMD_NEUTRAL_SKILLS_MENU 2
+#define LMD_JEDI_SKILLS_MENU    3
+#define LMD_SITH_SKILLS_MENU    4
+#define LMD_MERC_SKILLS_MENU    5
+#define LMD_LEVEL_UP_MENU       6
+#define LMD_RESET_SKILLS_MENU   7
+#define LMD_SWAP_PROF_MENU      8
+#define LMD_SELECT_PROF_MENU    9
+
 
 //typedef 
 enum {
@@ -542,6 +554,7 @@ struct gclient_s {
 
 		struct 
 		{
+
 			int state;
 			unsigned int runTime;
 			unsigned int sithFxTimer;
@@ -552,6 +565,47 @@ struct gclient_s {
 			vec3_t startOrigin;
 			qboolean effectFullFxPlayed;
 		} mediLevitate;
+
+			unsigned int delayTime;
+			qboolean openAgain;
+			unsigned int cooldownTime;
+			qboolean newRequest;
+		} setSaber;
+		
+    struct 
+		{
+			int entityNum;
+			unsigned int selection;
+			qboolean stoppedPressingUsing;
+			qboolean stoppedPressingForward;
+			qboolean stoppedPressingBackward;
+			qboolean stoppedPressingLeft;
+			qboolean stoppedPressingRight;
+			qboolean stoppedPressingAttack;
+			qboolean stoppedPressingAltAttack;
+
+			int messageCharsVisible;
+			int choicesVisible;
+			int nextUpdateTime;
+			qboolean menuActive;
+			int treeIndex;
+			int skillIndex;
+			int lastServerTime;
+			unsigned int engageTime;
+    		int trainerMenuMode;
+    		int currentPage;
+		} lmdMenu;
+
+		struct
+		{
+			int entNum;
+			unsigned int debounceTime;
+			char* text;
+		} crosshairText;
+
+		int crosshairEntNum;
+		unsigned int grabbing;
+
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

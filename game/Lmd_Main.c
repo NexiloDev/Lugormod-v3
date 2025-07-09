@@ -1,6 +1,8 @@
 
 #include "g_local.h"
+#include "Lmd_Crosshair.h"
 #include "Lmd_EntityCore.h"
+#include "Lmd_SetSaber.h"
 
 //#define LMD_MEMORY_DEBUG
 
@@ -170,6 +172,23 @@ void Lmd_PlayerThink(gentity_t *ent){
 	Interact_Check(ent);
 
 	updatePenalties(ent);
+	
+	if (ent->client->Lmd.setSaber.delayTime < level.time && ent->client->Lmd.setSaber.newRequest)
+	{
+		if (ent->client->Lmd.setSaber.openAgain)
+		{
+			ent->client->Lmd.setSaber.openAgain = qfalse;
+			if (ent->health > 0 &&
+				ent->client->ps.weaponTime <= 0 &&
+				ent->client->ps.saberHolstered != 0 &&
+				ent->client->ps.weapon == WP_SABER) Cmd_ToggleSaber_f(ent);
+		}
+		
+		ent->client->Lmd.setSaber.newRequest = qfalse;
+	}
+
+	lmd_checkSaberChanges(ent);
+	lmd_crosshairEntText(ent);
 	
 	ent->client->Lmd.thinkDelay = level.time + FRAMETIME;
 }

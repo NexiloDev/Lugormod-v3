@@ -1276,7 +1276,7 @@ char *Q_CleanStrC( char *string ) {
 	s = string;
 	d = string;
 	while ((c = *s) != 0 ) {
-		if ( s[0] == '^' && s[1] >= '0' && s[1] <= '7') { //Q_IsColorString(s)
+		if ( s[0] == '^' && s[1] >= '0' && s[1] <= '9') { //Q_IsColorString(s)
 			s++;
 		}		
 		else {

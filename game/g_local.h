@@ -7,7 +7,7 @@
 #include "bg_public.h"
 #include "g_public.h"
 
-#ifndef __LCC__
+#if !defined(__LCC__) && !defined(__MINGW32__) && !defined(__MINGW64__)
 #define GAME_INLINE ID_INLINE
 #else
 #define GAME_INLINE //none
@@ -1099,6 +1099,8 @@ extern	vmCvar_t	g_powerDuelStartHealth;
 extern	vmCvar_t	g_powerDuelEndHealth;
 
 extern vmCvar_t		g_showDuelHealths;
+
+extern vmCvar_t		g_blockspeedhack;
 
 //RoboPhred
 extern vmCvar_t lmd_enforceentwait;

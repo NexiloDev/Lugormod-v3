@@ -19,58 +19,65 @@ char *GroupPath(void){
 
 //TODO: check if you can do "../", possible security vunrability
 gentity_t *tryImport(KeyPairSet_t *set);
-int Groups_ImportFile(char *filename, char *newName, vec3_t groupOrigin, gentity_t *creatorEnt) {
+int Groups_ImportFile(char *filename, char *newName, vec3_t groupOrigin, gentity_t *creatorEnt, int *outEntNums, int maxEnts) {
 	fileHandle_t f;
 	char *buf, *str;
 	int count = 0;
 
 	int len = trap_FS_FOpenFile(va("%s/%s.lmd", GroupPath(), filename), &f, FS_READ);
-	if(!f || len <= 0)
+	if (!f || len <= 0)
 		return -1;
+
 	buf = (char *)G_Alloc(len);
 	trap_FS_Read(buf, len, f);
 	trap_FS_FCloseFile(f);
 	str = buf;
 
-	qboolean saveable;
-	if(creatorEnt->client && Auths_PlayerHasAuthFlag(creatorEnt, AUTH_SAVEPLACED))
-		saveable = qtrue;
-	else
-		saveable = qfalse;
-
+	qboolean saveable = (creatorEnt->client && Auths_PlayerHasAuthFlag(creatorEnt, AUTH_SAVEPLACED)) ? qtrue : qfalse;
 
 	KeyPairSet_t set = {0, NULL};
 	vec3_t origin;
 	gentity_t *spawned;
 	char *line;
-	while(str && str[0]) {
+
+	while (str && str[0]) {
 		line = COM_ParseLine((const char **)&str);
-		if(!line[0])
+		if (!line[0])
 			continue;
+
 		Lmd_Pairs_ParseDatastring(&set, line);
 		Lmd_Pairs_SetKey(&set, "group", newName);
+
 		line = Lmd_Pairs_GetKey(&set, "origin");
-		if(line) {
+		if (line) {
 			sscanf(line, "%f %f %f", &origin[0], &origin[1], &origin[2]);
 			VectorAdd(origin, groupOrigin, origin);
-		}
-		else
+		} else {
 			VectorCopy(groupOrigin, origin);
+		}
 		Lmd_Pairs_SetKey(&set, "origin", vtos2(origin));
+
 		spawned = tryImport(&set);
 		Lmd_Pairs_Clear(&set);
-		if(!spawned)
+
+		if (!spawned)
 			continue;
+
+		if (outEntNums && count < maxEnts) {
+			outEntNums[count] = spawned->s.number;
+		}
+
 		count++;
-		if(saveable)
+
+		if (saveable) {
 			Lmd_Entities_SetSaveable(spawned->Lmd.spawnData, qtrue);
-		else if(!creatorEnt->client){
-			//we are an instance ent, save us to its spawned tree
 		}
 	}
+
 	G_Free(buf);
 	return count;
 }
+
 
 void Cmd_ImportGroup_f(gentity_t *ent, int iArg){
 	//importgroup <file> <name>
@@ -99,11 +106,19 @@ void Cmd_ImportGroup_f(gentity_t *ent, int iArg){
 	char file[MAX_STRING_CHARS], name[MAX_STRING_CHARS];
 	trap_Argv(1, file, sizeof(file));
 	trap_Argv(2, name, sizeof(name));
-	int i = Groups_ImportFile(file, name, origin, ent);
-	if(i < 0)
+	int entNums[2048];
+	int i = Groups_ImportFile(file, name, origin, ent, entNums, 2048);
+	if (i < 0) {
 		Disp(ent, "^3Could not find file.");
-	else
-		Disp(ent, va("^2%i^3 entities imported.", i));
+	} else {
+		Disp(ent, va("^2%i^3 entities imported\n---------------------", i));
+		for (int j = 0; j < i; j++) {
+			gentity_t* g = &g_entities[entNums[j]];
+			Disp(ent, va("^2%d ^3%s", g->s.number, g->classname ? g->classname : "unknown"));
+		}
+		Disp(ent, "^3---------------------");
+	}
+
 }
 
 unsigned int Group_Count(char *name, qboolean saveable) {

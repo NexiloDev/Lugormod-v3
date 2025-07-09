@@ -539,6 +539,19 @@ struct gclient_s {
 
 		vec3_t mark;
 		int grabOffset;
+
+		struct 
+		{
+			int state;
+			unsigned int runTime;
+			unsigned int sithFxTimer;
+			float phase;
+			qboolean enabled;
+			unsigned int humSoundTimer;
+			unsigned int autoHealTimer;
+			vec3_t startOrigin;
+			qboolean effectFullFxPlayed;
+		} mediLevitate;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

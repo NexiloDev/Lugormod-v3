@@ -133,7 +133,8 @@ set(GAME_SRC
 	game/Lmd_KeyPairs.c 
 	game/Lmd_King.c 
 	game/Lmd_Locations.c 
-	game/Lmd_Main.c 
+	game/Lmd_Main.c
+	game/Lmd_Medilevitate.c 
 	game/Lmd_mem.c 
 	game/Lmd_Misc.c 
 	game/Lmd_Missile.c 

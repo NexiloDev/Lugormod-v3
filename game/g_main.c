@@ -63,6 +63,7 @@ const char *verMods =
 #include "Lmd_Commands_Auths.h"
 #include "Lmd_Bans.h"
 #include "Lmd_EntityCore.h"
+#include "Lmd_Medilevitate.h"
 
 level_locals_t	level;
 
@@ -393,6 +394,20 @@ vmCvar_t lmd_rewardcr_kill;
 vmCvar_t lmd_lightning_below_level_3_range;
 vmCvar_t lmd_drain_below_level_3_range;
 
+// Lmd_MediLevitate
+vmCvar_t lmd_medilevitate_initial_up_velocity;
+vmCvar_t lmd_medilevitate_initial_bounce_multiplier;
+vmCvar_t lmd_medilevitate_heal_amount;
+vmCvar_t lmd_medilevitate_heal_interval;
+vmCvar_t lmd_medilevitate_breath_sway;
+vmCvar_t lmd_medilevitate_jedi_fx;
+vmCvar_t lmd_medilevitate_sith_fx;
+vmCvar_t lmd_medilevitate_jedi_sound;
+vmCvar_t lmd_medilevitate_sith_sound;
+vmCvar_t lmd_medilevitate_finish;
+vmCvar_t lmd_medilevitate_maxHealth;
+vmCvar_t lmd_medilevitate_maxForcePoints;
+
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
 
@@ -613,7 +628,43 @@ static cvarTable_t		gameCvarTable[] = {
 },
 	{ &lmd_drain_below_level_3_range, "lmd_drain_below_level_3_range", "512", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force drain below level 3.",
-},
+	},
+	{ &lmd_medilevitate_initial_up_velocity, "lmd_medilevitate_initial_up_velocity", "50", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the initial upwards velocity for MediLevitate.",
+	},
+	{ &lmd_medilevitate_initial_bounce_multiplier, "lmd_medilevitate_initial_bounce_multiplier", "0.35", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the bounce multiplier for MediLevitate. 0 - 1.0!",
+	},
+	{ &lmd_medilevitate_heal_amount, "lmd_medilevitate_heal_amount", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"How much we heal per tick of lmd_medilevitate_heal_interval while MediLevitating.",
+	},
+	{ &lmd_medilevitate_heal_interval, "lmd_medilevitate_heal_interval", "2000", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The interval for lmd_medilevitate_heal_amount to heal us during MediLevitate.",
+	},
+	{ &lmd_medilevitate_breath_sway, "lmd_medilevitate_breath_sway", "10.0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the breath sway for MediLevitate.",
+	},
+	{ &lmd_medilevitate_jedi_fx, "lmd_medilevitate_jedi_fx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 then MediLevitate plays an effect when on jedi.",
+	},
+	{ &lmd_medilevitate_sith_fx, "lmd_medilevitate_sith_fx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 then MediLevitate plays an effect when on sith.",
+	},
+	{ &lmd_medilevitate_jedi_sound, "lmd_medilevitate_jedi_sound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 MediLevitate plays a sound when on jedi.",
+	},
+	{ &lmd_medilevitate_sith_sound, "lmd_medilevitate_sith_sound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 MediLevitate plays a sound when on sith.",
+	},
+	{ &lmd_medilevitate_finish, "lmd_medilevitate_finish", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 MediLevitate finishes if lmd_medilevitate_maxHealth or lmd_medilevitate_maxForcePoints is set to 1 and their values are reached.",
+	},
+	{ &lmd_medilevitate_maxHealth, "lmd_medilevitate_maxHealth", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The amount a jedi's HP can go up to when MediLevitate.",
+	},
+	{ &lmd_medilevitate_maxForcePoints, "lmd_medilevitate_maxForcePoints", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The amount a Sith's FP can go up to when MediLevitate.",
+	},
 	//====================================================================================================
 	//====================================================================================================
 
@@ -5607,6 +5658,9 @@ ContinueThink:
 				WP_ForcePowersUpdate(ent, &ent->client->pers.cmd );
 				WP_SaberPositionUpdate(ent, &ent->client->pers.cmd);
 				WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
+
+				// lumaya: MediLevitate
+				lmd_meditate_levitate_update(ent);
 			}
 
 			if (g_allowNPC.integer)

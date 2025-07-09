@@ -1646,6 +1646,14 @@ INACTIVE	must be used by a target_activate before it can be used
 qboolean G_FindEntityTeam(gentity_t *e);
 
 const entityInfoData_t func_door_spawnflags[] = {
+  {"1", "Start open"},
+  {"2", "Moves when push/pull is used on it"},
+  {"4", "Crushes anything in it\'s path, instead of returning to it\'s position it came from"}, 
+  {"8", "Stops at the end of it\'s movement and doesn\'t return unless used again"},
+  {"16", "Starts locked with the shader animap at the first frame and inactive. Once used, the shader animap changes to the second frame and the door operates normally"},
+  {"", "Note that you cannot use the door again after this."},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
   {NULL, NULL}
 };
 
@@ -1674,7 +1682,7 @@ const entityInfoData_t func_door_keys[] = {
 };
 
 const entityInfo_t func_door_info = {
-  "",
+  "A bmodel that opens and closes, can fire targets along the way. When this entity doesn\'t have a targetname it will autospawn another entity to trigger it called a \'trigger_door\'. To delete the trigger_door entity edit the func_door to have a targetname.",
   func_door_spawnflags,
   func_door_keys
 };

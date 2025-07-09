@@ -1645,6 +1645,40 @@ INACTIVE	must be used by a target_activate before it can be used
 //RoboPhred
 qboolean G_FindEntityTeam(gentity_t *e);
 
+const entityInfoData_t func_door_spawnflags[] = {
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_door_keys[] = {
+  {"target", "Door fires this when it starts moving from it\'s closed position to it\'s open position"},
+  {"opentarget", "Door fires this after reaching it\'s \'open\' position"},
+  {"target2", "Door fires this when it starts moving from it\'s open position to it\'s closed position"},
+  {"closetarget", "Door fires this after reaching it\'s \'closed\' position"},
+  {"model2" ".md3 model to also draw"},
+  {"angle", "determines the opening direction"},
+  {"targetname", "if set, no touch field will be spawned and a remote button or trigger field activates the door."},
+  {"speed", "movement speed (100 default)"},
+  {"wait", "wait before returning (3 default, -1 = never return)"},
+  {"lip", "lip remaining at the end of move (8 default)"},
+  {"dmg", "damage to inflict when blocked (2 default, set to negative for no damage)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight color"},
+  {"health", "if set, the door must be shot open"},
+  {"linear", "set to 1 and it will move linearly rather than with accelleration (default is 0)"},
+  {"teamallow", "even if locked, this team can always open and close it just by walking up to it"},
+  {"", "0 - none (locked to everyone)"},
+  {"", "1 - red"},
+  {"", "2 = blue"},
+  {"vehopen", "if non-0 vehicles/players riding vehicles can open"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_door_info = {
+  "",
+  func_door_spawnflags,
+  func_door_keys
+};
+
 void SP_func_door (gentity_t *ent) 
 {
 	//Lugormod

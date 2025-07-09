@@ -128,22 +128,22 @@ void lmd_meditate_levitate_update(gentity_t* self)
 
                 if (lmd_medilevitate_maxHealth.integer > 100 && !isSith)
                 {
-                    if (self->health < 135)
+                    if (self->health < lmd_medilevitate_maxHealth.integer)
                     {
                         self->health += lmd_medilevitate_heal_amount.integer;
-                        if (self->health > 135)
-                            self->health = 135;
+                        if (self->health > lmd_medilevitate_maxHealth.integer)
+                            self->health = lmd_medilevitate_maxHealth.integer;
 
                         self->client->ps.stats[STAT_MAX_HEALTH] = self->health;
                     }
                 }
                 else if (lmd_medilevitate_maxForcePoints.integer > 100 && isSith)
                 {
-                    if (self->client->ps.fd.forcePower < 200)
+                    if (self->client->ps.fd.forcePower < lmd_medilevitate_maxForcePoints.integer)
                     {
                         self->client->ps.fd.forcePower += lmd_medilevitate_heal_amount.integer;
-                        if (self->client->ps.fd.forcePower > 200)
-                            self->client->ps.fd.forcePower = 200;
+                        if (self->client->ps.fd.forcePower > lmd_medilevitate_maxForcePoints.integer)
+                            self->client->ps.fd.forcePower = lmd_medilevitate_maxForcePoints.integer;
                     }
                 }
                 

@@ -2625,6 +2625,38 @@ Applicable only during Siege gametype:
 teamnodmg - if 1, team 1 can't damage this. If 2, team 2 can't damage this.
 
 */
+const entityInfoData_t func_rotating_spawnflags[] = {
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_rotating_keys[] = {
+  {"model", "The bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", "percent of normal scale (on all x y and z axii) to scale the model2 if there is one. 100 is normal scale, min is 1 (100 times smaller than normal), max is 1000 (ten times normal)"},
+  {"speed", "determines how fast it moves (100 default)"},
+  {"dmg", "damage to inflict when blocked (2 default)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"spinangles", "instead of using \'speed\' you can use this to set rotation on all 3 axes (pitch yaw and roll)"},
+  {"health", "default is 0. if health is set, the follow key/values are available:"},
+  {"", "\'numchunks\' multiplies the number of chunks spawned. (1 default, .5 is half as many chunks, 2 is twice as many chunks)"},
+  {"", "\'chunksize\' scales up/down the chunk size (1 default)"},
+  {"", "\'showhealth\' if non-0, will display the health bar on the hud when crosshair is over this entity in seige"},
+  {"", "\'teamowner\' in seige this will specify which team this thing is owned by. Crosshair changes green/red"},
+  {"", "\'splashDamage\' damage to do"},
+  {"", "\'splashRadius\' radius for above damage"},
+  {"team", "if set, only this team can trip this trigger. (0 - any, 1 - red, 2 - blue)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+
+  {NULL, NULL}
+};
+const entityInfo_t func_rotating_info = {
+  "You need to have an origin brush as part of this entity. The center of that brush will be the point around which it is rotated. It will rotate around the Z axis by default. You can check either the X_AXIS or Y_AXIS box to change that.",
+  func_rotating_spawnflags,
+  func_rotating_keys
+};
+
 void SP_func_breakable( gentity_t *self );
 void SP_func_rotating (gentity_t *ent) {
 	vec3_t spinangles;

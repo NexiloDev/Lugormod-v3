@@ -2341,6 +2341,29 @@ entities and damage them on contact as well.
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+const entityInfoData_t func_train_spawnflags[] = {
+  {"1", "Start on"},
+  {"2", "?"},
+  {"4", "?"},
+  {"8", "?"},
+  {"16", "Damages anything in it\'s path"},
+  {"32", "?"},
+  {"64", "Can be used"},
+  {"128", "Starts deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_train_keys[] = {
+  {NULL, NULL}
+};
+
+const entityInfo_t func_train_info = {
+  "A train is a mover that moves between path_corner target points.",
+  func_train_spawnflags,
+  func_train_keys
+};
+
 void SP_func_train (gentity_t *self) {
 
 	//RoboPhred

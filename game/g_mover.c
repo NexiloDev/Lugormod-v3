@@ -2373,6 +2373,35 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 "linear" set to 1 and it will move linearly rather than with acceleration (default is 0)
 */
 
+const entityInfoData_t func_static_spawnflags[] = {
+  {"1", "Will be used when you Force-Push it"},
+  {"2", "Will be used when you force-Pull it"},
+  {"4", "Toggle the shader anim frame between 1 and 2 when used"},
+  {"8", "Make it do damage when it's blocked"},
+  {"16", "Make it do damage when it hits any entity"},
+//  {"32", "Player can use it with the use button"},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_static_keys[] = {
+  {"model", "The bmodel to use"},
+  {"model2","A .md3 model to also draw"},
+  {"model2scale","Precent of normal scale (on all x y z axii) to scale the model2"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"dmg", "how much damage to do when it crushes (use with spawnflags )"},
+  {"linear", "set to 1 and it will move linearly rather than with acceleration"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_static_info = {
+  "A bmodel that just sits there, does nothing. Can be used for conditional walls and models. On some levels like t2_rogue it can be used with a script to move.",
+  func_static_spawnflags,
+  func_static_keys
+};
+
 void SP_func_static( gentity_t *ent ) 
 {
 

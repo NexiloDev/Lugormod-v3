@@ -2355,6 +2355,14 @@ const entityInfoData_t func_train_spawnflags[] = {
 };
 
 const entityInfoData_t func_train_keys[] = {
+  {"model", "The bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", "Scale the model2"},
+  {"speed", "default 100"},
+  {"dmg", "default 2"},
+  {"target", "next path corner (required)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
   {NULL, NULL}
 };
 

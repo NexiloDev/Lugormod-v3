@@ -391,22 +391,22 @@ vmCvar_t lmd_enableCorpseDrag;
 
 vmCvar_t lmd_rewardcr_kill;
 
-vmCvar_t lmd_lightning_below_level_3_range;
-vmCvar_t lmd_drain_below_level_3_range;
+vmCvar_t lmd_lightningBelowLevel3Range;
+vmCvar_t lmd_drainBelowLevel3Range;
 
 // Lmd_MediLevitate
-vmCvar_t lmd_medilevitate_initial_up_velocity;
-vmCvar_t lmd_medilevitate_initial_bounce_multiplier;
-vmCvar_t lmd_medilevitate_heal_amount;
-vmCvar_t lmd_medilevitate_heal_interval;
-vmCvar_t lmd_medilevitate_breath_sway;
-vmCvar_t lmd_medilevitate_jedi_fx;
-vmCvar_t lmd_medilevitate_sith_fx;
-vmCvar_t lmd_medilevitate_jedi_sound;
-vmCvar_t lmd_medilevitate_sith_sound;
-vmCvar_t lmd_medilevitate_finish;
-vmCvar_t lmd_medilevitate_maxHealth;
-vmCvar_t lmd_medilevitate_maxForcePoints;
+vmCvar_t lmd_levitateInitialUpVelocity;
+vmCvar_t lmd_levitateInitialBounceMultiplier;
+vmCvar_t lmd_levitateHealAmount;
+vmCvar_t lmd_levitateHealInterval;
+vmCvar_t lmd_levitateBreathSway;
+vmCvar_t lmd_levitateJediFx;
+vmCvar_t lmd_levitateSithFx;
+vmCvar_t lmd_levitateJediSound;
+vmCvar_t lmd_levitateSithSound;
+vmCvar_t lmd_levitateFinish;
+vmCvar_t lmd_levitateMaxHealth;
+vmCvar_t lmd_levitateMaxForcePoints;
 
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
@@ -623,47 +623,47 @@ static cvarTable_t		gameCvarTable[] = {
 		"Give a player credits for killing other players.  Does not work for killing NPCs.",
 	},
 
-{ &lmd_lightning_below_level_3_range, "lmd_lightning_below_level_3_range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
+{ &lmd_lightningBelowLevel3Range, "lmd_lightningBelowLevel3Range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force lightning below level 3.",
 },
-	{ &lmd_drain_below_level_3_range, "lmd_drain_below_level_3_range", "512", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	{ &lmd_drainBelowLevel3Range, "lmd_drainBelowLevel3Range", "512", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force drain below level 3.",
 	},
-	{ &lmd_medilevitate_initial_up_velocity, "lmd_medilevitate_initial_up_velocity", "50", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	{ &lmd_levitateInitialUpVelocity, "lmd_levitateInitialUpVelocity", "50", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the initial upwards velocity for MediLevitate.",
 	},
-	{ &lmd_medilevitate_initial_bounce_multiplier, "lmd_medilevitate_initial_bounce_multiplier", "0.35", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	{ &lmd_levitateInitialBounceMultiplier, "lmd_levitateInitialBounceMultiplier", "0.35", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the bounce multiplier for MediLevitate. 0 - 1.0!",
 	},
-	{ &lmd_medilevitate_heal_amount, "lmd_medilevitate_heal_amount", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"How much we heal per tick of lmd_medilevitate_heal_interval while MediLevitating.",
+	{ &lmd_levitateHealAmount, "lmd_levitateHealAmount", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"How much we heal per tick of lmd_medilevitate_heal_interval while levitate.",
 	},
-	{ &lmd_medilevitate_heal_interval, "lmd_medilevitate_heal_interval", "2000", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"The interval for lmd_medilevitate_heal_amount to heal us during MediLevitate.",
+	{ &lmd_levitateHealInterval, "lmd_levitateHealInterval", "2000", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The interval for lmd_levitateHealAmount to heal us during MediLevitate.",
 	},
-	{ &lmd_medilevitate_breath_sway, "lmd_medilevitate_breath_sway", "10.0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"Set the breath sway for MediLevitate.",
+	{ &lmd_levitateBreathSway, "lmd_levitateBreathSway", "10.0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the breath sway for levitate.",
 	},
-	{ &lmd_medilevitate_jedi_fx, "lmd_medilevitate_jedi_fx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 then MediLevitate plays an effect when on jedi.",
+	{ &lmd_levitateJediFx, "lmd_levitateJediFx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 then levitate plays an effect when on jedi.",
 	},
-	{ &lmd_medilevitate_sith_fx, "lmd_medilevitate_sith_fx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 then MediLevitate plays an effect when on sith.",
+	{ &lmd_levitateSithFx, "lmd_levitateSithFx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 then levitate plays an effect when on sith.",
 	},
-	{ &lmd_medilevitate_jedi_sound, "lmd_medilevitate_jedi_sound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 MediLevitate plays a sound when on jedi.",
+	{ &lmd_levitateJediSound, "lmd_levitateJediSound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 levitate plays a sound when on jedi.",
 	},
-	{ &lmd_medilevitate_sith_sound, "lmd_medilevitate_sith_sound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 MediLevitate plays a sound when on sith.",
+	{ &lmd_levitateSithSound, "lmd_levitateSithSound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 levitate plays a sound when on sith.",
 	},
-	{ &lmd_medilevitate_finish, "lmd_medilevitate_finish", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 MediLevitate finishes if lmd_medilevitate_maxHealth or lmd_medilevitate_maxForcePoints is greater than 100 and their values are reached.",
+	{ &lmd_levitateFinish, "lmd_levitateFinish", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 levitate finishes if lmd_levitateMaxHealth or lmd_levitateMaxForcePoints is greater than 100 and their values are reached.",
 	},
-	{ &lmd_medilevitate_maxHealth, "lmd_medilevitate_maxHealth", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"The amount a jedi's HP can go up to when MediLevitate.",
+	{ &lmd_levitateMaxHealth, "lmd_levitateMaxHealth", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The amount a jedi's HP can go up to when levitating.",
 	},
-	{ &lmd_medilevitate_maxForcePoints, "lmd_medilevitate_maxForcePoints", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"The amount a Sith's FP can go up to when MediLevitate.",
+	{ &lmd_levitateMaxForcePoints, "lmd_levitateMaxForcePoints", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The amount a Sith's FP can go up to when levitating.",
 	},
 	//====================================================================================================
 	//====================================================================================================

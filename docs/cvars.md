@@ -157,6 +157,66 @@ Set to 0 for no maximum limit.
 ```
 Maximum number of days to keep an account between user logins.
 ```
+## lmd_levitateInitialUpVelocity
+### Default value: 50
+```
+Set the initial upwards velocity for Levitate.
+```
+## lmd_levitateInitialBounceMultiplier
+### Default value: 0.35
+```
+Set the bounce multiplier for Levitate. 0 - 1.0!
+```
+## lmd_levitateHealAmount
+### Default value: 2
+```
+How much we heal per tick of lmd_levitateHealInterval while levitating.
+```
+## lmd_levitateHealInterval
+### Default value: 2000
+```
+The interval (in milliseconds) at which lmd_levitateHealAmount is applied during Levitate.
+```
+## lmd_levitateBreathSway
+### Default value: 10.0
+```
+Set the breath sway (visual/positional wobble) for Levitate.
+```
+## lmd_levitateJediFx
+### Default value: 0
+```
+If set to 1, Levitate plays an effect when used by Jedi.
+```
+## lmd_levitateSithFx
+### Default value: 0
+```
+If set to 1, Levitate plays an effect when used by Sith.
+```
+## lmd_levitateJediSound
+### Default value: 0
+```
+If set to 1, Levitate plays a sound when used by Jedi.
+```
+## lmd_levitateSithSound
+### Default value: 0
+```
+If set to 1, Levitate plays a sound when used by Sith.
+```
+## lmd_levitateFinish
+### Default value: 0
+```
+If set to 1, Levitate will stop once lmd_levitateMaxHealth or lmd_levitateMaxForcePoints is reached.
+```
+## lmd_levitateMaxHealth
+### Default value: 100
+```
+Maximum health a Jedi can reach while levitating.
+```
+## lmd_levitateMaxForcePoints
+### Default value: 100
+```
+Maximum force points a Sith can reach while levitating.
+```
 ## lmd_logArchive
 ### Default value: 1
 ### Restart required

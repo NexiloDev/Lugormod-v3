@@ -7,18 +7,18 @@
 #include "Lmd_Professions.h"
 #include "Lmd_Prof_Jedi.h"
 
-extern vmCvar_t lmd_medilevitate_initial_up_velocity;
-extern vmCvar_t lmd_medilevitate_initial_bounce_multiplier;
-extern vmCvar_t lmd_medilevitate_heal_amount;
-extern vmCvar_t lmd_medilevitate_heal_interval;
-extern vmCvar_t lmd_medilevitate_breath_sway;
-extern vmCvar_t lmd_medilevitate_jedi_fx;
-extern vmCvar_t lmd_medilevitate_sith_fx;
-extern vmCvar_t lmd_medilevitate_jedi_sound;
-extern vmCvar_t lmd_medilevitate_sith_sound;
-extern vmCvar_t lmd_medilevitate_finish;
-extern vmCvar_t lmd_medilevitate_maxHealth;
-extern vmCvar_t lmd_medilevitate_maxForcePoints;
+extern vmCvar_t lmd_levitateInitialUpVelocity;
+extern vmCvar_t lmd_levitateInitialBounceMultiplier;
+extern vmCvar_t lmd_levitateHealAmount;
+extern vmCvar_t lmd_levitateHealInterval;
+extern vmCvar_t lmd_levitateBreathSway;
+extern vmCvar_t lmd_levitateJediFx;
+extern vmCvar_t lmd_levitateSithFx;
+extern vmCvar_t lmd_levitateJediSound;
+extern vmCvar_t lmd_levitateSithSound;
+extern vmCvar_t lmd_levitateFinish;
+extern vmCvar_t lmd_levitateMaxHealth;
+extern vmCvar_t lmd_levitateMaxForcePoints;
 
 void lmd_meditate_levitate_update(gentity_t* self)
 {
@@ -68,7 +68,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
         {
             self->client->Lmd.customGravity.time = level.time + FRAMETIME;
             self->client->Lmd.customSpeed.time = level.time + FRAMETIME;
-            self->client->ps.velocity[2] = lmd_medilevitate_initial_up_velocity.value;
+            self->client->ps.velocity[2] = lmd_levitateInitialUpVelocity.value;
             if (level.time > self->client->Lmd.mediLevitate.runTime + 2000)
             {
                 self->client->Lmd.mediLevitate.state = 3;
@@ -81,7 +81,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
             self->client->Lmd.customGravity.time = level.time + FRAMETIME;
             self->client->Lmd.customSpeed.time = level.time + FRAMETIME;
 
-            if (lmd_medilevitate_sith_fx.integer > 0 && Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE)
+            if (lmd_levitateSithFx.integer > 0 && Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE)
             {
                 if (level.time > self->client->Lmd.mediLevitate.sithFxTimer)
                 {
@@ -89,12 +89,12 @@ void lmd_meditate_levitate_update(gentity_t* self)
                     G_PlayEffectID(G_EffectIndex("force/kothos_recharge"), self->client->ps.origin, self->client->ps.viewangles);
                 }
             }
-            else if (lmd_medilevitate_jedi_fx.integer > 0)
+            else if (lmd_levitateJediFx.integer > 0)
             {
                 self->client->pushEffectTime = level.time + FRAMETIME;
             }
             
-            self->client->Lmd.mediLevitate.phase += FRAMETIME / 1000.0f * lmd_medilevitate_initial_bounce_multiplier.
+            self->client->Lmd.mediLevitate.phase += FRAMETIME / 1000.0f * lmd_levitateInitialBounceMultiplier.
                 value;
             if (self->client->Lmd.mediLevitate.phase > 2.0f * M_PI)
                 self->client->Lmd.mediLevitate.phase -= 2.0f * M_PI;
@@ -103,7 +103,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
             float verticalVelocity = sinf(self->client->Lmd.mediLevitate.phase) * amplitude;
             self->client->ps.velocity[2] = savedVelocity[2] + (verticalVelocity - savedVelocity[2]) * 0.1f;
 
-            float swayAmplitude = lmd_medilevitate_breath_sway.value;
+            float swayAmplitude = lmd_levitateBreathSway.value;
             float swayOffset = cosf(self->client->Lmd.mediLevitate.phase) * swayAmplitude;
             self->client->ps.origin[0] += (swayOffset - (self->client->ps.origin[0] - self->client->Lmd.mediLevitate.startOrigin[0])) * 0.1f;
 
@@ -112,11 +112,11 @@ void lmd_meditate_levitate_update(gentity_t* self)
             {
                 self->client->Lmd.mediLevitate.humSoundTimer = level.time + 3500;
 
-                if (lmd_medilevitate_sith_sound.integer > 0 && Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE)
+                if (lmd_levitateSithSound.integer > 0 && Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE)
                 {
                     G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/rageloop.wav"));
                 }
-                else if (lmd_medilevitate_jedi_sound.integer > 0)
+                else if (lmd_levitateJediSound.integer > 0)
                 {
                     G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/protectloop.wav"));
                 }
@@ -126,24 +126,24 @@ void lmd_meditate_levitate_update(gentity_t* self)
             {
                 const int isSith = (Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE);
 
-                if (lmd_medilevitate_maxHealth.integer > 100 && !isSith)
+                if (lmd_levitateMaxHealth.integer > 100 && !isSith)
                 {
-                    if (self->health < lmd_medilevitate_maxHealth.integer)
+                    if (self->health < lmd_levitateMaxHealth.integer)
                     {
-                        self->health += lmd_medilevitate_heal_amount.integer;
-                        if (self->health > lmd_medilevitate_maxHealth.integer)
-                            self->health = lmd_medilevitate_maxHealth.integer;
+                        self->health += lmd_levitateHealAmount.integer;
+                        if (self->health > lmd_levitateMaxHealth.integer)
+                            self->health = lmd_levitateMaxHealth.integer;
 
                         self->client->ps.stats[STAT_MAX_HEALTH] = self->health;
                     }
                 }
-                else if (lmd_medilevitate_maxForcePoints.integer > 100 && isSith)
+                else if (lmd_levitateMaxForcePoints.integer > 100 && isSith)
                 {
-                    if (self->client->ps.fd.forcePower < lmd_medilevitate_maxForcePoints.integer)
+                    if (self->client->ps.fd.forcePower < lmd_levitateMaxForcePoints.integer)
                     {
-                        self->client->ps.fd.forcePower += lmd_medilevitate_heal_amount.integer;
-                        if (self->client->ps.fd.forcePower > lmd_medilevitate_maxForcePoints.integer)
-                            self->client->ps.fd.forcePower = lmd_medilevitate_maxForcePoints.integer;
+                        self->client->ps.fd.forcePower += lmd_levitateHealAmount.integer;
+                        if (self->client->ps.fd.forcePower > lmd_levitateMaxForcePoints.integer)
+                            self->client->ps.fd.forcePower = lmd_levitateMaxForcePoints.integer;
                     }
                 }
                 
@@ -152,7 +152,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
                 if (jedi_level < 1.0f)
                     jedi_level = 1.0f;
 
-                int heal_interval = (int)(lmd_medilevitate_heal_interval.integer / jedi_level);
+                int heal_interval = (int)(lmd_levitateHealInterval.integer / jedi_level);
                 if (heal_interval < 300)
                     heal_interval = 300;
 

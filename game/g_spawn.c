@@ -332,6 +332,7 @@ extern entityInfo_t func_plat_info;
 void SP_func_static (gentity_t *ent);
 extern entityInfo_t func_static_info;
 void SP_func_rotating (gentity_t *ent);
+extern entityInfo_t func_rotating_info;
 void SP_func_bobbing (gentity_t *ent);
 void SP_func_pendulum( gentity_t *ent );
 void SP_func_button (gentity_t *ent);
@@ -786,8 +787,8 @@ spawn_t	spawnInitValues[] = {
 	{"func_plat", SP_func_plat, Logical_False, &func_plat_info},
 	{"func_button", SP_func_button, Logical_False},
 	{"func_door", SP_func_door, Logical_False, &func_door_info},
-	{"func_static", SP_func_static, Logical_False},
-	{"func_rotating", SP_func_rotating, Logical_False},
+	{"func_static", SP_func_static, Logical_False, &func_static_info},
+	{"func_rotating", SP_func_rotating, Logical_False, &func_rotating_info},
 	{"func_bobbing", SP_func_bobbing, Logical_False},
 	{"func_pendulum", SP_func_pendulum, Logical_False},
 	{"func_train", SP_func_train, Logical_False},

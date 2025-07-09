@@ -330,11 +330,13 @@ void SP_func_plat (gentity_t *ent);
 extern entityInfo_t func_plat_info;
 
 void SP_func_static (gentity_t *ent);
+extern entityInfo_t func_static_info;
 void SP_func_rotating (gentity_t *ent);
 void SP_func_bobbing (gentity_t *ent);
 void SP_func_pendulum( gentity_t *ent );
 void SP_func_button (gentity_t *ent);
 void SP_func_door (gentity_t *ent);
+extern entityInfo_t func_door_info;
 void SP_func_train (gentity_t *ent);
 void SP_func_timer (gentity_t *self);
 void SP_func_breakable (gentity_t *ent);
@@ -731,6 +733,7 @@ spawn_t	spawnInitValues[] = {
 
 	{"lmd_scale", lmd_scale, Logical_True, &lmd_scale_info},
 
+  // TODO: info keys
 	{"lmd_stashdepo", lmd_stashdepo, Logical_False},
 	{"lmd_stashspawnpoint", lmd_stashspawnpoint, Logical_True},
 	{"lmd_stashzone", lmd_stashzone, Logical_False},
@@ -759,7 +762,9 @@ spawn_t	spawnInitValues[] = {
 	{"info_player_duel1", SP_info_player_duel1, Logical_True, &info_player_duel1_info},
 	{"info_player_duel2", SP_info_player_duel2, Logical_True, &info_player_duel2_info},
 	{"info_player_deathmatch", SP_info_player_deathmatch, Logical_True, &info_player_deathmatch_info},
-	{"info_player_siegeteam1", SP_info_player_siegeteam1, Logical_True},
+	
+  // TODO: Info keys
+  {"info_player_siegeteam1", SP_info_player_siegeteam1, Logical_True},
 	{"info_player_siegeteam2", SP_info_player_siegeteam2, Logical_True},
 	{"info_player_intermission", SP_info_player_intermission, Logical_True},
 	{"info_player_intermission_red", SP_info_player_intermission_red, Logical_True},
@@ -777,9 +782,10 @@ spawn_t	spawnInitValues[] = {
 	{"target_siege_end", SP_target_siege_end, Logical_True},
 	{"misc_siege_item", SP_misc_siege_item, Logical_False},
 
+  // TODO: Info keys
 	{"func_plat", SP_func_plat, Logical_False, &func_plat_info},
 	{"func_button", SP_func_button, Logical_False},
-	{"func_door", SP_func_door, Logical_False},
+	{"func_door", SP_func_door, Logical_False, &func_door_info},
 	{"func_static", SP_func_static, Logical_False},
 	{"func_rotating", SP_func_rotating, Logical_False},
 	{"func_bobbing", SP_func_bobbing, Logical_False},

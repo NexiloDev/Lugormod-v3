@@ -407,6 +407,8 @@ void SP_light (gentity_t *self);
 void SP_info_null (gentity_t *self);
 void SP_info_notnull (gentity_t *self);
 void SP_info_camp (gentity_t *self);
+
+extern entityInfo_t path_corner_info;
 void SP_path_corner (gentity_t *self);
 
 void SP_misc_teleporter_dest (gentity_t *self);
@@ -853,7 +855,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_powerup", SP_target_powerup, Logical_True}, //Lugormod
 
 	{"light", SP_light, Logical_True},
-	{"path_corner", SP_path_corner, Logical_True},
+	{"path_corner", SP_path_corner, Logical_True, &path_corner_info},
 		
 	{"misc_teleporter_dest", SP_misc_teleporter_dest, Logical_True},
 	{"defender", SP_defender, Logical_False},

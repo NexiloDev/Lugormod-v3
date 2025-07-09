@@ -3315,7 +3315,7 @@ entityInfo_t lmd_chance_info = {
     lmd_chance_keys
 };
 
-oid lmd_chance(gentity_t* ent)
+void lmd_chance(gentity_t* ent)
 {
     if (ent->count < 1)
     {

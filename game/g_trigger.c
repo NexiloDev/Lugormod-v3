@@ -792,6 +792,40 @@ multiple classes with the use of |, e.g.:
 */
 
 //        extern vmCvar_t g_dontLoadNPC;
+const entityInfoData_t trigger_once_spawnflags[] = {
+  {"1", "only a player can trigger this by touch. makes it so an NPC cannot fire"},
+  {"2", "won\'t fire unless trigger ent\'s view angles are within 45 degrees of trigger\'s angles"},
+  {"4", "won\'t fire unless player is in it and is pressing the use button"},
+  {"8", "won\'t fire unless player/NPC is in it and pressing the fire button"},
+  {"16", "only non-player NPCs can trigger this by touch"},
+  {"32", "?"},
+  {"64", "?"},
+  {"128", "Starts deactivated"},
+  {"256", "multiple entities can touch this trigger in a single frame and if needed, the trigger can have a wait of > 0"},
+  {NULL, NULL}
+};
+const entityInfoData_t trigger_once_keys[] = {
+  {"target", "what to fire at, if there is a bounding box it will fire when the player/npc is in the box"},
+  {"targetname", "make something target this value for the entity to be used"},
+  {"random", "the wait variance (default 0)"},
+//  {"wait", "unsure if this works, might be wait time between when the trigger fires to check if an entity is inside"},
+  {"delay", "how many seconds to wait to fire its targets after tripped"},
+  {"noise", "sound to play when the trigger fires (plays at activator\'s origin)"},
+  {"NPC_targetname", "only the NPC with this NPC_targetname fires this trigger"},
+  {"team", "if set, only this team can trip the trigger (0 - any, 1 - red, 2 - blue)"},
+  {"soundSet", "ambient sound set to play when this trigger is activated"},
+  {"usetime", "require a client to hold the use key for x amount of milliseconds, along with spawnflags 4"},
+  {"teamuser", "(siege only) if 1, team 2 can\'t use this. if 2, team 1 can\'t use this"},
+  {"siegetrig", "(siege only) if non-0, can only be activated by players carrying a misc_siege_item which is associated with this trigger by the item\'s goaltarget value"},
+  {"idealclass", "(siege only) can only be used by this class/these classes. specify multiple using \'|\' e.g. \'Imperial Medic|Imperial Assassin| ImperialDemolitionist\'"},
+  {NULL, NULL}
+};
+const entityInfo_t trigger_once_info = {
+  "Works exactly like a trigger_multiple but fires only once. Then it doesn\'t fire again.",
+  trigger_once_spawnflags,
+  trigger_once_keys
+};
+
 
 void SP_trigger_once( gentity_t *ent )
 {

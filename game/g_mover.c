@@ -2317,6 +2317,24 @@ Target: next path corner and other targets to fire
 "speed" speed to move to the next corner
 "wait" seconds to wait before behining move to next corner
 */
+const entityInfoData_t path_corner_spawnflags[] = {
+  {NULL, NULL}
+};
+
+const entityInfoData_t path_corner_keys[] = {
+  {"target", "the next path_corner to go to (required) and other targets to fire"},
+  {"targetname", "make the previus path_corner target this, if it is the first path_corner the func_train needs to target this. If it is the first path corner, the last path_corner needs to also target this"},
+  {"speed", "speed to move to the next corner"},
+  {"wait", "seconds to wait before begining move to the next corner"},
+  {NULL, NULL}
+};
+
+const entityInfo_t path_corner_info = {
+  "func_train path corners. These are the waypoints the train travels to.",
+  path_corner_spawnflags,
+  path_corner_keys
+};
+
 void SP_path_corner( gentity_t *self ) {
 	if ( !self->targetname ) {
 		G_Printf ("path_corner with no targetname at %s\n", vtos(self->s.origin));

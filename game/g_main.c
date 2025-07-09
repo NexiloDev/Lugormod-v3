@@ -657,7 +657,7 @@ static cvarTable_t		gameCvarTable[] = {
 	"If 1 MediLevitate plays a sound when on sith.",
 	},
 	{ &lmd_medilevitate_finish, "lmd_medilevitate_finish", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 MediLevitate finishes if lmd_medilevitate_maxHealth or lmd_medilevitate_maxForcePoints is set to 1 and their values are reached.",
+	"If 1 MediLevitate finishes if lmd_medilevitate_maxHealth or lmd_medilevitate_maxForcePoints is greater than 100 and their values are reached.",
 	},
 	{ &lmd_medilevitate_maxHealth, "lmd_medilevitate_maxHealth", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"The amount a jedi's HP can go up to when MediLevitate.",

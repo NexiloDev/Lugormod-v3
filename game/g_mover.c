@@ -2626,6 +2626,14 @@ teamnodmg - if 1, team 1 can't damage this. If 2, team 2 can't damage this.
 
 */
 const entityInfoData_t func_rotating_spawnflags[] = {
+  {"1", "?"},
+  {"2", "?"},
+  {"4", "Moves on X-Axis"},
+  {"8", "Moves on Y-Axis"},
+  {"16", "Will hurt a player if blocked"},
+  {"32", "?"},
+  {"64", "Can be used"},
+  {"128", "Start deactivated"},
   {NULL, NULL}
 };
 

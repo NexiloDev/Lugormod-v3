@@ -358,6 +358,7 @@ void SP_trigger_lightningstrike( gentity_t *ent );
 extern entityInfo_t trigger_lightningstrike_info;
 
 void SP_trigger_once( gentity_t *ent );
+extern entityInfo_t trigger_once_info;
 
 qboolean trigger_multiple_allowlogical();
 void SP_trigger_multiple (gentity_t *ent);
@@ -814,7 +815,7 @@ spawn_t	spawnInitValues[] = {
 	// could not be client side predicted (push and teleport).
 
 	{"trigger_lightningstrike", SP_trigger_lightningstrike, Logical_True, &trigger_lightningstrike_info},
-	{"trigger_once", SP_trigger_once, Logical_False},
+	{"trigger_once", SP_trigger_once, Logical_False, &trigger_once_info},
 	{"trigger_multiple", SP_trigger_multiple, {qtrue, trigger_multiple_allowlogical}, &trigger_multiple_info},
 	{"trigger_push", SP_trigger_push, Logical_False, &trigger_push_info},
 

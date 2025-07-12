@@ -4334,6 +4334,32 @@ void rail_mover_init (gentity_t *ent) {
 }
 
 
+const entityInfoData_t rail_mover_spawnflags[] = {
+  {"1", ""},
+  {"2", ""},
+  {"4", ""},
+  {"8", ""},
+  {"16", ""},
+  {"32", ""},
+  {"64", ""},
+  {"128", "Starts deactivated, is invisible until used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t rail_mover_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 to also draw"},
+  {"model2scale", ""},
+  {"target", "target a rail_track or rail_lane or something"},
+  {"targetname", "use this to activate or deactivate the rail_mover ent"},
+  {NULL, NULL}
+};
+
+const entityInfo_t rail_mover_info = {
+  "A bmodel that\'s supposed to behave like the background skyscrapers in t1_rail. The entity that is drawn as a skyscraper passing y.",
+  rail_mover_spawnflags,
+  rail_mover_keys
+};
 void SP_rail_mover ( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
 	ent->reached = 0;
@@ -4544,6 +4570,32 @@ void rail_lane_use (gentity_t *self, gentity_t *other, gentity_t *activator) {
 	other->flags |= FL_INACTIVE;
 	t->nextTrain = other;
 }
+
+
+const entityInfoData_t rail_track_spawnflags[] = {
+  {"1", "Starts deactivated"},
+  {"2", ""},
+  {"4", ""},
+  {"8", ""},
+  {"16", ""},
+  {"32", ""},
+  {"64", ""},
+  {"128", ""},
+  {NULL, NULL}
+};
+
+const entityInfoData_t rail_track_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"target", "the next something"},
+  {"targetname", "the targetname for the track"},
+  {NULL, NULL}
+};
+
+const entityInfo_t rail_track_info = {
+  "Looks to be the physical track model to draw for a rail_mover. Can be passed through, is not physical.",
+  rail_track_spawnflags,
+  rail_track_keys
+};
 
 void SP_rail_track ( gentity_t *ent ) {
 	ent->s.eFlags |= EF_NODRAW;

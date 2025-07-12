@@ -2965,6 +2965,41 @@ Pendulum frequency is a physical constant based on the length of the beam and gr
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+
+const entityInfoData_t func_pendulum_spawnflags[] = {
+//  {"1", ""},
+//  {"2", ""},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_pendulum_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"speed", "the number of degrees each way the pendulum swings, (30 default)"},
+  {"phase", "the 0.0 to 1.0 offset in the cycle to start at"},
+  {"dmg", "damage to inflict when blocked (2 default)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_pendulum_info = {
+  "You need to have an origin brush as part of this entity. " 
+  "Pendulums always swing north / south on unrotated models. " 
+  "Add an angles field to the model to allow rotation in other directions. " 
+  "Pendulum frequency is a physical constant based on the length of the beam and gravity.",
+  func_pendulum_spawnflags,
+  func_pendulum_keys
+};
+
 void SP_func_pendulum(gentity_t *ent) {
 	float		freq;
 	float		length;

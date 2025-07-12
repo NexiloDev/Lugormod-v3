@@ -2821,6 +2821,37 @@ Normally bobs on the Z axis
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+const entityInfoData_t func_bobbing_spawnflags[] = {
+  {"1", "?"},
+  {"2", "?"},
+  {"4", "Move on X-Axis"},
+  {"8", "Move on Y-Axis"},
+  {"16", "Make it do damage when it hits any entity"},
+//  {"32", "Player can use it with the use button"},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_bobbing_keys[] = {
+  {"model", "The bmodel to use"},
+  {"model2","A .md3 model to also draw"},
+  {"model2scale","Precent of normal scale (on all x y z axii) to scale the model2"},
+  {"speed", "seconds to complete a bob cycle (4 default)"},
+  {"phase", "damage to inflict when blocked (2 default)"},
+  {"dmg", "how much damage to do when it crushes (use with spawnflags )"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_bobbing_info = {
+  "Normally bobs on the z-axis",
+  func_bobbing_spawnflags,
+  func_bobbing_keys
+};
+
 void SP_func_bobbing (gentity_t *ent) {
 	float		height;
 	float		phase;

@@ -346,6 +346,7 @@ extern entityInfo_t func_train_info;
 void SP_func_timer (gentity_t *self);
 void SP_func_breakable (gentity_t *ent);
 void SP_func_glass (gentity_t *ent);
+extern entityInfo_t func_glass_info;
 void SP_func_usable( gentity_t *ent);
 extern entityInfo_t func_usable_info;
 void SP_func_wall( gentity_t *ent );
@@ -804,7 +805,7 @@ spawn_t	spawnInitValues[] = {
 	{"func_group", SP_info_null, Logical_False},
 	{"func_timer", SP_func_timer, Logical_False},			// rename trigger_timer?
 	{"func_breakable", SP_func_breakable, Logical_False},
-	{"func_glass", SP_func_glass, Logical_False},
+	{"func_glass", SP_func_glass, Logical_False, &func_glass_info},
 	{"func_usable", SP_func_usable, Logical_False, &func_usable_info},
 	{"func_wall", SP_func_wall, Logical_False, &func_wall_info},
 

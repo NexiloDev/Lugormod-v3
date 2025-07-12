@@ -3714,6 +3714,35 @@ Breakable glass
 "light"		constantLight radius
 "maxshards"	Max number of shards to spawn on glass break
 */
+
+const entityInfoData_t func_glass_spawnflags[] = {
+ // {"1", ""},
+ // {"2", ""},
+ // {"4", ""},
+ // {"8", ""},
+ // {"16", ""},
+ // {"32", ""},
+  {"64", "Player can use"},
+  {"128", "Starts deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_glass_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"maxshards", "max number of shards to spawn on glass break"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_glass_info = {
+  "Breakable glass",
+  func_glass_spawnflags,
+  func_glass_keys
+};
+
 void SP_func_glass( gentity_t *ent ) {
 
 	//RoboPhred

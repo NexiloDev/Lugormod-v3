@@ -5,6 +5,31 @@
 
 #include "Lmd_EntityCore.h"
 #include "Lmd_Entities_Public.h"
+
+
+const entityInfoData_t placeholder_spawnflags[] = {
+  {"1", ""},
+  {"2", ""},
+  {"4", ""},
+  {"8", ""},
+  {"16", ""},
+  {"32", ""},
+  {"64", ""},
+  {"128", ""},
+  {NULL, NULL}
+};
+
+const entityInfoData_t placeholder_keys[] = {
+  {"", ""},
+  {NULL, NULL}
+};
+
+const entityInfo_t placeholder_info = {
+  "",
+  placeholder_spawnflags,
+  placeholder_keys
+};
+
 /*
 ===============================================================================
 
@@ -2094,6 +2119,39 @@ When a button is touched, it moves some distance in the direction of it's angle,
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+const entityInfoData_t func_button_spawnflags[] = {
+//  {"1", ""},
+//  {"2", ""},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_button_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"angle", "determines the opening direction"},
+  {"target", "all entities with a matching targetname will be used"},
+  {"speed", "override the default 40 speed"},
+  {"wait", "override the default 1 second wait (-1 = never return)"},
+  {"lip", "override the default 4 pixel lip remaining at end of move"},
+  {"health", "if set, the button must be killed instead of touched"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_button_info = {
+  "When a button is touched, it moves some distance in the direction of it\'s angle, triggers all of it\'s targets, waits some time, then returns to it\'s original position where it can be triggered again.",
+  func_button_spawnflags,
+  func_button_keys
+};
+
 void SP_func_button( gentity_t *ent ) {
 	vec3_t		abs_movedir;
 	float		distance;

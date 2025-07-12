@@ -349,6 +349,7 @@ void SP_func_glass (gentity_t *ent);
 void SP_func_usable( gentity_t *ent);
 extern entityInfo_t func_usable_info;
 void SP_func_wall( gentity_t *ent );
+extern entityInfo_t func_wall_info;
 void SP_rail_mover (gentity_t *ent); //Lugormod
 void SP_rail_track (gentity_t *ent); //Lugormod
 void SP_rail_lane (gentity_t *ent); //Lugormod
@@ -805,7 +806,7 @@ spawn_t	spawnInitValues[] = {
 	{"func_breakable", SP_func_breakable, Logical_False},
 	{"func_glass", SP_func_glass, Logical_False},
 	{"func_usable", SP_func_usable, Logical_False, &func_usable_info},
-	{"func_wall", SP_func_wall, Logical_False},
+	{"func_wall", SP_func_wall, Logical_False, &func_wall_info},
 
 	// Triggers are brush objects that cause an effect when contacted
 	// by a living player, usually involving firing targets.

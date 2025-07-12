@@ -4116,6 +4116,34 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 
 START_OFF - the wall will not be there
 */
+
+const entityInfoData_t func_wall_spawnflags[] = {
+//  {"1", ""},
+//  {"2", ""},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_wall_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_wall_info = {
+  "A bmodel that just sits there, does nothing. can be used for conditional walls and models.",
+  func_wall_spawnflags,
+  func_wall_keys
+};
+
 void SP_func_wall( gentity_t *ent ) 
 {
 

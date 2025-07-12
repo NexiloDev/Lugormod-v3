@@ -347,6 +347,7 @@ void SP_func_timer (gentity_t *self);
 void SP_func_breakable (gentity_t *ent);
 void SP_func_glass (gentity_t *ent);
 void SP_func_usable( gentity_t *ent);
+extern entityInfo_t func_usable_info;
 void SP_func_wall( gentity_t *ent );
 void SP_rail_mover (gentity_t *ent); //Lugormod
 void SP_rail_track (gentity_t *ent); //Lugormod
@@ -803,7 +804,7 @@ spawn_t	spawnInitValues[] = {
 	{"func_timer", SP_func_timer, Logical_False},			// rename trigger_timer?
 	{"func_breakable", SP_func_breakable, Logical_False},
 	{"func_glass", SP_func_glass, Logical_False},
-	{"func_usable", SP_func_usable, Logical_False},
+	{"func_usable", SP_func_usable, Logical_False, &func_usable_info},
 	{"func_wall", SP_func_wall, Logical_False},
 
 	// Triggers are brush objects that cause an effect when contacted

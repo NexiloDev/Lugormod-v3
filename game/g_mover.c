@@ -3908,6 +3908,41 @@ teamuser - if 1, team 2 can't use this. If 2, team 1 can't use this.
 
 */
 
+const entityInfoData_t func_usable_spawnflags[] = {
+  {"1", "the wall will not be there"},
+  {"2", "doesn\'t toggle on and off when used, just runs usescript and fires target"},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Can be used"},
+  {"128", "Start deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_usable_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"targetname", "When used, will toggle on and off"},
+  {"target", "Will fire this target every time it is toggled OFF"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"usescript", "script to run when turned on"},
+  {"deathscript", "script to run when turned off"},
+  {"wait", "amount of time before the object is usable again (only valid with ALWAYS_ON flag)"},
+  {"health", "if it has health, it will be used whenever shot at/killed - if you want it to only be used once this way, set health to 1"},
+  {"endframe", "Will make it animate to next shader frame when used, not turn on/off... set this to number of frames in the shader, minus 1"},
+  {"teamuser", "Applicable only during Siege gametype: if 1, team 2 can't use this. If 2, team 1 can't use this."},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_usable_info = {
+  "A bmodel that just sits there, doing nothing. Can be used for conditional walls and models. Disappears when used and reappears when used again.",
+  placeholder_spawnflags,
+  placeholder_keys
+};
+
 //Lugormod
 /*
 void Touch_func_usable( gentity_t *ent, gentity_t *other, trace_t *trace ) 

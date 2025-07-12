@@ -3473,6 +3473,52 @@ Applicable only during Siege gametype:
 teamnodmg - if 1, team 1 can't damage this. If 2, team 2 can't damage this.
 
 */
+
+const entityInfoData_t func_breakable_spawnflags[] = {
+  {"1", "can only be broken by being used"},
+  {"2", "does damage on impact"},
+  {"4", "won\'t reverse movement when hit an obstacle"},
+  {"8", "can be broken by impact damage, like glass"},
+  {"16", "only takes damage from sabers"},
+  {"32", "only takes damage by a heavy weapon, like an emplaced gun or AT-ST gun."},
+  {"64", "Using it doesn't make it break, still can be destroyed by damage"},
+  {"128", "Player can use it with the use button"},
+  {"256", "Does not play an explosion effect, though will still create chunks if specified"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_breakable_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 to also draw"},
+  {"model2scale", ""},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"target", "all entities with a matching targetname will be used when this is destoryed"},
+  {"targetname", "entities with matching target will fire it"},
+  {"paintaget", "target to fire when hit (but not destroyed)"},
+  {"wait", "how long minimum to wait between firing paintarget each time hit"},
+  {"delay", "When killed or used, how long (in seconds) to wait before blowing up (none by default)"},
+  {"health", "default is 10"},
+  {"numchunks", "Multiplies the number of chunks spawned.  Chunk code tries to pick a good volume of chunks, but you can alter this to scale the number of spawned chunks. (default 1)  (.5) is half as many chunks, (2) is twice as many chunks"},
+  {"chunksize", "scales up/down the chunk size by this number (default is 1)"},
+  {"playfx", "path of effect to play on death"},
+  {"showhealth", "if non-0, will display the health bar on the hud when the crosshair is over this ent (in siege)"},
+  {"teamowner", "in siege this will specify which team this thing is \'owned\' by. To that team the crosshair will be green, the other red."},
+  {"splashDamage", "damage to do (default none)"},
+  {"splashRadius", "radius for damage"},
+  {"team", "If set, only this team can trip this trigger. 0 - any, 1 - red, 2 - blue"},
+  {"material", "default is 0. 17 choices available (0-16)"},
+  {"teamnodmg", "Applicable only during siege gametype. If 1, team 1 can\'t damage this. If 2, team 2 can\'t damage this."},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_breakable_info = {
+  "When destroyed, fires it's trigger and chunks and plays sound \'noise\' or sound for type if no noise specified",
+  func_breakable_spawnflags,
+  func_breakable_keys
+};
+
+
 void SP_func_breakable( gentity_t *self ) 
 {
 	int t;

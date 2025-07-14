@@ -554,7 +554,6 @@ struct gclient_s {
 
 		struct 
 		{
-
 			int state;
 			unsigned int runTime;
 			unsigned int sithFxTimer;
@@ -566,6 +565,8 @@ struct gclient_s {
 			qboolean effectFullFxPlayed;
 		} mediLevitate;
 
+		struct 
+		{
 			unsigned int delayTime;
 			qboolean openAgain;
 			unsigned int cooldownTime;

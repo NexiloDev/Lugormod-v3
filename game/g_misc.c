@@ -12,6 +12,8 @@
 #include "Lmd_EntityCore.h"
 #include "Lmd_EntityUtil.h"
 
+#include "Lmd_Entities_Public.h"
+
 #define HOLOCRON_RESPAWN_TIME 30000
 #define MAX_AMMO_GIVE 2
 #define STATION_RECHARGE_TIME 100
@@ -473,6 +475,25 @@ void misc_camera_use(gentity_t *self, gentity_t *other, gentity_t *activator){
 
 	return;
 }
+
+const entityInfoData_t misc_camera_spawnflags[] = {
+	{NULL, NULL}
+};
+
+const entityInfoData_t misc_camera_keys[] = {
+	{"wait", "time between the user being able to fire its targets by attacking.  (defaults to 1 second)"},
+	{"target2", "when the user attacks"},
+	{"target3", "fire when the user alt-attacks"},
+	{"model", "a .md3 to draw instead of the default camera model"},
+	{"targetname", "make the trigger target this value for the entity to be used."},
+	{NULL, NULL}
+};
+
+const entityInfo_t misc_camera_info = {
+	"A working camera that is similar to the single player camera system. the player is noclipped and teleported and frozen at the camera location, and a fake model is left behind where he was. Any damage given to the fake model is passed onto the player. The entity spawns a camera model by default at the origin/angle of the entity. You can turn off the model by setting model,null,",
+	misc_camera_spawnflags,
+	misc_camera_keys
+};
 
 void SP_misc_camera (gentity_t *ent){
 	//G_FreeEntity(ent);
@@ -3216,6 +3237,12 @@ This world effect will spawn space dust globally into the level.
 "count" the number of snow particles (default of 1000)
 */
 //----------------------------------------------------------
+
+const entityInfo_t fx_spacedust_info = {
+	"This world effect will spawn space dust globally into the level",
+	NULL,
+	{"count", "the number of space dust particles (default of 1000)"}
+};
 void SP_CreateSpaceDust( gentity_t *ent )
 {
 	G_EffectIndex(va("*spacedust %i", ent->count));
@@ -3228,6 +3255,11 @@ This world effect will spawn snow globally into the level.
 "count" the number of snow particles (default of 1000)
 */
 //----------------------------------------------------------
+const entityInfo_t fx_snow_info = {
+	"This world effect will spawn snow globally into the level",
+	NULL,
+	{"count", "the number of snow particles (default of 1000)"}
+};
 void SP_CreateSnow( gentity_t *ent )
 {
 	G_EffectIndex("*snow");
@@ -3241,6 +3273,11 @@ This world effect will spawn rain globally into the level.
 "count" the number of rain particles (default of 500)
 */
 //----------------------------------------------------------
+const entityInfo_t fx_rain_info = {
+	"This world effect will spawn rain globally into the level",
+	NULL,
+	{"count", "the number of rain particles (default of 500)"}
+};
 void SP_CreateRain( gentity_t *ent )
 {
 	if (g_dontLoadNPC.integer) {
@@ -3257,6 +3294,11 @@ void SP_CreateRain( gentity_t *ent )
 	G_EffectIndex(va("*rain init %i", ent->count));
 }
 
+const entityInfo_t fx_wind_info = {
+	"This world effect will spawn wind globally into the level",
+	{"2", "make a camera shake effect"},
+	{"speed", "speed at which wind is blowing (default 100)"}
+};
 void SP_CreateWind( gentity_t *ent )
 {
 	if (!ent->speed) { //Lugormod (where else would it be done???)

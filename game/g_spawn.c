@@ -293,6 +293,7 @@ extern entityInfo_t money_dispenser_info; //Lugormod
 void SP_control_point (gentity_t *ent); //Lugormod
 extern entityInfo_t control_point_info; //Lugormod
 void SP_misc_camera (gentity_t *ent); //Lugormod
+extern entityInfo_t misc_camera_info;
 void SP_info_player_jail (gentity_t *ent); //Lugormod
 extern entityInfo_t info_player_jail_info; //Lugormod
 
@@ -461,6 +462,7 @@ void SP_reference_tag ( gentity_t *ent );
 void SP_misc_weapon_shooter( gentity_t *self );
 
 void SP_NPC_spawner( gentity_t *self );
+extern entityInfo_t NPC_spawner_info;
 
 void SP_LMD_spawner( gentity_t *NPCspawner );
 
@@ -544,9 +546,13 @@ void SP_waypoint_navgoal_2 (gentity_t *ent);
 void SP_waypoint_navgoal_1 (gentity_t *ent);
 
 void SP_CreateSpaceDust( gentity_t *ent );
+extern entityInfo_t fx_spacedust_info;
 void SP_CreateSnow( gentity_t *ent );
+extern entityInfo_t fx_snow_info;
 void SP_CreateRain( gentity_t *ent );
-void SP_CreateWind( gentity_t *ent ); //Lugormod
+extern entityInfo_t fx_rain_info;
+void SP_CreateWind( gentity_t *ent ); //Lugormod, unused not spawnable
+extern entityInfo_t fx_wind_info; // Lugormod, unused not spawnable
 
 void SP_point_combat( gentity_t *self );
 
@@ -914,7 +920,7 @@ spawn_t	spawnInitValues[] = {
 	{"lmd_spawner", SP_LMD_spawner, Logical_True},
 
 	//new NPC ents
-	{"NPC_spawner", SP_NPC_spawner, Logical_True},
+	{"NPC_spawner", SP_NPC_spawner, Logical_True, &NPC_spawner_info},
 	{"NPC_Vehicle", SP_NPC_Vehicle, Logical_True},
 	{"NPC_Kyle", SP_NPC_Kyle, Logical_True},
 	{"NPC_Lando", SP_NPC_Lando, Logical_True},
@@ -1006,10 +1012,12 @@ spawn_t	spawnInitValues[] = {
 	{"waypoint_navgoal_2", SP_waypoint_navgoal_2, Logical_True},
 	{"waypoint_navgoal_1", SP_waypoint_navgoal_1, Logical_True},
 
-	{"fx_spacedust", SP_CreateSpaceDust, Logical_True},
-	{"fx_rain", SP_CreateRain, Logical_True},
-	{"fx_snow", SP_CreateSnow, Logical_True},
+	{"fx_spacedust", SP_CreateSpaceDust, Logical_True, &fx_spacedust_info},
+	{"fx_rain", SP_CreateRain, Logical_True, &fx_rain_info},
+	{"fx_snow", SP_CreateSnow, Logical_True, &fx_snow_info},
 	//{"fx_wind", SP_CreateWind}, //Lugormod
+	// if ever used in the future
+
 
 	{"point_combat", SP_point_combat, Logical_True},
 
@@ -1029,7 +1037,7 @@ spawn_t	spawnInitValues[] = {
 
 	{"misc_turret", SP_misc_turret, Logical_False, &misc_turret_info},
 	{"misc_turretG2", SP_misc_turretG2, Logical_False, &misc_turretG2_info},
-	{"misc_camera", SP_misc_camera, Logical_False},//Lugormod
+	{"misc_camera", SP_misc_camera, Logical_False, &misc_camera_info},//Lugormod
 	{"random_spot", SP_random_spot, Logical_True, &random_spot_info},//Lugormod
 	{"money_dispenser", SP_money_dispenser, Logical_False, &money_dispenser_info},//Lugormod
 	{"control_point", SP_control_point, Logical_False, &control_point_info},//Lugormod

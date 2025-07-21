@@ -416,50 +416,77 @@ void SP_target_play_music( gentity_t *self );
 void SP_target_push (gentity_t *ent);
 
 void SP_light (gentity_t *self);
+extern entityInfo_t SP_light_info;
 void SP_info_null (gentity_t *self);
+extern entityInfo_t SP_info_null_info;
 void SP_info_notnull (gentity_t *self);
+extern entityInfo_t SP_info_notnull_info;
 void SP_info_camp (gentity_t *self);
+extern entityInfo_t SP_info_camp_info;
 
 extern entityInfo_t path_corner_info;
 void SP_path_corner (gentity_t *self);
 
 void SP_misc_teleporter_dest (gentity_t *self);
+extern entityInfo_t misc_teleporter_dest_info;
 void SP_misc_model_breakable(gentity_t *ent); //Lugormod
+extern entityInfo_t misc_model_breakable_info;
 void SP_misc_exploding_crate(gentity_t *ent); //Lugormod
+extern entityInfo_t misc_exploding_crate_info;
 void SP_misc_security_panel(gentity_t *ent);
+extern entityInfo_t misc_security_panel_info;
 void SP_defender(gentity_t *ent);
 void SP_misc_model(gentity_t *ent);
+extern entityInfo_t misc_model_info;
 void SP_misc_model_static(gentity_t *ent);
+extern entityInfo_t misc_model_static_info;
 void SP_misc_G2model(gentity_t *ent);
+extern entityInfo_t misc_G2model_info;
 void SP_misc_portal_camera(gentity_t *ent);
+extern entityInfo_t misc_portal_camera_info;
 void SP_misc_portal_surface(gentity_t *ent);
+extern entityInfo_t misc_portal_surface_info;
 void SP_misc_weather_zone( gentity_t *ent );
+extern entityInfo_t misc_weather_zone_info;
 
 void SP_misc_bsp (gentity_t *ent);
+extern entityInfo_t misc_bsp_info;
 void SP_terrain (gentity_t *ent);
+extern entityInfo_t terrain_info;
 void SP_misc_skyportal_orient (gentity_t *ent);
+extern entityInfo_t misc_skyportal_orient_info;
 void SP_misc_skyportal (gentity_t *ent);
+extern entityInfo_t misc_skyportal_info;
 
 void SP_misc_ammo_floor_unit(gentity_t *ent);
+extern entityInfo_t misc_ammo_floor_unit_info;
 void SP_misc_shield_floor_unit( gentity_t *ent );
+extern entityInfo_t misc_shield_floor_unit_info;
 void SP_misc_model_shield_power_converter( gentity_t *ent );
+extern entityInfo_t misc_model_shield_power_convert_info;
 void SP_misc_model_ammo_power_converter( gentity_t *ent );
+extern entityInfo_t misc_model_ammo_power_converter_info;
 void SP_misc_model_health_power_converter( gentity_t *ent );
+extern entityInfo_t misc_model_health_power_converter_info;
 
 void SP_fx_runner( gentity_t *ent );
 extern entityInfo_t fx_runner_info;
 
 void SP_target_screenshake(gentity_t *ent);
+extern entityInfo_t target_screenshake_info;
 void SP_target_escapetrig(gentity_t *ent);
 
 void SP_misc_maglock ( gentity_t *self );
+extern entityInfo_t misc_maglock_info;
 
 void SP_misc_faller(gentity_t *ent);
 extern entityInfo_t misc_faller_info;
 
 void SP_misc_holocron(gentity_t *ent);
+extern entityInfo_t misc_holocron_info;
 
 void SP_reference_tag ( gentity_t *ent );
+extern entityInfo_t ref_tag_info;
 
 void SP_misc_weapon_shooter( gentity_t *self );
 extern entityInfo_t misc_weapon_shooter_info;
@@ -562,6 +589,7 @@ extern entityInfo_t fx_wind_info; // Lugormod, unused not spawnable
 void SP_point_combat( gentity_t *self );
 
 void SP_shooter_blaster( gentity_t *ent );
+extern entityInfo_t shooter_blaster_info;
 
 void SP_team_CTF_redplayer( gentity_t *ent );
 void SP_team_CTF_blueplayer( gentity_t *ent );
@@ -574,6 +602,7 @@ extern entityInfo_t misc_turret_info;
 void SP_misc_turretG2( gentity_t *base );
 extern entityInfo_t misc_turretG2_info;
 void SP_misc_slotmachine (gentity_t *ent);//Lugormod
+extern entityInfo_t misc_slotmachine_info;
 void SP_ghost_exit (gentity_t *ent);//Lugormod
 void SP_target_fixdoor (gentity_t *ent); //Lugormod
 extern entityInfo_t target_fixdoor_info;
@@ -804,9 +833,9 @@ spawn_t	spawnInitValues[] = {
 	{"info_jedimaster_start", SP_info_jedimaster_start, Logical_True},
 	{"info_player_start_red", SP_info_player_start_red, Logical_True},
 	{"info_player_start_blue", SP_info_player_start_blue, Logical_True},
-	{"info_null", SP_info_null, Logical_True},
-	{"info_notnull", SP_info_notnull, Logical_True},		// use target_position instead
-	{"info_camp", SP_info_camp, Logical_True},
+	{"info_null", SP_info_null, Logical_True, &SP_info_null_info},
+	{"info_notnull", SP_info_notnull, Logical_True, &SP_info_notnull_info},		// use target_position instead
+	{"info_camp", SP_info_camp, Logical_True, &SP_info_camp_info},
 
 	{"info_siege_objective", SP_info_siege_objective, Logical_False},
 	{"info_siege_radaricon", SP_info_siege_radaricon, Logical_False},
@@ -823,7 +852,7 @@ spawn_t	spawnInitValues[] = {
 	{"func_bobbing", SP_func_bobbing, Logical_False, &func_bobbing_info},
 	{"func_pendulum", SP_func_pendulum, Logical_False, &func_pendulum_info},
 	{"func_train", SP_func_train, Logical_False, &func_train_info},
-	{"func_group", SP_info_null, Logical_False},
+	{"func_group", SP_info_null, Logical_False, &SP_info_null_info},
 	{"func_timer", SP_func_timer, Logical_False},			// rename trigger_timer?
 	{"func_breakable", SP_func_breakable, Logical_False, &func_breakable_info},
 	{"func_glass", SP_func_glass, Logical_False, &func_glass_info},
@@ -877,47 +906,47 @@ spawn_t	spawnInitValues[] = {
 	{"target_push", SP_target_push, Logical_True},
 	{"target_powerup", SP_target_powerup, Logical_True}, //Lugormod
 
-	{"light", SP_light, Logical_True},
+	{"light", SP_light, Logical_True, &SP_light_info},
 	{"path_corner", SP_path_corner, Logical_True, &path_corner_info},
 		
-	{"misc_teleporter_dest", SP_misc_teleporter_dest, Logical_True},
+	{"misc_teleporter_dest", SP_misc_teleporter_dest, Logical_True, &misc_teleporter_dest_info},
 	{"defender", SP_defender, Logical_False},
-	{"misc_security_panel", SP_misc_security_panel, Logical_False},
+	{"misc_security_panel", SP_misc_security_panel, Logical_False, &misc_security_panel_info},
 	{"misc_stuff", SP_misc_model_breakable, Logical_False}, //Lugormod
-	{"misc_exploding_crate", SP_misc_exploding_crate, Logical_False}, //Lugormod
-	{"misc_model", SP_misc_model, Logical_False},
-	{"misc_model_static", SP_misc_model_static, Logical_False},
-	{"misc_model_breakable", SP_misc_model_breakable, Logical_False},
+	{"misc_exploding_crate", SP_misc_exploding_crate, Logical_False, &misc_exploding_crate_info}, //Lugormod
+	{"misc_model", SP_misc_model, Logical_False, &misc_model_info},
+	{"misc_model_static", SP_misc_model_static, Logical_False, &misc_model_static_info},
+	{"misc_model_breakable", SP_misc_model_breakable, Logical_False, &misc_model_breakable_info},
 	//{"misc_model_breakable", SP_misc_model_static},
-	{"misc_G2model", SP_misc_G2model, Logical_False},
-	{"misc_portal_surface", SP_misc_portal_surface, Logical_False},
-	{"misc_portal_camera", SP_misc_portal_camera, Logical_False},
-	{"misc_weather_zone", SP_misc_weather_zone, Logical_False},
+	{"misc_G2model", SP_misc_G2model, Logical_False, &misc_G2model_info},
+	{"misc_portal_surface", SP_misc_portal_surface, Logical_False, &misc_portal_surface_info},
+	{"misc_portal_camera", SP_misc_portal_camera, Logical_False, &misc_portal_camera_info},
+	{"misc_weather_zone", SP_misc_weather_zone, Logical_False, &misc_weather_zone_info},
 
-	{"misc_bsp", SP_misc_bsp, Logical_False},
-	{"terrain", SP_terrain, Logical_False},
-	{"misc_skyportal_orient", SP_misc_skyportal_orient, Logical_True},
-	{"misc_skyportal", SP_misc_skyportal, Logical_True},
+	{"misc_bsp", SP_misc_bsp, Logical_False, &misc_bsp_info},
+	{"terrain", SP_terrain, Logical_False, &terrain_info},
+	{"misc_skyportal_orient", SP_misc_skyportal_orient, Logical_True, &misc_skyportal_orient_info},
+	{"misc_skyportal", SP_misc_skyportal, Logical_True, &misc_skyportal_info},
 
 	//rwwFIXMEFIXME: only for testing rmg team stuff
 	{"gametype_item", SP_gametype_item, Logical_False},
 
-	{"misc_ammo_floor_unit", SP_misc_ammo_floor_unit, Logical_False},
-	{"misc_shield_floor_unit", SP_misc_shield_floor_unit, Logical_False},
-	{"misc_model_shield_power_converter", SP_misc_model_shield_power_converter, Logical_False},
-	{"misc_model_ammo_power_converter", SP_misc_model_ammo_power_converter, Logical_False},
-	{"misc_model_health_power_converter", SP_misc_model_health_power_converter, Logical_False},
+	{"misc_ammo_floor_unit", SP_misc_ammo_floor_unit, Logical_False, &misc_ammo_floor_unit_info},
+	{"misc_shield_floor_unit", SP_misc_shield_floor_unit, Logical_False, &misc_shield_floor_unit_info},
+	{"misc_model_shield_power_converter", SP_misc_model_shield_power_converter, Logical_False, &misc_model_shield_power_convert_info},
+	{"misc_model_ammo_power_converter", SP_misc_model_ammo_power_converter, Logical_False, &misc_model_ammo_power_converter_info},
+	{"misc_model_health_power_converter", SP_misc_model_health_power_converter, Logical_False, &misc_model_health_power_converter_info},
 
 	{"fx_runner", SP_fx_runner, Logical_False, &fx_runner_info},
 
-	{"target_screenshake", SP_target_screenshake, Logical_True},
+	{"target_screenshake", SP_target_screenshake, Logical_True, &target_screenshake_info},
 	{"target_escapetrig", SP_target_escapetrig, Logical_True},
 
-	{"misc_maglock", SP_misc_maglock, Logical_False},
+	{"misc_maglock", SP_misc_maglock, Logical_False, &misc_maglock_info},
 
 	{"misc_faller", SP_misc_faller, Logical_True, &misc_faller_info},
 
-	{"ref_tag",	SP_reference_tag, Logical_True},
+	{"ref_tag",	SP_reference_tag, Logical_True, &ref_tag_info},
 	{"ref_tag_huge", SP_reference_tag, Logical_True},
 
 	{"misc_weapon_shooter", SP_misc_weapon_shooter, Logical_True, &misc_weapon_shooter_info},
@@ -1026,9 +1055,9 @@ spawn_t	spawnInitValues[] = {
 
 	{"point_combat", SP_point_combat, Logical_True},
 
-	{"misc_holocron", SP_misc_holocron, Logical_False},
+	{"misc_holocron", SP_misc_holocron, Logical_False, &misc_holocron_info},
 
-	{"shooter_blaster", SP_shooter_blaster, Logical_True},
+	{"shooter_blaster", SP_shooter_blaster, Logical_True, &shooter_blaster_info},
 
 	{"team_CTF_redplayer", SP_team_CTF_redplayer, Logical_True},
 	{"team_CTF_blueplayer", SP_team_CTF_blueplayer, Logical_True},
@@ -1052,7 +1081,7 @@ spawn_t	spawnInitValues[] = {
 	{"rail_mover", SP_rail_mover, Logical_False, &rail_mover_info}, //Lugormod
 	{"rail_track", SP_rail_track, Logical_True, &rail_track_info}, //Lugormod
 	{"rail_lane", SP_rail_lane, Logical_True, &rail_lane_info}, //Lugormod
-	{"misc_slotmachine", SP_misc_slotmachine, Logical_False}, //Lugormod
+	{"misc_slotmachine", SP_misc_slotmachine, Logical_False, &misc_slotmachine_info}, //Lugormod
 	{"ghost_exit_red", SP_ghost_exit, Logical_True}, //Lugormod
 	{"ghost_exit_blue", SP_ghost_exit, Logical_True}, //Lugormod
 	

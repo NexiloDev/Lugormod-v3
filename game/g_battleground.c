@@ -1,4 +1,5 @@
 #include "g_local.h"
+#include "Lmd_Entities_Public.h"
 
 #define CP_TIME             500
 #define CP_RECOVER          250
@@ -275,6 +276,23 @@ int trap_RealTime( qtime_t *qtime );
 //void animate_model (gentity_t *self);
 void SP_misc_model_breakable(gentity_t *ent);
 
+const entityInfoData_t control_point_spawnflags[] = {
+	{"1","The control point cannot be taken. Only valid if \'alliedTeam\' is set to either 1 or 2 (red or blue)"},
+	{"2", "Important control point. Takes longer to hack and reduces the rate the points count down more when controlled"},
+	{NULL, NULL}
+};
+
+const entityInfoData_t control_point_keys[] = {
+	{"alliedTeam", "1 - red team, 2 - blue team"},
+	{"message", "set a message displayed to the owning alliedTeam when someone is trying to steal the control point"},
+	{"model", "optionally choose a model other than the default"},
+	{NULL, NULL},
+};
+entityInfo_t control_point_info = {
+	"For use in battle ground gametype. This is a capturable control point for a team. You must place at least one for each team. If you set the \'alliedTeam\' option on a NPC_Vehicle the control point will only spawn vehicles if owned by the selected team",
+	control_point_spawnflags,
+	control_point_keys
+};
 
 void SP_control_point (gentity_t *ent)
 {

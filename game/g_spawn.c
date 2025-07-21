@@ -558,10 +558,10 @@ void SP_team_CTF_blueplayer( gentity_t *ent );
 void SP_team_CTF_redspawn( gentity_t *ent );
 void SP_team_CTF_bluespawn( gentity_t *ent );
 
-extern entityInfo_t misc_turret_info;
 void SP_misc_turret( gentity_t *ent );
-
+extern entityInfo_t misc_turret_info;
 void SP_misc_turretG2( gentity_t *base );
+extern entityInfo_t misc_turretG2_info;
 void SP_misc_slotmachine (gentity_t *ent);//Lugormod
 void SP_ghost_exit (gentity_t *ent);//Lugormod
 void SP_target_fixdoor (gentity_t *ent); //Lugormod
@@ -1027,8 +1027,8 @@ spawn_t	spawnInitValues[] = {
 
 	{"emplaced_gun", SP_emplaced_gun, Logical_False, &emplaced_gun_info},
 
-	{"misc_turret", SP_misc_turret, Logical_False, &misc_turret_info },
-	{"misc_turretG2", SP_misc_turretG2, Logical_False},
+	{"misc_turret", SP_misc_turret, Logical_False, &misc_turret_info},
+	{"misc_turretG2", SP_misc_turretG2, Logical_False, &misc_turretG2_info},
 	{"misc_camera", SP_misc_camera, Logical_False},//Lugormod
 	{"random_spot", SP_random_spot, Logical_True, &random_spot_info},//Lugormod
 	{"money_dispenser", SP_money_dispenser, Logical_False, &money_dispenser_info},//Lugormod

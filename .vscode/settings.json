@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "lmd_commands_auths.h": "c"
+        "lmd_commands_auths.h": "c",
+        "lmd_accounts_stats.h": "c"
     }
 }

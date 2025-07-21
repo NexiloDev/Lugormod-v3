@@ -7,6 +7,8 @@ gentity_t *Lmd_logic_entity(int index);
 #include "Lmd_Professions.h"
 #include "Lmd_Prof_Merc.h"
 
+#include "Lmd_Entities_Public.h"
+
 //RoboPhred
 extern vmCvar_t lmd_stashdepotime;
 extern vmCvar_t lmd_stashrate;
@@ -435,6 +437,14 @@ void zone_think (gentity_t *ent){
 	ent->nextthink = level.time + 5000;
 }
 
+const entityInfoData_t money_dispenser_keys[] = {
+	{NULL, NULL},
+};
+entityInfo_t money_dispenser_info = {
+	"Spawns a money depo where players can deposit a stash at",
+	NULL,
+	money_dispenser_keys
+};
 
 void SP_money_dispenser (gentity_t *ent){
 	if (g_gametype.integer != GT_FFA) {

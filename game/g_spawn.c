@@ -288,6 +288,7 @@ extern entityInfo_t target_credits_info; // Lugormod
 void SP_random_spot (gentity_t *ent); //Lugormod
 extern entityInfo_t random_spot_info; //Lugormod
 void SP_money_dispenser (gentity_t *ent); //Lugormod
+extern entityInfo_t money_dispenser_info; //Lugormod
 void SP_control_point (gentity_t *ent); //Lugormod
 void SP_misc_camera (gentity_t *ent); //Lugormod
 void SP_info_player_jail (gentity_t *ent); //Lugormod
@@ -1028,7 +1029,7 @@ spawn_t	spawnInitValues[] = {
 	{"misc_turretG2", SP_misc_turretG2, Logical_False},
 	{"misc_camera", SP_misc_camera, Logical_False},//Lugormod
 	{"random_spot", SP_random_spot, Logical_True, &random_spot_info},//Lugormod
-	{"money_dispenser", SP_money_dispenser, Logical_False},//Lugormod
+	{"money_dispenser", SP_money_dispenser, Logical_False, &money_dispenser_info},//Lugormod
 	{"control_point", SP_control_point, Logical_False},//Lugormod
 	{"emplaced_eweb", SP_emplaced_gun, Logical_False},//Lugormod
 	{"target_fixdoor", SP_target_fixdoor, Logical_False, &target_fixdoor_info}, //Lugormod

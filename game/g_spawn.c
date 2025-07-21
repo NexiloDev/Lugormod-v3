@@ -1025,7 +1025,7 @@ spawn_t	spawnInitValues[] = {
 
 	{"item_botroam", SP_item_botroam, Logical_True},
 
-	{"emplaced_gun", SP_emplaced_gun, Logical_False},
+	{"emplaced_gun", SP_emplaced_gun, Logical_False, &emplaced_gun_info},
 
 	{"misc_turret", SP_misc_turret, Logical_False, &misc_turret_info },
 	{"misc_turretG2", SP_misc_turretG2, Logical_False},

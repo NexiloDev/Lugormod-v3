@@ -62,12 +62,12 @@ const entityInfoData_t random_spot_spawnflags[] = {
 };
 
 const entityInfoData_t random_spot_keys[] = {
-  {"", ""},
+  {"origin", "Where the random spot is located (x y z)"},
   {NULL, NULL}
 };
 
 const entityInfo_t random_spot_info = {
-  "A generic stash spawn point for credits. Only works in FFA, Team, Holocron gametypes.",
+  "A location for a stash to randomly spawn. Only works in FFA, Team, Holocron gametypes. Once a stash has spawned it won't use the same spot for another 10 minutes.",
   random_spot_spawnflags,
   random_spot_keys
 };

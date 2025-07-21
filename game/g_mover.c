@@ -1841,6 +1841,17 @@ void SP_func_door (gentity_t *ent)
 	}
 }
 
+const entityInfoData_t target_fixdoor_keys[] = {
+	{"target", "targetname of the func_door to fix"},
+	{NULL, NULL}
+};
+
+const entityInfo_t target_fixdoor_info = {
+	"Spawns a trigger_door for all func_doors with the specified targetname.",
+	target_fixdoor_keys,
+	NULL
+};
+
 void fixdoor(gentity_t *self){
 	//void fixdoor ( gentity_t *self, gentity_t *other, gentity_t *activator ){
 	if (!self->target) {

@@ -561,6 +561,7 @@ void SP_misc_turretG2( gentity_t *base );
 void SP_misc_slotmachine (gentity_t *ent);//Lugormod
 void SP_ghost_exit (gentity_t *ent);//Lugormod
 void SP_target_fixdoor (gentity_t *ent); //Lugormod
+extern entityInfo_t target_fixdoor_info;
 
 //RoboPhred
 
@@ -1022,14 +1023,14 @@ spawn_t	spawnInitValues[] = {
 
 	{"emplaced_gun", SP_emplaced_gun, Logical_False},
 
-	{ "misc_turret", SP_misc_turret, Logical_False, &misc_turret_info },
+	{"misc_turret", SP_misc_turret, Logical_False, &misc_turret_info },
 	{"misc_turretG2", SP_misc_turretG2, Logical_False},
 	{"misc_camera", SP_misc_camera, Logical_False},//Lugormod
 	{"random_spot", SP_random_spot, Logical_True, &random_spot_info},//Lugormod
 	{"money_dispenser", SP_money_dispenser, Logical_False},//Lugormod
 	{"control_point", SP_control_point, Logical_False},//Lugormod
 	{"emplaced_eweb", SP_emplaced_gun, Logical_False},//Lugormod
-	{"target_fixdoor", SP_target_fixdoor, Logical_False}, //Lugormod
+	{"target_fixdoor", SP_target_fixdoor, Logical_False, &target_fixdoor_info}, //Lugormod
 	{"target_credits", SP_target_credits, Logical_True}, //Lugormod
 	{"rail_mover", SP_rail_mover, Logical_False, &rail_mover_info}, //Lugormod
 	{"rail_track", SP_rail_track, Logical_True, &rail_track_info}, //Lugormod

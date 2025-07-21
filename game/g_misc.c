@@ -3237,11 +3237,14 @@ This world effect will spawn space dust globally into the level.
 "count" the number of snow particles (default of 1000)
 */
 //----------------------------------------------------------
-
+const entityInfoData_t fx_spacedust_keys[] = {
+	{"count", "the number of space dust particles (default of 1000)"},
+	{NULL, NULL}
+};
 const entityInfo_t fx_spacedust_info = {
 	"This world effect will spawn space dust globally into the level",
 	NULL,
-	{"count", "the number of space dust particles (default of 1000)"}
+	fx_spacedust_keys
 };
 void SP_CreateSpaceDust( gentity_t *ent )
 {
@@ -3255,10 +3258,14 @@ This world effect will spawn snow globally into the level.
 "count" the number of snow particles (default of 1000)
 */
 //----------------------------------------------------------
+const entityInfoData_t fx_snow_keys[] = {
+	{"count", "the number of snow particles (default of 1000)"},
+	{NULL, NULL}
+};
 const entityInfo_t fx_snow_info = {
 	"This world effect will spawn snow globally into the level",
 	NULL,
-	{"count", "the number of snow particles (default of 1000)"}
+	fx_snow_keys
 };
 void SP_CreateSnow( gentity_t *ent )
 {
@@ -3273,10 +3280,14 @@ This world effect will spawn rain globally into the level.
 "count" the number of rain particles (default of 500)
 */
 //----------------------------------------------------------
+const entityInfoData_t fx_rain_keys[] = {
+	{"count", "the number of rain particles (default of 500)"},
+	{NULL, NULL}
+};
 const entityInfo_t fx_rain_info = {
 	"This world effect will spawn rain globally into the level",
 	NULL,
-	{"count", "the number of rain particles (default of 500)"}
+	fx_rain_keys
 };
 void SP_CreateRain( gentity_t *ent )
 {
@@ -3294,10 +3305,18 @@ void SP_CreateRain( gentity_t *ent )
 	G_EffectIndex(va("*rain init %i", ent->count));
 }
 
+const entityInfoData_t fx_wind_spawnflags[] = {
+	{"2", "make a camera shake effect"},
+	{NULL, NULL}
+};
+const entityInfoData_t fx_wind_keys[] = {
+	{"speed", "speed at which wind is blowing (default 100)"},
+	{NULL, NULL}
+};
 const entityInfo_t fx_wind_info = {
 	"This world effect will spawn wind globally into the level",
-	{"2", "make a camera shake effect"},
-	{"speed", "speed at which wind is blowing (default 100)"}
+	fx_wind_spawnflags,
+	fx_wind_keys
 };
 void SP_CreateWind( gentity_t *ent )
 {

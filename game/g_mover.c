@@ -4001,8 +4001,8 @@ const entityInfoData_t func_usable_keys[] = {
 
 const entityInfo_t func_usable_info = {
   "A bmodel that just sits there, doing nothing. Can be used for conditional walls and models. Disappears when used and reappears when used again.",
-  placeholder_spawnflags,
-  placeholder_keys
+  func_usable_spawnflags,
+  func_usable_keys
 };
 
 //Lugormod

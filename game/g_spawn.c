@@ -465,6 +465,7 @@ void SP_NPC_spawner( gentity_t *self );
 extern entityInfo_t NPC_spawner_info;
 
 void SP_LMD_spawner( gentity_t *NPCspawner );
+extern entityInfo_t LMD_spawner_info;
 
 void SP_NPC_Vehicle( gentity_t *self);
 
@@ -917,7 +918,7 @@ spawn_t	spawnInitValues[] = {
 
 	{"misc_weapon_shooter", SP_misc_weapon_shooter, Logical_True},
 
-	{"lmd_spawner", SP_LMD_spawner, Logical_True},
+	{"lmd_spawner", SP_LMD_spawner, Logical_True, &LMD_spawner_info},
 
 	//new NPC ents
 	{"NPC_spawner", SP_NPC_spawner, Logical_True, &NPC_spawner_info},

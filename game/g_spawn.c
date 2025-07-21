@@ -281,6 +281,7 @@ void SP_gametype_item ( gentity_t* ent )
 }
 
 void SP_emplaced_gun( gentity_t *ent );
+extern entityInfo_t emplaced_gun_info;
 #define SP (~(1 << GT_SINGLE_PLAYER) & ~(1 << GT_SIEGE))
 
 void SP_target_credits( gentity_t *ent ); //Lugormod

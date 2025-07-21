@@ -289,7 +289,7 @@ const entityInfoData_t control_point_keys[] = {
 	{NULL, NULL},
 };
 entityInfo_t control_point_info = {
-	"For use in battle ground gametype. This is a capturable control point for a team. You must place at least one for each team. If you set the \'alliedTeam\' option on a NPC_Vehicle the control point will only spawn vehicles if owned by the selected team",
+	"For use in battle ground gametype. This is a capturable control point for a team. You must place at least one for each team. If you set the \'alliedTeam\' option on a NPC_Vehicle the control point will only spawn vehicles if owned by the selected team. Spawns a control_point_zone when placed. Recommended to save the map with extension \'battleground\' to be loaded by default when the gametype is selected",
 	control_point_spawnflags,
 	control_point_keys
 };

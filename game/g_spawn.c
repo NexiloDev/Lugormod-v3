@@ -1033,7 +1033,7 @@ spawn_t	spawnInitValues[] = {
 	{"random_spot", SP_random_spot, Logical_True, &random_spot_info},//Lugormod
 	{"money_dispenser", SP_money_dispenser, Logical_False, &money_dispenser_info},//Lugormod
 	{"control_point", SP_control_point, Logical_False, &control_point_info},//Lugormod
-	{"emplaced_eweb", SP_emplaced_gun, Logical_False},//Lugormod
+	{"emplaced_eweb", SP_emplaced_gun, Logical_False, &emplaced_gun_info},//Lugormod
 	{"target_fixdoor", SP_target_fixdoor, Logical_False, &target_fixdoor_info}, //Lugormod
 	{"target_credits", SP_target_credits, Logical_True, &target_credits_info}, //Lugormod
 	{"rail_mover", SP_rail_mover, Logical_False, &rail_mover_info}, //Lugormod

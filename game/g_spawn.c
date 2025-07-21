@@ -447,6 +447,7 @@ void SP_misc_model_ammo_power_converter( gentity_t *ent );
 void SP_misc_model_health_power_converter( gentity_t *ent );
 
 void SP_fx_runner( gentity_t *ent );
+extern entityInfo_t fx_runner_info;
 
 void SP_target_screenshake(gentity_t *ent);
 void SP_target_escapetrig(gentity_t *ent);
@@ -454,12 +455,14 @@ void SP_target_escapetrig(gentity_t *ent);
 void SP_misc_maglock ( gentity_t *self );
 
 void SP_misc_faller(gentity_t *ent);
+extern entityInfo_t misc_faller_info;
 
 void SP_misc_holocron(gentity_t *ent);
 
 void SP_reference_tag ( gentity_t *ent );
 
 void SP_misc_weapon_shooter( gentity_t *self );
+extern entityInfo_t misc_weapon_shooter_info;
 
 void SP_NPC_spawner( gentity_t *self );
 extern entityInfo_t NPC_spawner_info;
@@ -905,19 +908,19 @@ spawn_t	spawnInitValues[] = {
 	{"misc_model_ammo_power_converter", SP_misc_model_ammo_power_converter, Logical_False},
 	{"misc_model_health_power_converter", SP_misc_model_health_power_converter, Logical_False},
 
-	{"fx_runner", SP_fx_runner, Logical_False},
+	{"fx_runner", SP_fx_runner, Logical_False, &fx_runner_info},
 
 	{"target_screenshake", SP_target_screenshake, Logical_True},
 	{"target_escapetrig", SP_target_escapetrig, Logical_True},
 
 	{"misc_maglock", SP_misc_maglock, Logical_False},
 
-	{"misc_faller", SP_misc_faller, Logical_True},
+	{"misc_faller", SP_misc_faller, Logical_True, &misc_faller_info},
 
 	{"ref_tag",	SP_reference_tag, Logical_True},
 	{"ref_tag_huge", SP_reference_tag, Logical_True},
 
-	{"misc_weapon_shooter", SP_misc_weapon_shooter, Logical_True},
+	{"misc_weapon_shooter", SP_misc_weapon_shooter, Logical_True, &misc_weapon_shooter_info},
 
 	{"lmd_spawner", SP_LMD_spawner, Logical_True, &LMD_spawner_info},
 
@@ -1017,7 +1020,7 @@ spawn_t	spawnInitValues[] = {
 	{"fx_spacedust", SP_CreateSpaceDust, Logical_True, &fx_spacedust_info},
 	{"fx_rain", SP_CreateRain, Logical_True, &fx_rain_info},
 	{"fx_snow", SP_CreateSnow, Logical_True, &fx_snow_info},
-	//{"fx_wind", SP_CreateWind}, //Lugormod
+	//{"fx_wind", SP_CreateWind, Logical_True, &fx_wind_info}, //Lugormod
 	// if ever used in the future
 
 

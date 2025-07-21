@@ -3185,6 +3185,27 @@ void fx_runner_link( gentity_t *ent )
 }
 
 //----------------------------------------------------------
+const entityInfoData_t fx_runner_spawnflags[] = {
+	{"1", "effect will start in the off state"},
+	{"2", "effect fires once and that's when it\'s used"},
+	{"4", "does radius damage around effect"},
+	{NULL, NULL}
+};
+const entityInfoData_t fx_runner_keys[] = {
+	{"fxFile", "name of the effect file to play"},
+	{"target", "direction to aim the effect in (default to up)"},
+	{"target2", "uses its target2 when the fx gets triggered"},
+	{"splashRadius", "the radius around the origin that the fx is located (default 16)"},
+	{"splashDamage", "the damage to give everything in the splash radius (default is 5)"},
+	{"soundSet", "plays start sound when toggled on, loop sound while on, and a stop sound when turned off"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t fx_runner_info = {
+	"Runs the specified effect. If used it will toggle on/off",
+	fx_runner_spawnflags,
+	fx_runner_keys
+};
 void SP_fx_runner( gentity_t *ent )
 {
 	char *fxFile;
@@ -3641,6 +3662,21 @@ targetname	- if specified, will only spawn when used
 interval	- spawn every so often (milliseconds)
 fudgefactor	- milliseconds between 0 and this number randomly added to interval
 */
+const entityInfoData_t misc_faller_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t misc_faller_keys[] = {
+	{"targetname", "if specified, will only spawn when used"},
+	{"interval", "spawn every so often (milliseconds)"},
+	{"fudgefactor", "milliseconds between 0 and this number randomly added to interval"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_faller_info = {
+	"Raining Stormtroopers?? spawned every interval+random fudgefactor, or if specified, when used. This takes up a lot of temp ents if you let them rain freely.",
+	misc_faller_spawnflags,
+	misc_faller_keys
+};
+
 void SP_misc_faller(gentity_t *ent)
 {
 	G_ModelIndex("models/players/stormtrooper/model.glm");
@@ -4269,6 +4305,27 @@ void misc_weapon_shooter_aim( gentity_t *self )
 #include "../namespace_begin.h"
 extern stringID_table_t WPTable[];
 #include "../namespace_end.h"
+
+const entityInfoData_t misc_weapon_shooter_spawnflags[] = {
+	{"1", "fire the alt-fire of the chosen weapon"},
+	{"2", "keep firing until used again (fires at intervals of \'wait\')"},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_weapon_shooter_keys[] = {
+	{"wait", "debounce time between refires (defaults to 500)"},
+	{"target", "what to aim at (will update aim every frame if it\'s a moving target. if you target a door it will always shoot the door, even if the door moves)"},
+	{"weapon", "specify the weapon to use. Some of these are unstable, or will shut down the server when used, careful with them (default is WP_BLASTER)"},
+	{"targetname", "make the trigger target this value for the entity to be used."},
+	{"", ""},
+	{"", ""},
+	{"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t misc_weapon_shooter_info = {
+	"fires weapon projectiles when used",
+	misc_weapon_shooter_spawnflags,
+	misc_weapon_shooter_keys
+};
 
 void SP_misc_weapon_shooter( gentity_t *self )
 {

@@ -284,13 +284,14 @@ void SP_emplaced_gun( gentity_t *ent );
 #define SP (~(1 << GT_SINGLE_PLAYER) & ~(1 << GT_SIEGE))
 
 void SP_target_credits( gentity_t *ent ); //Lugormod
+extern entityInfo_t target_credits_info; // Lugormod
 void SP_random_spot (gentity_t *ent); //Lugormod
 extern entityInfo_t random_spot_info; //Lugormod
-void SP_money_dispenser (gentity_t *ent);//Lugormod
-void SP_control_point (gentity_t *ent);//Lugormod
+void SP_money_dispenser (gentity_t *ent); //Lugormod
+void SP_control_point (gentity_t *ent); //Lugormod
 void SP_misc_camera (gentity_t *ent); //Lugormod
 void SP_info_player_jail (gentity_t *ent); //Lugormod
-extern entityInfo_t info_player_jail_info;
+extern entityInfo_t info_player_jail_info; //Lugormod
 
 void SP_info_player_start (gentity_t *ent);
 extern entityInfo_t info_player_start_info;
@@ -1031,7 +1032,7 @@ spawn_t	spawnInitValues[] = {
 	{"control_point", SP_control_point, Logical_False},//Lugormod
 	{"emplaced_eweb", SP_emplaced_gun, Logical_False},//Lugormod
 	{"target_fixdoor", SP_target_fixdoor, Logical_False, &target_fixdoor_info}, //Lugormod
-	{"target_credits", SP_target_credits, Logical_True}, //Lugormod
+	{"target_credits", SP_target_credits, Logical_True, &target_credits_info}, //Lugormod
 	{"rail_mover", SP_rail_mover, Logical_False, &rail_mover_info}, //Lugormod
 	{"rail_track", SP_rail_track, Logical_True, &rail_track_info}, //Lugormod
 	{"rail_lane", SP_rail_lane, Logical_True, &rail_lane_info}, //Lugormod

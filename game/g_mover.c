@@ -1847,7 +1847,7 @@ const entityInfoData_t target_fixdoor_keys[] = {
 };
 
 const entityInfo_t target_fixdoor_info = {
-	"Spawns a trigger_door for all func_doors with the specified targetname.",
+	"Spawns a trigger_door for a func_door that has no trigger to open it. Useful on SP maps for quick fixes.",
 	target_fixdoor_keys,
 	NULL
 };

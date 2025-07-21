@@ -1252,6 +1252,18 @@ target_credits
 ==============
 */
 
+const entityInfoData_t target_credits_keys[] = {
+	{"count", "the amount of credits to give the activator"},
+	{"random", "the amount of credits you want to randomly receive. This number is added onto the count. If your count is 20 and you set this to 10 you will receive anywhere from 20-30 credits"},
+	{"targetname", "make the trigger target this value for the entity to be used, the person who triggers this will receive the set amount of credits"},
+	{NULL, NULL},
+};
+entityInfo_t target_credits_info = {
+	"Gives the person who fires this an amount of credits",
+	NULL,
+	target_credits_keys
+};
+
 void Use_Target_Credits (gentity_t *ent, gentity_t *other, gentity_t *activator){
 	//RoboPhred: silly lugor
 	int activatorCreds;

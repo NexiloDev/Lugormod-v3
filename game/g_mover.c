@@ -6,30 +6,6 @@
 #include "Lmd_EntityCore.h"
 #include "Lmd_Entities_Public.h"
 
-
-const entityInfoData_t placeholder_spawnflags[] = {
-  {"1", ""},
-  {"2", ""},
-  {"4", ""},
-  {"8", ""},
-  {"16", ""},
-  {"32", ""},
-  {"64", ""},
-  {"128", ""},
-  {NULL, NULL}
-};
-
-const entityInfoData_t placeholder_keys[] = {
-  {"", ""},
-  {NULL, NULL}
-};
-
-const entityInfo_t placeholder_info = {
-  "",
-  placeholder_spawnflags,
-  placeholder_keys
-};
-
 /*
 ===============================================================================
 
@@ -4335,13 +4311,6 @@ void rail_mover_init (gentity_t *ent) {
 
 
 const entityInfoData_t rail_mover_spawnflags[] = {
-  {"1", ""},
-  {"2", ""},
-  {"4", ""},
-  {"8", ""},
-  {"16", ""},
-  {"32", ""},
-  {"64", ""},
   {"128", "Starts deactivated, is invisible until used"},
   {NULL, NULL}
 };
@@ -4611,6 +4580,24 @@ void SP_rail_track ( gentity_t *ent ) {
 	ent->think = rail_track_init;
 	ent->nextthink = level.time + 100;
 }
+
+const entityInfoData_t rail_lane_spawnflags[] = {
+  {"1", "Starts deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t rail_lane_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"target", "the next something"},
+  {"targetname", "the targetname for the track"},
+  {NULL, NULL}
+};
+
+const entityInfo_t rail_lane_info = {
+  "A bmodel entity that's used in t1_rail to spawn the rail_mover entities. Looks to use a bmodel but not render it.",
+  rail_lane_spawnflags,
+  rail_lane_keys
+};
 
 void SP_rail_lane ( gentity_t *ent ){
 	ent->s.eFlags |= EF_NODRAW;

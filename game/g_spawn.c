@@ -285,6 +285,7 @@ void SP_emplaced_gun( gentity_t *ent );
 
 void SP_target_credits( gentity_t *ent ); //Lugormod
 void SP_random_spot (gentity_t *ent); //Lugormod
+extern entityInfo_t random_spot_info; //Lugormod
 void SP_money_dispenser (gentity_t *ent);//Lugormod
 void SP_control_point (gentity_t *ent);//Lugormod
 void SP_misc_camera (gentity_t *ent); //Lugormod
@@ -353,8 +354,11 @@ extern entityInfo_t func_usable_info;
 void SP_func_wall( gentity_t *ent );
 extern entityInfo_t func_wall_info;
 void SP_rail_mover (gentity_t *ent); //Lugormod
+extern entityInfo_t rail_mover_info;
 void SP_rail_track (gentity_t *ent); //Lugormod
+extern entityInfo_t rail_track_info;
 void SP_rail_lane (gentity_t *ent); //Lugormod
+extern entityInfo_t rail_lane_info;
 
 void SP_trigger_lightningstrike( gentity_t *ent );
 extern entityInfo_t trigger_lightningstrike_info;
@@ -1021,15 +1025,15 @@ spawn_t	spawnInitValues[] = {
 	{ "misc_turret", SP_misc_turret, Logical_False, &misc_turret_info },
 	{"misc_turretG2", SP_misc_turretG2, Logical_False},
 	{"misc_camera", SP_misc_camera, Logical_False},//Lugormod
-	{"random_spot", SP_random_spot, Logical_True},//Lugormod
+	{"random_spot", SP_random_spot, Logical_True, &random_spot_info},//Lugormod
 	{"money_dispenser", SP_money_dispenser, Logical_False},//Lugormod
 	{"control_point", SP_control_point, Logical_False},//Lugormod
 	{"emplaced_eweb", SP_emplaced_gun, Logical_False},//Lugormod
 	{"target_fixdoor", SP_target_fixdoor, Logical_False}, //Lugormod
 	{"target_credits", SP_target_credits, Logical_True}, //Lugormod
-	{"rail_mover", SP_rail_mover, Logical_False}, //Lugormod
-	{"rail_track", SP_rail_track, Logical_True}, //Lugormod
-	{"rail_lane", SP_rail_lane, Logical_True}, //Lugormod
+	{"rail_mover", SP_rail_mover, Logical_False, &rail_mover_info}, //Lugormod
+	{"rail_track", SP_rail_track, Logical_True, &rail_track_info}, //Lugormod
+	{"rail_lane", SP_rail_lane, Logical_True, &rail_lane_info}, //Lugormod
 	{"misc_slotmachine", SP_misc_slotmachine, Logical_False}, //Lugormod
 	{"ghost_exit_red", SP_ghost_exit, Logical_True}, //Lugormod
 	{"ghost_exit_blue", SP_ghost_exit, Logical_True}, //Lugormod

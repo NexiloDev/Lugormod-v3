@@ -468,6 +468,7 @@ void SP_LMD_spawner( gentity_t *NPCspawner );
 extern entityInfo_t LMD_spawner_info;
 
 void SP_NPC_Vehicle( gentity_t *self);
+extern entityInfo_t NPC_Vehicle_info;
 
 void SP_NPC_Kyle( gentity_t *self );
 void SP_NPC_Lando( gentity_t *self );
@@ -922,7 +923,7 @@ spawn_t	spawnInitValues[] = {
 
 	//new NPC ents
 	{"NPC_spawner", SP_NPC_spawner, Logical_True, &NPC_spawner_info},
-	{"NPC_Vehicle", SP_NPC_Vehicle, Logical_True},
+	{"NPC_Vehicle", SP_NPC_Vehicle, Logical_True, &NPC_Vehicle_info},
 	{"NPC_Kyle", SP_NPC_Kyle, Logical_True},
 	{"NPC_Lando", SP_NPC_Lando, Logical_True},
 	{"NPC_Jan", SP_NPC_Jan, Logical_True},

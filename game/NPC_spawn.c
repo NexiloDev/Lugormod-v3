@@ -2646,6 +2646,30 @@ void NPC_VehicleSpawnUse( gentity_t *self, gentity_t *other, gentity_t *activato
 	}
 }
 
+const entityInfoData_t NPC_Vehicle_spawnflags[] = {
+	{"1", "die after certain amount of time of not having a pilot"},
+	{"2", "Fighters: Don't drop until someone gets in it. this only works if it's never been used. ships in trigger_space will never drop when unoccupied"},
+	{"16", "spawn on the floor instead of floating around in the air"},
+	{"32", "Will spawn with no default AI (BS_CINEMATIC) or won't blink when spawned"},
+	{"64", "Starts not solid"},
+	{"256", "Spawner is shy (wont spawn if a player is looking at it)"},
+	{NULL, NULL}
+};
+const entityInfoData_t NPC_Vehicle_keys[] = {
+	{"dropTime", "use with spawnflags 2, the vehicle will drop straight down for this number of seconds before flying forward"},
+	{"dmg", "use with spawnflags 1, delay in milliseconds for ship to explode if no pilot (default 10000)"},
+	{"speed", "se with spawnflags 1, distance for pilot to get away from ship after dismounting before it starts counting down the death timer"},
+	{"model2", "if the vehicle can have a droid, this NPC will be spawned and placed there"},
+	{"showhealth", "set to 1 to show health bar on this entity when crosshair is over it"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t NPC_Vehicle_info = {
+	"Spawns a NPC Vehicle, please note the entity name is case sensitive",
+	NPC_Vehicle_spawnflags,
+	NPC_Vehicle_keys
+};
+
 void SP_NPC_Vehicle( gentity_t *self)
 {
 	/* done in g_spawn now

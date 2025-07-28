@@ -325,7 +325,9 @@ extern entityInfo_t info_player_intermission_blue_info;
 void SP_info_jedimaster_start (gentity_t *ent);
 extern entityInfo_t info_jedimaster_start_info;
 void SP_info_player_start_red (gentity_t *ent);
+extern entityInfo_t info_player_start_red_info;
 void SP_info_player_start_blue (gentity_t *ent);
+extern entityInfo_t info_player_start_blue_info;
 void SP_info_firstplace(gentity_t *ent);
 void SP_info_secondplace(gentity_t *ent);
 void SP_info_thirdplace(gentity_t *ent);
@@ -837,8 +839,8 @@ spawn_t	spawnInitValues[] = {
 	{"info_player_intermission_red", SP_info_player_intermission_red, Logical_True, &info_player_intermission_red_info},
 	{"info_player_intermission_blue", SP_info_player_intermission_blue, Logical_True, &info_player_intermission_blue_info},
 	{"info_jedimaster_start", SP_info_jedimaster_start, Logical_True, &info_jedimaster_start_info,
-	{"info_player_start_red", SP_info_player_start_red, Logical_True},
-	{"info_player_start_blue", SP_info_player_start_blue, Logical_True},
+	{"info_player_start_red", SP_info_player_start_red, Logical_True, &info_player_start_red_info},
+	{"info_player_start_blue", SP_info_player_start_blue, Logical_True}, &info_player_start_blue_info,
 	{"info_null", SP_info_null, Logical_True, &SP_info_null_info},
 	{"info_notnull", SP_info_notnull, Logical_True, &SP_info_notnull_info},		// use target_position instead
 	{"info_camp", SP_info_camp, Logical_True, &SP_info_camp_info},

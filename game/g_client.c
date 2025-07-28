@@ -373,6 +373,20 @@ INITIAL - The first time a player enters the game, they will be at an 'initial' 
 "nobots" will prevent bots from using this spot.
 "nohumans" will prevent non-bots from using this spot.
 */
+const entityInfoData_t info_player_start_red_spawnflags[] = {
+	// {"1", "The first time a player enters the game, they will be at an \'initial\' spot."}, // pretty sure INITIAL is a spawnflag and it's not used?
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_start_red_keys[] = {
+	{"nobots", "will prevent bots from using this spot"},
+	{"nohumans", "will prevent non-bots from using this spot"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_start_red_info = {
+	"For Red Team DM starts, equivalent to info_player_deathmatch. Targets will be fired when someone spawns in on them",
+	info_player_start_red_spawnflags,
+	info_player_start_red_keys
+};
 void SP_info_player_start_red(gentity_t *ent) {
 	//RoboPhred
 	if(g_gametype.integer == GT_FFA){
@@ -407,6 +421,20 @@ INITIAL - The first time a player enters the game, they will be at an 'initial' 
 "nobots" will prevent bots from using this spot.
 "nohumans" will prevent non-bots from using this spot.
 */
+const entityInfoData_t info_player_start_blue_spawnflags[] = {
+	// {"1", "The first time a player enters the game, they will be at an \'initial\' spot."}, // pretty sure INITIAL is a spawnflag and it's not used?
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_start_blue_keys[] = {
+	{"nobots", "will prevent bots from using this spot"},
+	{"nohumans", "will prevent non-bots from using this spot"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_start_blue_info = {
+	"For Blue Team DM starts, equivalent to info_player_deathmatch. Targets will be fired when someone spawns in on them",
+	info_player_start_blue_spawnflags,
+	info_player_start_blue_keys
+};
 void SP_info_player_start_blue(gentity_t *ent) {
 	if(g_gametype.integer == GT_FFA){
 		if (disablesenabled && thereIsAPlayerSpawn()) { //Lugormod

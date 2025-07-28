@@ -313,7 +313,9 @@ void SP_info_player_deathmatch (gentity_t *ent);
 extern entityInfo_t info_player_deathmatch_info;
 
 void SP_info_player_siegeteam1 (gentity_t *ent);
+extern entityInfo_t info_player_siegeteam1_info;
 void SP_info_player_siegeteam2 (gentity_t *ent);
+extern entityInfo_t info_player_siegeteam2_info;
 void SP_info_player_intermission (gentity_t *ent);
 void SP_info_player_intermission_red (gentity_t *ent);
 void SP_info_player_intermission_blue (gentity_t *ent);
@@ -825,8 +827,8 @@ spawn_t	spawnInitValues[] = {
 	{"info_player_deathmatch", SP_info_player_deathmatch, Logical_True, &info_player_deathmatch_info},
 	
   // TODO: Info keys
-  {"info_player_siegeteam1", SP_info_player_siegeteam1, Logical_True},
-	{"info_player_siegeteam2", SP_info_player_siegeteam2, Logical_True},
+  	{"info_player_siegeteam1", SP_info_player_siegeteam1, Logical_True, &info_player_siegeteam1_info},
+	{"info_player_siegeteam2", SP_info_player_siegeteam2, Logical_True, &info_player_siegeteam2_info},
 	{"info_player_intermission", SP_info_player_intermission, Logical_True},
 	{"info_player_intermission_red", SP_info_player_intermission_red, Logical_True},
 	{"info_player_intermission_blue", SP_info_player_intermission_blue, Logical_True},

@@ -453,6 +453,23 @@ idealclass - if specified, this spawn point will be considered
 entry in the .scl (siege class) file.
 Targets will be fired when someone spawns in on them.
 */
+const entityInfoData_t info_player_siegeteam1_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_siegeteam1_keys[] = {
+	{"startoff", "if non-0 spawn point will be disabled until used"},
+	{"idealclass", "if specified, this spawn point will be considered \'ideal\' for players of this class. Corresponds to the name entry in the .scl (siege class) file"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_siegeteam1_info = {
+	"Siege team start point for team1. Name and behavior of team1 depends on what is defined in the .siege file for the level. If gametype is not siege this becomes a info_player_deathmatch.",
+	info_player_siegeteam1_spawnflags,
+	info_player_siegeteam1_keys
+};
+
 void SP_info_player_siegeteam1(gentity_t *ent) {
 	int soff = 0;
 
@@ -513,6 +530,22 @@ idealclass - if specified, this spawn point will be considered
 entry in the .scl (siege class) file.
 Targets will be fired when someone spawns in on them.
 */
+const entityInfoData_t info_player_siegeteam2_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_siegeteam2_keys[] = {
+	{"startoff", "if non-0 spawn point will be disabled until used"},
+	{"idealclass", "if specified, this spawn point will be considered \'ideal\' for players of this class. Corresponds to the name entry in the .scl (siege class) file"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_siegeteam2_info = {
+	"Siege team start point for team2. Name and behavior of team2 depends on what is defined in the .siege file for the level. If gametype is not siege this becomes a info_player_deathmatch.",
+	info_player_siegeteam2_spawnflags,
+	info_player_siegeteam2_keys
+};
 void SP_info_player_siegeteam2(gentity_t *ent) {
 	int soff = 0;
 

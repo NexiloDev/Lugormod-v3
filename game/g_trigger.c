@@ -1650,6 +1650,20 @@ If spectator is set, only spectators can use this teleport
 Spectator teleporters are not normally placed in the editor, but are created
 automatically near doors to allow spectators to move through them
 */
+const entityInfoData_t trigger_teleport_spawnflags[] = {
+	{"1", "only spectators can use this teleport"},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_teleport_keys[] = {
+	{"maxs/mins", "bounding box for trigger size"},
+	{"target", "the location to teleport to"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_teleport_info = {
+	"Allows client side prediction of teleportation events. Must point at a target_position, which will be the teleport destination",
+	trigger_teleport_spawnflags,
+	trigger_teleport_keys
+};
 void SP_trigger_teleport( gentity_t *self ) {
 	InitTrigger (self);
 
@@ -1691,9 +1705,26 @@ NO_PROTECTION	*nothing* stops the damage
 "team"			team (1 or 2) to allow hurting (if none then hurt anyone) only applicable for siege
 "dmg"			default 5 (whole numbers only)
 If dmg is set to -1 this brush will use the fade-kill method
-
 */
-
+const entityInfoData_t trigger_hurt_spawnflags[] = {
+	{"1", "The entity will start in its off state"},
+	{"2", "if you target it, it will toggle on and off"},
+	{"4", "supresses playing the sound"},
+	{"8", "*nothing* stops the damage"},
+	{"16", "changes the damage rate to once per second"},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_hurt_keys[] = {
+	{"maxs/mins", "define trigger size"},
+	{"team", "team (1 or 2) to allow hurting (if none then hurt anyone) only applicable for siege"},
+	{"dmg", "default 5 (whole numbers only). -1 is fade-kill method"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_hurt_info = {
+	"Any entity that touches this will be hurt. It does dmg points of damage each server frame. Targeting the trigger will toggle its on / off state",
+	trigger_hurt_spawnflags,
+	trigger_hurt_keys
+};
 void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	int		dflags = DAMAGE_NO_DISMEMBER;
 	//RoboPhred: the hell?

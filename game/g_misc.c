@@ -50,7 +50,7 @@ const entityInfoData_t SP_info_camp_spawnflags[] = {
 	{NULL, NULL}
 };
 const entityInfoData_t SP_info_camp_keys[] = {
-	 "make the trigger target this value for the entity to be used"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
 	{NULL, NULL}
 };
 const entityInfo_t SP_info_camp_info = {

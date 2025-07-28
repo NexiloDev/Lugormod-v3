@@ -334,10 +334,15 @@ void SP_info_thirdplace(gentity_t *ent);
 void SP_info_podium(gentity_t *ent);
 
 void SP_info_siege_objective (gentity_t *ent);
+extern entityInfo_t info_siege_objective_info;
 void SP_info_siege_radaricon (gentity_t *ent);
+extern entityInfo_t info_siege_radaricon_info;
 void SP_info_siege_decomplete (gentity_t *ent);
+extern entityInfo_t info_siege_decomplete_info;
 void SP_target_siege_end (gentity_t *ent);
+extern entityInfo_t target_siege_end_info;
 void SP_misc_siege_item (gentity_t *ent);
+extern entityInfo_t misc_siege_item_info;
 void SP_target_powerup (gentity_t *ent);
 
 void SP_func_plat (gentity_t *ent);
@@ -845,11 +850,11 @@ spawn_t	spawnInitValues[] = {
 	{"info_notnull", SP_info_notnull, Logical_True, &SP_info_notnull_info},		// use target_position instead
 	{"info_camp", SP_info_camp, Logical_True, &SP_info_camp_info},
 
-	{"info_siege_objective", SP_info_siege_objective, Logical_False},
-	{"info_siege_radaricon", SP_info_siege_radaricon, Logical_False},
-	{"info_siege_decomplete", SP_info_siege_decomplete, Logical_True},
-	{"target_siege_end", SP_target_siege_end, Logical_True},
-	{"misc_siege_item", SP_misc_siege_item, Logical_False},
+	{"info_siege_objective", SP_info_siege_objective, Logical_False, &info_siege_objective_info},
+	{"info_siege_radaricon", SP_info_siege_radaricon, Logical_False, &info_siege_radaricon_info},
+	{"info_siege_decomplete", SP_info_siege_decomplete, Logical_True, &info_siege_decomplete_info},
+	{"target_siege_end", SP_target_siege_end, Logical_True, &target_siege_end_info},
+	{"misc_siege_item", SP_misc_siege_item, Logical_False, &misc_siege_item_info},
 
   // TODO: Info keys
 	{"func_plat", SP_func_plat, Logical_False, &func_plat_info},

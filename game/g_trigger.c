@@ -1185,6 +1185,19 @@ trigger_visible_use ( gentity_t *self, gentity_t *other, gentity_t *activator )
 	self->use = NULL;
 }
 
+const entityInfoData_t trigger_visible_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_visible_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_visible_info = {
+	"No documentation provided but used in spots where a ent is expected.",
+	trigger_visible_spawnflags,
+	trigger_visible_keys
+};
 void SP_trigger_visible (gentity_t *ent)
 {
 	if (ent->targetname) {

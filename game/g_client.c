@@ -597,6 +597,19 @@ The intermission will be viewed from this point.  Target an info_notnull for the
 RED - In a Siege game, the intermission will happen here if the Red (attacking) team wins
 BLUE - In a Siege game, the intermission will happen here if the Blue (defending) team wins
 */
+const entityInfoData_t info_player_intermission_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_intermission_keys[] = {
+	{"target", "target an info_notnull for the view direction"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_intermission_info = {
+	"The intermission will be viewed from this point. Might be removed.",
+	info_player_intermission_spawnflags,
+	info_player_intermission_keys
+};
 void SP_info_player_intermission( gentity_t *ent ) {
 
 }
@@ -608,6 +621,20 @@ In a Siege game, the intermission will happen here if the Red (attacking) team w
 target - ent to look at
 target2 - ents to use when this intermission point is chosen
 */
+const entityInfoData_t info_player_intermission_red_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_intermission_red_keys[] = {
+	{"target", "target an info_notnull for the view direction"},
+	{"target2", "ents to use when this intermission point is chosen"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_intermission_red_info = {
+	"The intermission will be viewed from this point if red wins. Might be removed.",
+	info_player_intermission_red_spawnflags,
+	info_player_intermission_red_keys
+};
 void SP_info_player_intermission_red( gentity_t *ent ) {
 
 }
@@ -619,6 +646,20 @@ In a Siege game, the intermission will happen here if the Blue (defending) team 
 target - ent to look at
 target2 - ents to use when this intermission point is chosen
 */
+const entityInfoData_t info_player_intermission_blue_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_intermission_blue_keys[] = {
+	{"target", "target an info_notnull for the view direction"},
+	{"target2", "ents to use when this intermission point is chosen"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_intermission_blue_info = {
+	"The intermission will be viewed from this point if blue wins. Might be removed.",
+	info_player_intermission_blue_spawnflags,
+	info_player_intermission_blue_keys
+};
 void SP_info_player_intermission_blue( gentity_t *ent ) {
 
 }
@@ -864,6 +905,19 @@ gentity_t *gJMSaberEnt = NULL;
 /*QUAKED info_jedimaster_start (1 0 0) (-16 -16 -24) (16 16 32)
 "jedi master" saber spawn point
 */
+const entityInfoData_t info_jedimaster_start_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_jedimaster_start_keys[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t info_jedimaster_start_info = {
+	"Saber spawn point for \'Jedi Master\' gametype. If the gametype is something else the ent is removed.",
+	info_jedimaster_start_spawnflags,
+	info_jedimaster_start_keys
+};
 void SP_info_jedimaster_start(gentity_t *ent)
 {
 	if (g_gametype.integer != GT_JEDIMASTER)

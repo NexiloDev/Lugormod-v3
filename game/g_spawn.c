@@ -363,6 +363,7 @@ void SP_func_train (gentity_t *ent);
 extern entityInfo_t func_train_info;
 
 void SP_func_timer (gentity_t *self);
+extern entityInfo_t func_timer_info;
 void SP_func_breakable (gentity_t *ent);
 extern entityInfo_t func_breakable_info;
 void SP_func_glass (gentity_t *ent);
@@ -394,8 +395,11 @@ extern entityInfo_t trigger_push_info;
 void SP_trigger_space(gentity_t *self);
 extern entityInfo_t trigger_space_info;
 void SP_trigger_shipboundary(gentity_t *self);
+extern entityInfo_t trigger_shipboundary_info;
 void SP_trigger_hyperspace(gentity_t *self);
+extern entityInfo_t trigger_hyperspace_info;
 void SP_trigger_asteroid_field(gentity_t *self);
+extern entityInfo_t trigger_asteroid_field_info;
 
 void SP_trigger_always (gentity_t *ent);
 void SP_trigger_visible (gentity_t *ent);
@@ -866,7 +870,7 @@ spawn_t	spawnInitValues[] = {
 	{"func_pendulum", SP_func_pendulum, Logical_False, &func_pendulum_info},
 	{"func_train", SP_func_train, Logical_False, &func_train_info},
 	{"func_group", SP_info_null, Logical_False, &SP_info_null_info},
-	{"func_timer", SP_func_timer, Logical_False},			// rename trigger_timer?
+	{"func_timer", SP_func_timer, Logical_False, &func_timer_info},			// rename trigger_timer?
 	{"func_breakable", SP_func_breakable, Logical_False, &func_breakable_info},
 	{"func_glass", SP_func_glass, Logical_False, &func_glass_info},
 	{"func_usable", SP_func_usable, Logical_False, &func_usable_info},
@@ -884,9 +888,9 @@ spawn_t	spawnInitValues[] = {
 	{"trigger_push", SP_trigger_push, Logical_False, &trigger_push_info},
 
 	{"trigger_space", SP_trigger_space, Logical_False, &trigger_space_info},
-	{"trigger_shipboundary", SP_trigger_shipboundary, Logical_False},
-	{"trigger_hyperspace", SP_trigger_hyperspace, Logical_False},
-	{"trigger_asteroid_field", SP_trigger_asteroid_field, Logical_False},
+	{"trigger_shipboundary", SP_trigger_shipboundary, Logical_False, &trigger_shipboundary_info},
+	{"trigger_hyperspace", SP_trigger_hyperspace, Logical_False, &trigger_hyperspace_info},
+	{"trigger_asteroid_field", SP_trigger_asteroid_field, Logical_False, &trigger_asteroid_field_info},
 
 	{"trigger_teleport", SP_trigger_teleport, Logical_False},
 	{"trigger_hurt", SP_trigger_hurt, Logical_False},

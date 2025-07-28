@@ -2048,6 +2048,20 @@ causes vehicle to turn toward target and travel in that direction for a set time
 "traveltime"	time to travel in this direction
 
 */
+const entityInfoData_t trigger_shipboundary_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_shipboundary_keys[] = {
+	{"target", "name of entity to turn toward (can be info_notnull, or whatever)"},
+	{"traveltime", "time to travel in this direction"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_shipboundary_info = {
+	"causes vehicle to turn toward target and travel in that direction for a set time when hit",
+	trigger_shipboundary_spawnflags,
+	trigger_shipboundary_keys
+};
 void SP_trigger_shipboundary(gentity_t *self)
 {
 	InitTrigger(self);
@@ -2185,6 +2199,20 @@ Ship will turn to face the angles of the first target_position then fly forward,
 "target"		whatever position the ship teleports from in relation to the target_position specified here, that's the relative position the ship will spawn at around the target2 target_position
 "target2"		name of target_position to teleport the ship to (will be relative to it's origin)
 */
+const entityInfoData_t trigger_hyperspace_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_hyperspace_keys[] = {
+	{"target", "whatever position the ship teleports from in relation to the target_position specified here, that's the relative position the ship will spawn at around the target2 target_position"},
+	{"target2", "name of target_position to teleport the ship to (will be relative to it's origin)"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_hyperspace_info = {
+	"Ship will turn to face the angles of the first target_position then fly forward, playing the hyperspace effect, then pop out at a relative point around the target",
+	trigger_hyperspace_spawnflags,
+	trigger_hyperspace_keys
+};
 void SP_trigger_hyperspace(gentity_t *self)
 {
 	//register the hyperspace end sound (start sounds are customized)
@@ -2230,6 +2258,22 @@ so, the basic time between firing is a random time between
 (wait - random) and (wait + random)
 
 */
+const entityInfoData_t func_timer_spawnflags[] = {
+	{"1", "start on"},
+	{NULL, NULL}
+};
+const entityInfoData_t func_timer_keys[] = {
+	{"wait", "base time between triggering all targets, default is 1"},
+	{"random", "wait variance (+/- each direction), default is 0"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{"target", "targets to fire"},
+	{NULL, NULL}
+};
+const entityInfo_t func_timer_info = {
+	"This should be renamed trigger_timer... Repeatedly fires its targets. Can be turned on or off by using.",
+	func_timer_spawnflags,
+	func_timer_keys
+};
 void func_timer_think( gentity_t *self ) {
 	G_UseTargets (self, self->activator);
 	// set time before next firing
@@ -2440,6 +2484,21 @@ speed - how fast, on average, the asteroid moves
 count - how many asteroids, max, to have at one time
 target - target this at func_rotating asteroids
 */
+const entityInfoData_t trigger_asteroid_field_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_asteroid_field_keys[] = {
+	{"speed", "how fast, on average, the asteroid moves"},
+	{"count", "how many asteroids, max, to have at one time"},
+	{"target", "target this at func_rotating asteroids"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_asteroid_field_info = {
+	"Something like t3_byss asteroid field",
+	trigger_asteroid_field_spawnflags,
+	trigger_asteroid_field_keys
+};
 void SP_trigger_asteroid_field(gentity_t *self)
 {
 	trap_SetBrushModel( self, self->model );

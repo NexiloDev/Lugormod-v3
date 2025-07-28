@@ -402,6 +402,7 @@ void SP_trigger_asteroid_field(gentity_t *self);
 extern entityInfo_t trigger_asteroid_field_info;
 
 void SP_trigger_always (gentity_t *ent);
+extern entityInfo_t trigger_always_info;
 void SP_trigger_visible (gentity_t *ent);
 void SP_trigger_teleport (gentity_t *ent);
 extern entityInfo_t trigger_teleport_info;
@@ -896,7 +897,7 @@ spawn_t	spawnInitValues[] = {
 
 	{"trigger_teleport", SP_trigger_teleport, Logical_False, &trigger_teleport_info},
 	{"trigger_hurt", SP_trigger_hurt, Logical_False, &trigger_hurt_info},
-	{"trigger_always", SP_trigger_always, Logical_True},
+	{"trigger_always", SP_trigger_always, Logical_True, &trigger_always_info},
 	{"trigger_visible", SP_trigger_visible, Logical_True},
 
 

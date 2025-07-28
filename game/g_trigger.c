@@ -1091,6 +1091,20 @@ void trigger_always_think( gentity_t *ent ) {
 /*QUAKED trigger_always (.5 .5 .5) (-8 -8 -8) (8 8 8)
 This trigger will always fire.  It is activated by the world.
 */
+const entityInfoData_t trigger_always_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_always_keys[] = {
+	{"target", "target to fire"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_always_info = {
+	"This trigger will always fire.  It is activated by the world.",
+	trigger_always_spawnflags,
+	trigger_always_keys
+};
 void SP_trigger_always (gentity_t *ent) {
 	// we must have some delay to make sure our use targets are present
 	// needs to be very long it seems

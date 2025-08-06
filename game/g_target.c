@@ -925,6 +925,20 @@ Set "count" to 0-7 for color.
 Closest target_location in sight used for the location, if none
 in site, closest in distance
 */
+const entityInfoData_t target_location_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_location_keys[] = {
+	{"message", "the name of this location"},
+	{"count", "0-7 for color. 0 - white, 1 - red, 2 - green, etc."},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_location_info = {
+	"Closest target_location in sight used for the location, if none in site, closest in distance",
+	target_location_spawnflags,
+	target_location_keys
+};
 void SP_target_location( gentity_t *self ){
 	self->think = target_location_linkup;
 	self->nextthink = level.time + 200;  // Let them all spawn first

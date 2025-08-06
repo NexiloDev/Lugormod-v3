@@ -437,6 +437,7 @@ extern entityInfo_t target_kill_info;
 void SP_target_position (gentity_t *ent);
 extern entityInfo_t target_position_info;
 void SP_target_location (gentity_t *ent);
+extern entityInfo_t target_location_info;
 void SP_target_counter (gentity_t *self);
 void SP_target_random (gentity_t *self);
 void SP_target_scriptrunner( gentity_t *self );
@@ -926,7 +927,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_relay", SP_target_relay, Logical_True, &target_relay_info},
 	{"target_kill", SP_target_kill, Logical_True, &target_kill_info},
 	{"target_position", SP_target_position, Logical_True, &target_position_info},
-	{"target_location", SP_target_location, Logical_True},
+	{"target_location", SP_target_location, Logical_True, &target_location_info},
 	{"target_counter", SP_target_counter, Logical_True},
 	{"target_random", SP_target_random, Logical_True},
 	{"target_scriptrunner", SP_target_scriptrunner, qfalse},

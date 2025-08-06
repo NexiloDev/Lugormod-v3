@@ -867,6 +867,18 @@ void SP_target_kill( gentity_t *self ) {
 /*QUAKED target_position (0 0.5 0) (-4 -4 -4) (4 4 4)
 Used as a positional target for in-game calculation, like jumppad targets.
 */
+const entityInfoData_t target_position_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_position_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_position_info = {
+	"Used as a positional target for in-game calculation, like jumppad targets.",
+	target_position_spawnflags,
+	target_position_keys
+};
 void SP_target_position( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 	/*

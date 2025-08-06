@@ -1047,7 +1047,20 @@ Randomly fires off only one of it's targets each time used
 
 USEONCE	set to never fire again
 */
-
+const entityInfoData_t target_random_spawnflags[] = {
+	{"1", "Fire once then disable itself"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_random_keys[] = {
+	{"target", "should target more than one entity, it will only fire at one of its targets."},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_random_info = {
+	"Randomly fires off only one of it\'s targets each time used",
+	target_random_spawnflags,
+	target_random_keys
+};
 void target_random_use(gentity_t *self, gentity_t *other, gentity_t *activator)
 {
 	int			t_count = 0, pick;
@@ -1242,6 +1255,24 @@ wait - can't be used again in this amount of seconds (Default is 1 second if it'
 delay - how long to wait after use to run script
 
 */
+const entityInfoData_t target_scriptrunner_spawnflags[] = {
+	{"1", "Will run the script on the entity that used this or tripped the trigger that used this"},
+	{"128", "Will start in the off state"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_scriptrunner_keys[] = {
+	{"useScript", "script to run when used. ex: close_door_cinematic"},
+	{"count", "how many times to run, -1 = infinite.  Default is once"},
+	{"wait", "can\'t be used again in this amount of seconds (Default is 1 second if it\'s multiple-use)"},
+	{"delay", "how long to wait after use to run script"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_scriptrunner_info = {
+	"Starts a script once used.",
+	target_scriptrunner_spawnflags,
+	target_scriptrunner_keys
+};
 void SP_target_scriptrunner( gentity_t *self )
 {
 	/*

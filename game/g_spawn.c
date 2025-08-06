@@ -441,7 +441,9 @@ extern entityInfo_t target_location_info;
 void SP_target_counter (gentity_t *self);
 extern entityInfo_t target_counter_info;
 void SP_target_random (gentity_t *self);
+extern entityInfo_t target_random_info;
 void SP_target_scriptrunner( gentity_t *self );
+extern entityInfo_t target_scriptrunner_info;
 void SP_target_interest (gentity_t *self);
 void SP_target_activate (gentity_t *self);
 void SP_target_deactivate (gentity_t *self);
@@ -930,8 +932,8 @@ spawn_t	spawnInitValues[] = {
 	{"target_position", SP_target_position, Logical_True, &target_position_info},
 	{"target_location", SP_target_location, Logical_True, &target_location_info},
 	{"target_counter", SP_target_counter, Logical_True, &target_counter_info},
-	{"target_random", SP_target_random, Logical_True},
-	{"target_scriptrunner", SP_target_scriptrunner, qfalse},
+	{"target_random", SP_target_random, Logical_True, &target_random_info},
+	{"target_scriptrunner", SP_target_scriptrunner, qfalse, &target_scriptrunner_info},
 	{"target_interest", SP_target_interest, Logical_True},
 	{"target_activate", SP_target_activate, Logical_True},
 	{"target_deactivate", SP_target_deactivate, Logical_True},

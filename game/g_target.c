@@ -841,6 +841,20 @@ void SP_target_relay (gentity_t *self) {
 /*QUAKED target_kill (.5 .5 .5) (-8 -8 -8) (8 8 8)
 Kills the activator.
 */
+
+const entityInfoData_t target_kill_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_kill_keys[] = {
+	{"target", "target a player to kill them"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_kill_info = {
+	"Kills the activator.",
+	target_kill_keys,
+	target_kill_spawnflags
+};
 void target_kill_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	G_ActivateBehavior(self,BSET_USE);
 	G_Damage ( activator, NULL, NULL, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);

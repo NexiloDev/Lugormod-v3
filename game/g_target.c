@@ -957,6 +957,23 @@ After the counter has been triggered "count" times (default 2), it will fire all
 
 bounceCount - number of times the counter should reset to it's full count when it's done
 */
+const entityInfoData_t target_counter_spawnflags[] = {
+	{"1", "Start Inactive, must be hit by a target_activate to be able to be used."},
+	{NULL, NULL}
+};
+const entityInfoData_t target_counter_keys[] = {
+	{"target", "what to first fire at when the entity as been hit a certain amount of times."},
+	{"target2", "fires this every time you target the entity and it isnt at its count"},
+	{"count", "the amount of times to be hit for firing its target (default 2)"},
+	{"bounceCount", "set this at -1 so the entity will never stop working, otherwise after the first use it will stop working. if you set bouncecount to 5 then after the fifth use it will stop working."},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_counter_info = {
+	"You have to use this entity a specified amount of times for it to fire at its target, the default is 2 times ravensoft made it so it will deactivate after it gets hit a certain amount of times",
+	target_counter_spawnflags,
+	target_counter_keys
+};
 extern void G_DebugPrint( int level, const char *format, ... );
 void target_counter_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 {

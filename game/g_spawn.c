@@ -454,6 +454,7 @@ extern entityInfo_t target_level_change_info;
 void SP_target_play_music( gentity_t *self );
 extern entityInfo_t target_play_music_info;
 void SP_target_push (gentity_t *ent);
+extern entityInfo_t target_push_info;
 
 void SP_light (gentity_t *self);
 extern entityInfo_t SP_light_info;
@@ -943,7 +944,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_deactivate", SP_target_deactivate, Logical_True, &target_deactivate_info},
 	{"target_level_change", SP_target_level_change, Logical_True, &target_level_change_info},
 	{"target_play_music", SP_target_play_music, Logical_True, &target_play_music_info},
-	{"target_push", SP_target_push, Logical_True},
+	{"target_push", SP_target_push, Logical_True, &target_push_info},
 	{"target_powerup", SP_target_powerup, Logical_True}, //Lugormod
 
 	{"light", SP_light, Logical_True, &SP_light_info},

@@ -1602,6 +1602,23 @@ Pushes the activator in the direction.of angle, or towards a target apex.
 "speed"		defaults to 1000
 if "bouncepad", play bounce noise instead of none
 */
+
+const entityInfoData_t target_push_spawnflags[] = {
+	{"1", "play bounce noise"},
+	{"2", "will push activator at constant speed, speed does need to be set for this to work"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_push_keys[] = {
+	{"speed", "speed to push activator (default 1000)"},
+	{"target", "a target_position to aim at"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_push_info = {
+	"will push activator in direction of \'target\' at constant \'speed\'. Should target a target_position.",
+	target_push_spawnflags,
+	target_push_keys
+};
 void SP_target_push( gentity_t *self ) {
 	if (!self->speed) {
 		self->speed = 1000;

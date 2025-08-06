@@ -746,11 +746,20 @@ wait - set to -1 to use it only once
 */
 
 const entityInfoData_t target_relay_spawnflags[] = {
+	{"1", "only red team can use this"},
+	{"", "only blue team can use this"},
 	{"4", "makes the target get fired off randomly, currently this only works for target1"},
+	{"128", "makes the entity start deactivated"},
 	{NULL, NULL}
 };
 const entityInfoData_t target_relay_keys[] = {
 	{"wait", "set to -1 to use it only once"},
+	{"target", "the first target to fire"},
+	{"target2", "the second target to fire"},
+	{"target3", "the third target to fire"},
+	{"target4", "the fourth target to fire"},
+	{"target5", "the fifth target to fire"},
+	{"target6", "the sixth target to fire"},
 	{"targetname", "make the trigger target this value for the entity to be used"},
 	{NULL, NULL}
 };

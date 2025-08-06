@@ -99,6 +99,20 @@ void SP_target_remove_powerups( gentity_t *ent ) {
 
 //==========================================================
 
+const entityInfoData_t target_powerup_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_powerup_keys[] = {
+	{"powerup", "powerup to give to the player (number 1-15)"},
+	{"wait", "duration in seconds"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_powerup_info = {
+	"Sets a powerup to the player.",
+	target_powerup_spawnflags,
+	target_powerup_keys
+};
 void Use_target_powerup( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	if( !activator->client ) {
 		return;

@@ -344,6 +344,7 @@ extern entityInfo_t target_siege_end_info;
 void SP_misc_siege_item (gentity_t *ent);
 extern entityInfo_t misc_siege_item_info;
 void SP_target_powerup (gentity_t *ent);
+extern entityInfo_t target_powerup_info;
 
 void SP_func_plat (gentity_t *ent);
 extern entityInfo_t func_plat_info;
@@ -945,7 +946,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_level_change", SP_target_level_change, Logical_True, &target_level_change_info},
 	{"target_play_music", SP_target_play_music, Logical_True, &target_play_music_info},
 	{"target_push", SP_target_push, Logical_True, &target_push_info},
-	{"target_powerup", SP_target_powerup, Logical_True}, //Lugormod
+	{"target_powerup", SP_target_powerup, Logical_True, &target_powerup_info}, //Lugormod
 
 	{"light", SP_light, Logical_True, &SP_light_info},
 	{"path_corner", SP_path_corner, Logical_True, &path_corner_info},

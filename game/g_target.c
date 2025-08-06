@@ -1460,6 +1460,19 @@ void target_level_change_use(gentity_t *self, gentity_t *other, gentity_t *activ
 /*QUAKED target_level_change (1 0 0) (-4 -4 -4) (4 4 4)
 "mapname" - Name of map to change to
 */
+const entityInfoData_t target_level_change_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_level_change_keys[] = {
+	{"mapname", "Name of map to change to"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_level_change_info = {
+	"changes the map to whatever you specify when this entity gets used. This is dangerous in older lugormod versions or if not used with OpenJK. Escape sequences and the \';\' can be used in the mapname key maliciously. Use with care and/or remove.",
+	target_level_change_spawnflags,
+	target_level_change_keys
+};
 void SP_target_level_change( gentity_t *self )
 {
 	//RoboPhred
@@ -1501,6 +1514,19 @@ If an intro file and loop file are specified, the intro plays first, then the lo
 portion will start and loop indefinetly.  If no introfile is entered, only the loopfile
 will play.
 */
+const entityInfoData_t target_play_music_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_play_music_keys[] = {
+	{"music", "music WAV or MP3 file ex: music/introfile.mp3 or music/loopfile.mp3"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_play_music_info = {
+	"Plays the requested music files when this target is used.",
+	target_play_music_spawnflags,
+	target_play_music_keys
+};
 void SP_target_play_music( gentity_t *self )
 {
 	char *s = NULL;

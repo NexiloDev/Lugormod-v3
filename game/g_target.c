@@ -1423,6 +1423,24 @@ void SP_target_activate( gentity_t *self )
 /*QUAKED target_deactivate (1 0 0) (-4 -4 -4) (4 4 4)
 Will set the target(s) to be non-usable/triggerable
 */
+const entityInfoData_t target_deactivate_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_deactivate_keys[] = {
+	{"target", "the target to make non-usable/triggerable"},
+	{"target2", "a second target to make non-usable/triggerable"},
+	{"target3", "a third target to make non-usable/triggerable"},
+	{"target4", "a fourth target to make non-usable/triggerable"},
+	{"target5", "a fifth target to make non-usable/triggerable"},
+	{"target6", "a sixth target to make non-usable/triggerable"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_deactivate_info = {
+	"Will set the target(s) to be non-usable/triggerable. Accepts up to 6 targets.",
+	target_deactivate_spawnflags,
+	target_deactivate_keys
+};
 void SP_target_deactivate( gentity_t *self )
 {
 	G_SetOrigin( self, self->s.origin );

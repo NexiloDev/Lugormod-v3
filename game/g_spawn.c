@@ -448,6 +448,7 @@ void SP_target_interest (gentity_t *self);
 void SP_target_activate (gentity_t *self);
 extern entityInfo_t target_activate_info;
 void SP_target_deactivate (gentity_t *self);
+extern entityInfo_t target_deactivate_info;
 void SP_target_level_change( gentity_t *self );
 void SP_target_play_music( gentity_t *self );
 void SP_target_push (gentity_t *ent);
@@ -937,7 +938,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_scriptrunner", SP_target_scriptrunner, qfalse, &target_scriptrunner_info},
 	{"target_interest", SP_target_interest, Logical_True},
 	{"target_activate", SP_target_activate, Logical_True, &target_activate_info},
-	{"target_deactivate", SP_target_deactivate, Logical_True},
+	{"target_deactivate", SP_target_deactivate, Logical_True, &target_deactivate_info},
 	{"target_level_change", SP_target_level_change, Logical_True},
 	{"target_play_music", SP_target_play_music, Logical_True},
 	{"target_push", SP_target_push, Logical_True},

@@ -425,8 +425,9 @@ void SP_target_print (gentity_t *ent);
 extern entityInfo_t target_print_info;
 void SP_target_laser (gentity_t *self);
 extern entityInfo_t target_laser_info;
-void SP_target_character (gentity_t *ent);
+void SP_target_character (gentity_t *ent); // no doc
 void SP_target_score( gentity_t *ent );
+extern entityInfo_t target_score_info;
 void SP_target_teleporter( gentity_t *ent );
 void SP_target_relay (gentity_t *ent);
 void SP_target_kill (gentity_t *ent);
@@ -916,7 +917,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_speaker", SP_target_speaker, {qtrue, target_speaker_allowlogical}, &target_speaker_info},
 	{"target_print", SP_target_print, Logical_True, &target_print_info},
 	{"target_laser", SP_target_laser, Logical_True, &target_laser_info},
-	{"target_score", SP_target_score, Logical_True},
+	{"target_score", SP_target_score, Logical_True, &target_score_info},
 	{"target_teleporter", SP_target_teleporter, Logical_True},
 	{"target_relay", SP_target_relay, Logical_True},
 	{"target_kill", SP_target_kill, Logical_True},

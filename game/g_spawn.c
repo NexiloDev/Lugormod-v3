@@ -431,6 +431,7 @@ extern entityInfo_t target_score_info;
 void SP_target_teleporter( gentity_t *ent );
 extern entityInfo_t target_teleporter_info;
 void SP_target_relay (gentity_t *ent);
+extern entityInfo_t target_relay_info;
 void SP_target_kill (gentity_t *ent);
 void SP_target_position (gentity_t *ent);
 void SP_target_location (gentity_t *ent);
@@ -920,7 +921,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_laser", SP_target_laser, Logical_True, &target_laser_info},
 	{"target_score", SP_target_score, Logical_True, &target_score_info},
 	{"target_teleporter", SP_target_teleporter, Logical_True, &target_teleporter_info},
-	{"target_relay", SP_target_relay, Logical_True},
+	{"target_relay", SP_target_relay, Logical_True, &target_relay_info},
 	{"target_kill", SP_target_kill, Logical_True},
 	{"target_position", SP_target_position, Logical_True},
 	{"target_location", SP_target_location, Logical_True},

@@ -220,6 +220,19 @@ void SP_target_delay( gentity_t *ent ) {
 
 The activator is given this many points.
 */
+const entityInfoData_t target_score_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_score_keys[] = {
+	{"count", "number of points to add, default 1"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_score_info = {
+	"The activator is given this many points.",
+	target_score_keys,
+	target_score_spawnflags
+};
 void Use_Target_Score (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	//RoboPhred
 	if(ent->spawnflags & 1)
@@ -697,6 +710,19 @@ void target_teleporter_use( gentity_t *self, gentity_t *other, gentity_t *activa
 /*QUAKED target_teleporter (1 0 0) (-8 -8 -8) (8 8 8)
 The activator will be teleported away.
 */
+const entityInfoData_t target_teleporter_spawnflags[] = {
+	{"1", "Do not teleport player if they are in a duel."},
+	{NULL, NULL}
+};
+const entityInfoData_t target_teleporter_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_teleporter_info = {
+	"The activator will be teleported away... Use angle or angles keys to change the direction that you teleport in.",
+	target_teleporter_keys,
+	target_teleporter_spawnflags
+};
 void SP_target_teleporter( gentity_t *self ) {
 	//RoboPhred
 	/*Their target is themselvs if neccessary.
@@ -718,6 +744,21 @@ INACTIVE  Can't be used until activated
 
 wait - set to -1 to use it only once
 */
+
+const entityInfoData_t target_relay_spawnflags[] = {
+	{"4", "makes the target get fired off randomly, currently this only works for target1"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_relay_keys[] = {
+	{"wait", "set to -1 to use it only once"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_relay_info = {
+	"Does nothing but fire at its targets, can fire at up to 6 targets it will fire them all at the same time. If random checked, only one will be fired.",
+	target_relay_keys,
+	target_relay_spawnflags
+};
 void target_relay_use (gentity_t *self, gentity_t *other, gentity_t *activator) {
 	qboolean ranscript = qfalse;
 	if ( ( self->spawnflags & 1 ) && activator->client 

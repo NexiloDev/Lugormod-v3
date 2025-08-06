@@ -562,6 +562,19 @@ void SP_target_speaker( gentity_t *ent ) {
 /*QUAKED target_laser (0 .5 .8) (-8 -8 -8) (8 8 8) START_ON
 When triggered, fires a laser.  You can either set a target or a direction.
 */
+const entityInfoData_t target_laser_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_laser_keys[] = {
+	{"target", "make this target a target_position. you don't need to do this you can just set angles"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_laser_info = {
+	"When triggered, fires a laser. You can either set a target or a direction. Starts in the off state so you have to use its targetname for it to turn on",
+	target_laser_keys,
+	target_laser_spawnflags
+};
 void target_laser_think (gentity_t *self) {
 	vec3_t	end;
 	trace_t	tr;

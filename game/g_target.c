@@ -10,6 +10,20 @@
 /*QUAKED target_give (1 0 0) (-8 -8 -8) (8 8 8)
 Gives the activator all the items pointed to.
 */
+const entityInfoData_t target_give_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t target_give_keys[] = {
+	{"target", "the item to give a player"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_give_info = {
+	"Gives the activator all the items pointed to.",
+	target_give_spawnflags,
+	target_give_keys
+};
 void Use_Target_Give( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	gentity_t	*t;
 	trace_t		trace;
@@ -47,6 +61,19 @@ void SP_target_give( gentity_t *ent ) {
 takes away all the activators powerups.
 Used to drop flight powerups into death puts.
 */
+const entityInfoData_t target_remove_powerups_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t target_remove_powerups_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_remove_powerups_info = {
+	"Gives the activator all the items pointed to.",
+	target_remove_powerups_spawnflags,
+	target_remove_powerups_keys
+};
 void Use_target_remove_powerups( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	if( !activator->client ) {
 		return;
@@ -112,6 +139,22 @@ activated again while it is counting down to an event.
 "wait" seconds to pause before firing targets.
 "random" delay variance, total delay = delay +/- random seconds
 */
+const entityInfoData_t target_delay_spawnflags[] = {
+	{"1", "Keeps the delay from resetting the time if it is activated again while it is counting down to an event."},
+	{NULL, NULL}
+};
+const entityInfoData_t target_delay_keys[] = {
+	{"wait", "seconds to pause before firing targets"},
+	{"random", "delay variance, total delay = delay +/- random seconds"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_delay_info = {
+	"This is a great entity for making an entity not fire its target right away, instead it waits the amount of time you set with the \'wait\' key to fire its target.",
+	target_delay_spawnflags,
+	target_delay_keys
+};
+
 //Ufo: multithread option
 void Think_Target_Delay( gentity_t *ent ) {
 	if (ent->spawnflags & 2)

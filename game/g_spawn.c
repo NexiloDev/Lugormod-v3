@@ -411,8 +411,11 @@ void SP_trigger_hurt (gentity_t *ent);
 extern entityInfo_t trigger_hurt_info;
 
 void SP_target_remove_powerups( gentity_t *ent );
+extern entityInfo_t target_remove_powerups_info;
 void SP_target_give (gentity_t *ent);
+extern entityInfo_t target_give_info;
 void SP_target_delay (gentity_t *ent);
+extern entityInfo_t target_delay_info;
 
 qboolean target_speaker_allowlogical();
 void SP_target_speaker (gentity_t *ent);
@@ -904,9 +907,9 @@ spawn_t	spawnInitValues[] = {
 
 	// targets perform no action by themselves, but must be triggered
 	// by another entity
-	{"target_give", SP_target_give, Logical_True},
-	{"target_remove_powerups", SP_target_remove_powerups, Logical_True},
-	{"target_delay", SP_target_delay, Logical_True},
+	{"target_give", SP_target_give, Logical_True, &target_give_info},
+	{"target_remove_powerups", SP_target_remove_powerups, Logical_True, &target_remove_powerups_info},
+	{"target_delay", SP_target_delay, Logical_True, &target_delay_info},
 	{"target_speaker", SP_target_speaker, {qtrue, target_speaker_allowlogical}},
 	{"target_print", SP_target_print, Logical_True},
 	{"target_laser", SP_target_laser, Logical_True},

@@ -230,8 +230,8 @@ const entityInfoData_t target_score_keys[] = {
 };
 const entityInfo_t target_score_info = {
 	"The activator is given this many points.",
-	target_score_keys,
-	target_score_spawnflags
+	target_score_spawnflags,
+	target_score_keys
 };
 void Use_Target_Score (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	//RoboPhred
@@ -469,8 +469,8 @@ const entityInfoData_t target_speaker_keys[] = {
 };
 const entityInfo_t target_speaker_info = {
 	"This entity will play a sound that you specify in a certain radius.",
-	target_speaker_keys,
-	target_speaker_spawnflags
+	target_speaker_spawnflags,
+	target_speaker_keys
 };
 
 void Use_Target_Speaker (gentity_t *ent, gentity_t *other, gentity_t *activator) {
@@ -585,8 +585,8 @@ const entityInfoData_t target_laser_keys[] = {
 };
 const entityInfo_t target_laser_info = {
 	"When triggered, fires a laser. You can either set a target or a direction. Starts in the off state so you have to use its targetname for it to turn on",
-	target_laser_keys,
-	target_laser_spawnflags
+	target_laser_spawnflags,
+	target_laser_keys
 };
 void target_laser_think (gentity_t *self) {
 	vec3_t	end;
@@ -720,8 +720,8 @@ const entityInfoData_t target_teleporter_keys[] = {
 };
 const entityInfo_t target_teleporter_info = {
 	"The activator will be teleported away... Use angle or angles keys to change the direction that you teleport in.",
-	target_teleporter_keys,
-	target_teleporter_spawnflags
+	target_teleporter_spawnflags,
+	target_teleporter_keys
 };
 void SP_target_teleporter( gentity_t *self ) {
 	//RoboPhred
@@ -765,8 +765,8 @@ const entityInfoData_t target_relay_keys[] = {
 };
 const entityInfo_t target_relay_info = {
 	"Does nothing but fire at its targets, can fire at up to 6 targets it will fire them all at the same time. If random checked, only one will be fired.",
-	target_relay_keys,
-	target_relay_spawnflags
+	target_relay_spawnflags,
+	target_relay_keys
 };
 void target_relay_use (gentity_t *self, gentity_t *other, gentity_t *activator) {
 	qboolean ranscript = qfalse;
@@ -852,8 +852,8 @@ const entityInfoData_t target_kill_keys[] = {
 };
 const entityInfo_t target_kill_info = {
 	"Kills the activator.",
-	target_kill_keys,
-	target_kill_spawnflags
+	target_kill_spawnflags,
+	target_kill_keys
 };
 void target_kill_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	G_ActivateBehavior(self,BSET_USE);

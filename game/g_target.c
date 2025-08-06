@@ -1396,6 +1396,19 @@ void target_deactivate_use(gentity_t *self, gentity_t *other, gentity_t *activat
 /*QUAKED target_activate (1 0 0) (-4 -4 -4) (4 4 4)
 Will set the target(s) to be usable/triggerable
 */
+const entityInfoData_t target_activate_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_activate_keys[] = {
+	{"target", "the target to make usable/triggerable"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_activate_info = {
+	"Will set the target(s) to be usable/triggerable.",
+	target_activate_spawnflags,
+	target_activate_keys
+};
 void SP_target_activate( gentity_t *self )
 {
 	G_SetOrigin( self, self->s.origin );

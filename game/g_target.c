@@ -1401,11 +1401,16 @@ const entityInfoData_t target_activate_spawnflags[] = {
 };
 const entityInfoData_t target_activate_keys[] = {
 	{"target", "the target to make usable/triggerable"},
+	{"target2", "a second target to make usable/triggerable"},
+	{"target3", "a third target to make usable/triggerable"},
+	{"target4", "a fourth target to make usable/triggerable"},
+	{"target5", "a fifth target to make usable/triggerable"},
+	{"target6", "a sixth target to make usable/triggerable"},
 	{"targetname", "make the trigger target this value for the entity to be used"},
 	{NULL, NULL}
 };
 const entityInfo_t target_activate_info = {
-	"Will set the target(s) to be usable/triggerable.",
+	"Will set the target(s) to be usable/triggerable. Accepts up to 6 targets.",
 	target_activate_spawnflags,
 	target_activate_keys
 };

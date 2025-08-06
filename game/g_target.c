@@ -244,6 +244,26 @@ void SP_target_score( gentity_t *ent ) {
 If "private", only the activator gets the message.  If no checks, all clients get the message.
 */
 
+const entityInfoData_t target_print_spawnflags[] = {
+	{"1", "Red team only"},
+	{"2", "Blue team only"},
+	{"4", "Only the person who activated the entity can see the message"},
+	{"8", "Message will appear at top left corner of the screen"},
+	{"16", "Message will appear in area where chat normally appears"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_print_keys[] = {
+	{"message", "text to print"},
+	{"wait", "don\'t fire off again if triggered within this many milliseconds ago"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_print_info = {
+	"This will print a message across the screen. Basically the same as the announce command. If no spawnflag is set, it will make the print global.",
+	target_print_spawnflags,
+	target_print_keys
+};
+
 //RoboPhred
 //Ufo: Added data tags support
 
@@ -419,6 +439,27 @@ Multiple identical looping sounds will just increase volume without any speed co
 "wait" : Seconds between auto triggerings, 0 = don't auto trigger
 "random"	wait variance, default is 0
 */
+
+const entityInfoData_t target_speaker_spawnflags[] = {
+	{"1", "Makes the sound start on, loops the sound when complete"},
+	{"2", "Makes the sound start off"},
+	{"4", "Everybody on the entire map can hear the sound"},
+	{"8", "Only the activator can hear the sound"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_speaker_keys[] = {
+	{"noise", "wav file to play. ex: sound/ambience/narshaddaa/cantina_1.mp3"},
+	{"wait", "seconds between auto triggerings, 0 = don't auto trigger"},
+	{"random", "wait variance, default is 0"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_speaker_info = {
+	"This entity will play a sound that you specify in a certain radius.",
+	target_speaker_keys,
+	target_speaker_spawnflags
+};
+
 void Use_Target_Speaker (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	G_ActivateBehavior(ent,BSET_USE);
 

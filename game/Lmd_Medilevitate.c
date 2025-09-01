@@ -240,9 +240,9 @@ void lmd_meditate_levitate_end(gentity_t* self)
 {
     G_SetAnim(self, SETANIM_BOTH, BOTH_MEDITATE_END, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 100);
     self->client->ps.stats[STAT_MAX_HEALTH] = 100;
-    self->client->ps.forceHandExtendTime = level.time + pm->ps->legsTimer;
-    self->client->ps.weaponTime = pm->ps->legsTimer;
-    self->client->Lmd.customSpeed.time = level.time + pm->ps->legsTimer;
+    self->client->ps.forceHandExtendTime = level.time + self->client->ps.legsTimer;
+    self->client->ps.weaponTime = self->client->ps.legsTimer;
+    self->client->Lmd.customSpeed.time = level.time + self->client->ps.legsTimer;
     self->client->Lmd.mediLevitate.effectFullFxPlayed = qfalse;
     self->client->Lmd.mediLevitate.enabled = qfalse;
     self->client->Lmd.mediLevitate.state = 0;

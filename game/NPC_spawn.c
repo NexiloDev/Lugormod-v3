@@ -2475,7 +2475,7 @@ const entityInfoData_t NPC_spawner_keys[] = {
 	{"awakescript", "default script to run once awoken"},
 	{"angerscript", "default script to run once angered"},
 	{"painscript", "default script to run when hit"},
-	{"fleescript", "default script to run when hit and below 50\% health"},
+	{"fleescript", "default script to run when hit and below 50 percent health"},
 	{"deathscript", "default script to run when killed"},
 	{NULL, NULL}
 };

@@ -359,7 +359,7 @@ void use_lmd_light(gentity_t* self, gentity_t* other, gentity_t* activator)
 
 const entityInfoData_t lmd_light_keys[] = {
     {"Light", "The intensity of the light when turned on."},
-    {"Color", "The colors in decimal precent form (0 to 1, 0.5 would be 50%) for the color to display.  Values are red, green, and blue, in that order.  Example: color,1 0 1, would be yellow."},
+    {"Color", "The colors in decimal precent form (0 to 1, 0.5 would be 50 percent) for the color to display.  Values are red, green, and blue, in that order.  Example: color,1 0 1, would be yellow."},
     {"Offlight", "Same as light, but when toggled off."},
     {"Offcolor", "Same as color, but when toggled off."},
     {NULL, NULL}

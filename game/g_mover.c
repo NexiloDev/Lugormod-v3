@@ -1663,7 +1663,7 @@ const entityInfoData_t func_door_keys[] = {
   {"opentarget", "Door fires this after reaching it\'s \'open\' position"},
   {"target2", "Door fires this when it starts moving from it\'s open position to it\'s closed position"},
   {"closetarget", "Door fires this after reaching it\'s \'closed\' position"},
-  {"model2" ".md3 model to also draw"},
+  {"model2", ".md3 model to also draw"},
   {"angle", "determines the opening direction"},
   {"targetname", "if set, no touch field will be spawned and a remote button or trigger field activates the door."},
   {"speed", "movement speed (100 default)"},

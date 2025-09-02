@@ -6,6 +6,7 @@
 #include "bg_saga.h"
 #include "bg_vehicles.h"
 #include "g_nav.h"
+#include "Lmd_Entities_Public.h"
 
 extern void G_DebugPrint( int level, const char *format, ... );
 
@@ -2447,6 +2448,43 @@ void NPC_PrecacheType( char *NPC_type )
 }
 //void SP_trigger_visible (gentity_t *ent);
 
+const entityInfoData_t NPC_spawner_spawnflags[] = {
+	{"16", "NPC can be in air, but will spawn on the closest floor surface below it"},
+	{"32", "Will spawn with no default AI (BS_CINEMATIC), or the blinking that happens when it spawns"},
+	{"256", "Spawner is shy (wont spawn if a player is looking at it)"},
+	{NULL, NULL}
+};
+const entityInfoData_t NPC_spawner_keys[] = {
+	{"NPC_type", "name of NPC to spawn"},
+	{"targetname", "name this NPC goes by for targeting"},
+	{"count", "how many npcs to spawn if targeted. set to -1 to spawn multiple times (default 1)"},
+	{"delay", "how long to wait to spawn after used"},
+	{"wait", "if trying to spawn and blocked, how many seconds to wait before trying again"},
+	{"NPC_target", "target to fire when killed"},
+	{"NPC_target2", "target to fire when knocked out"},
+	{"NPC_target4", "target to fire when killed by friendly fire"},
+	{"NPC_target5", "target to fire when killed for the player that killed the entity (target credits)"},
+	{"NPC_target6", "target to fire when npc kills a player"},
+	{"health", "starting health (default 100)"},
+	{"showhealth", "set to 1 to show health bar on this entity when crosshair is over it"},
+	{"noBasicSounds", "set to 1 to prevent loading and usage of basic sounds (pain, death, etc)"},
+	{"noCombatSounds", "set to 1 to prevent loading and usage of combat sounds (anger, victory, etc)"},
+	{"noExtraSounds", "set to 1 to prevent loading and usage of \'extra\' sounds (chasing the enemy, detecting, fleeing, jedi combat sounds)"},
+	{"spawnscript", "default script to run once spawned"},
+	{"usescript", "default script to run when used"},
+	{"awakescript", "default script to run once awoken"},
+	{"angerscript", "default script to run once angered"},
+	{"painscript", "default script to run when hit"},
+	{"fleescript", "default script to run when hit and below 50 percent health"},
+	{"deathscript", "default script to run when killed"},
+	{NULL, NULL}
+};
+const entityInfo_t NPC_spawner_info = {
+	"Spawns a NPC that you specify, remember all keys are case sensative. (Its not npc_type, its NPC_type), if this is going to be used by a button add \'count,-1,\' so it can spawn more than once.",
+	NPC_spawner_spawnflags,
+	NPC_spawner_keys
+};
+
 void SP_NPC_spawner( gentity_t *self){
 	int t;
 	if ( !self->fullName || !self->fullName[0] )
@@ -2607,6 +2645,30 @@ void NPC_VehicleSpawnUse( gentity_t *self, gentity_t *other, gentity_t *activato
 		G_VehicleSpawn( self );
 	}
 }
+
+const entityInfoData_t NPC_Vehicle_spawnflags[] = {
+	{"1", "die after certain amount of time of not having a pilot"},
+	{"2", "Fighters: Don't drop until someone gets in it. this only works if it's never been used. ships in trigger_space will never drop when unoccupied"},
+	{"16", "spawn on the floor instead of floating around in the air"},
+	{"32", "Will spawn with no default AI (BS_CINEMATIC) or won't blink when spawned"},
+	{"64", "Starts not solid"},
+	{"256", "Spawner is shy (wont spawn if a player is looking at it)"},
+	{NULL, NULL}
+};
+const entityInfoData_t NPC_Vehicle_keys[] = {
+	{"dropTime", "use with spawnflags 2, the vehicle will drop straight down for this number of seconds before flying forward"},
+	{"dmg", "use with spawnflags 1, delay in milliseconds for ship to explode if no pilot (default 10000)"},
+	{"speed", "se with spawnflags 1, distance for pilot to get away from ship after dismounting before it starts counting down the death timer"},
+	{"model2", "if the vehicle can have a droid, this NPC will be spawned and placed there"},
+	{"showhealth", "set to 1 to show health bar on this entity when crosshair is over it"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t NPC_Vehicle_info = {
+	"Spawns a NPC Vehicle, please note the entity name is case sensitive",
+	NPC_Vehicle_spawnflags,
+	NPC_Vehicle_keys
+};
 
 void SP_NPC_Vehicle( gentity_t *self)
 {
@@ -4507,6 +4569,20 @@ gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboo
 	//}
 }
 qboolean isVehicleName (char *name);
+
+const entityInfoData_t LMD_spawner_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t LMD_spawner_keys[] = {
+	{"customscale", "scale this npc/vehicle when it spawns"},
+	{"count", "amount of NPCs allowed to be on the map at once from this spawn"},
+	{NULL, NULL}
+};
+const entityInfo_t LMD_spawner_info = {
+	"This entity was implemented by Lugor, it should be able to use any of the keys provided for npc_spawner and one more, it also allows the NPC to respawn after it has been destroyed.",
+	LMD_spawner_spawnflags,
+	LMD_spawner_keys
+};
 
 void SP_LMD_spawner (gentity_t *NPCspawner){
 	//RoboPhred: apparently this is possible

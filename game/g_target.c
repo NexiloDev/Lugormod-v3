@@ -10,6 +10,20 @@
 /*QUAKED target_give (1 0 0) (-8 -8 -8) (8 8 8)
 Gives the activator all the items pointed to.
 */
+const entityInfoData_t target_give_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t target_give_keys[] = {
+	{"target", "the item to give a player"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_give_info = {
+	"Gives the activator all the items pointed to.",
+	target_give_spawnflags,
+	target_give_keys
+};
 void Use_Target_Give( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	gentity_t	*t;
 	trace_t		trace;
@@ -47,6 +61,19 @@ void SP_target_give( gentity_t *ent ) {
 takes away all the activators powerups.
 Used to drop flight powerups into death puts.
 */
+const entityInfoData_t target_remove_powerups_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t target_remove_powerups_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_remove_powerups_info = {
+	"Gives the activator all the items pointed to.",
+	target_remove_powerups_spawnflags,
+	target_remove_powerups_keys
+};
 void Use_target_remove_powerups( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	if( !activator->client ) {
 		return;
@@ -72,6 +99,20 @@ void SP_target_remove_powerups( gentity_t *ent ) {
 
 //==========================================================
 
+const entityInfoData_t target_powerup_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_powerup_keys[] = {
+	{"powerup", "powerup to give to the player (number 1-15)"},
+	{"wait", "duration in seconds"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_powerup_info = {
+	"Sets a powerup to the player.",
+	target_powerup_spawnflags,
+	target_powerup_keys
+};
 void Use_target_powerup( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	if( !activator->client ) {
 		return;
@@ -112,6 +153,22 @@ activated again while it is counting down to an event.
 "wait" seconds to pause before firing targets.
 "random" delay variance, total delay = delay +/- random seconds
 */
+const entityInfoData_t target_delay_spawnflags[] = {
+	{"1", "Keeps the delay from resetting the time if it is activated again while it is counting down to an event."},
+	{NULL, NULL}
+};
+const entityInfoData_t target_delay_keys[] = {
+	{"wait", "seconds to pause before firing targets"},
+	{"random", "delay variance, total delay = delay +/- random seconds"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_delay_info = {
+	"This is a great entity for making an entity not fire its target right away, instead it waits the amount of time you set with the \'wait\' key to fire its target.",
+	target_delay_spawnflags,
+	target_delay_keys
+};
+
 //Ufo: multithread option
 void Think_Target_Delay( gentity_t *ent ) {
 	if (ent->spawnflags & 2)
@@ -177,6 +234,19 @@ void SP_target_delay( gentity_t *ent ) {
 
 The activator is given this many points.
 */
+const entityInfoData_t target_score_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_score_keys[] = {
+	{"count", "number of points to add, default 1"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_score_info = {
+	"The activator is given this many points.",
+	target_score_spawnflags,
+	target_score_keys
+};
 void Use_Target_Score (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	//RoboPhred
 	if(ent->spawnflags & 1)
@@ -200,6 +270,26 @@ void SP_target_score( gentity_t *ent ) {
 "wait"		don't fire off again if triggered within this many milliseconds ago
 If "private", only the activator gets the message.  If no checks, all clients get the message.
 */
+
+const entityInfoData_t target_print_spawnflags[] = {
+	{"1", "Red team only"},
+	{"2", "Blue team only"},
+	{"4", "Only the person who activated the entity can see the message"},
+	{"8", "Message will appear at top left corner of the screen"},
+	{"16", "Message will appear in area where chat normally appears"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_print_keys[] = {
+	{"message", "text to print"},
+	{"wait", "don\'t fire off again if triggered within this many milliseconds ago"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_print_info = {
+	"This will print a message across the screen. Basically the same as the announce command. If no spawnflag is set, it will make the print global.",
+	target_print_spawnflags,
+	target_print_keys
+};
 
 //RoboPhred
 //Ufo: Added data tags support
@@ -376,6 +466,27 @@ Multiple identical looping sounds will just increase volume without any speed co
 "wait" : Seconds between auto triggerings, 0 = don't auto trigger
 "random"	wait variance, default is 0
 */
+
+const entityInfoData_t target_speaker_spawnflags[] = {
+	{"1", "Makes the sound start on, loops the sound when complete"},
+	{"2", "Makes the sound start off"},
+	{"4", "Everybody on the entire map can hear the sound"},
+	{"8", "Only the activator can hear the sound"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_speaker_keys[] = {
+	{"noise", "wav file to play. ex: sound/ambience/narshaddaa/cantina_1.mp3"},
+	{"wait", "seconds between auto triggerings, 0 = don't auto trigger"},
+	{"random", "wait variance, default is 0"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_speaker_info = {
+	"This entity will play a sound that you specify in a certain radius.",
+	target_speaker_spawnflags,
+	target_speaker_keys
+};
+
 void Use_Target_Speaker (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	G_ActivateBehavior(ent,BSET_USE);
 
@@ -478,6 +589,19 @@ void SP_target_speaker( gentity_t *ent ) {
 /*QUAKED target_laser (0 .5 .8) (-8 -8 -8) (8 8 8) START_ON
 When triggered, fires a laser.  You can either set a target or a direction.
 */
+const entityInfoData_t target_laser_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_laser_keys[] = {
+	{"target", "make this target a target_position. you don't need to do this you can just set angles"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_laser_info = {
+	"When triggered, fires a laser. You can either set a target or a direction. Starts in the off state so you have to use its targetname for it to turn on",
+	target_laser_spawnflags,
+	target_laser_keys
+};
 void target_laser_think (gentity_t *self) {
 	vec3_t	end;
 	trace_t	tr;
@@ -600,6 +724,19 @@ void target_teleporter_use( gentity_t *self, gentity_t *other, gentity_t *activa
 /*QUAKED target_teleporter (1 0 0) (-8 -8 -8) (8 8 8)
 The activator will be teleported away.
 */
+const entityInfoData_t target_teleporter_spawnflags[] = {
+	{"1", "Do not teleport player if they are in a duel."},
+	{NULL, NULL}
+};
+const entityInfoData_t target_teleporter_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_teleporter_info = {
+	"The activator will be teleported away... Use angle or angles keys to change the direction that you teleport in.",
+	target_teleporter_spawnflags,
+	target_teleporter_keys
+};
 void SP_target_teleporter( gentity_t *self ) {
 	//RoboPhred
 	/*Their target is themselvs if neccessary.
@@ -621,6 +758,30 @@ INACTIVE  Can't be used until activated
 
 wait - set to -1 to use it only once
 */
+
+const entityInfoData_t target_relay_spawnflags[] = {
+	{"1", "only red team can use this"},
+	{"", "only blue team can use this"},
+	{"4", "makes the target get fired off randomly, currently this only works for target1"},
+	{"128", "makes the entity start deactivated"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_relay_keys[] = {
+	{"wait", "set to -1 to use it only once"},
+	{"target", "the first target to fire"},
+	{"target2", "the second target to fire"},
+	{"target3", "the third target to fire"},
+	{"target4", "the fourth target to fire"},
+	{"target5", "the fifth target to fire"},
+	{"target6", "the sixth target to fire"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_relay_info = {
+	"Does nothing but fire at its targets, can fire at up to 6 targets it will fire them all at the same time. If random checked, only one will be fired.",
+	target_relay_spawnflags,
+	target_relay_keys
+};
 void target_relay_use (gentity_t *self, gentity_t *other, gentity_t *activator) {
 	qboolean ranscript = qfalse;
 	if ( ( self->spawnflags & 1 ) && activator->client 
@@ -694,6 +855,20 @@ void SP_target_relay (gentity_t *self) {
 /*QUAKED target_kill (.5 .5 .5) (-8 -8 -8) (8 8 8)
 Kills the activator.
 */
+
+const entityInfoData_t target_kill_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_kill_keys[] = {
+	{"target", "target a player to kill them"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_kill_info = {
+	"Kills the activator.",
+	target_kill_spawnflags,
+	target_kill_keys
+};
 void target_kill_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	G_ActivateBehavior(self,BSET_USE);
 	G_Damage ( activator, NULL, NULL, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
@@ -706,6 +881,18 @@ void SP_target_kill( gentity_t *self ) {
 /*QUAKED target_position (0 0.5 0) (-4 -4 -4) (4 4 4)
 Used as a positional target for in-game calculation, like jumppad targets.
 */
+const entityInfoData_t target_position_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_position_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_position_info = {
+	"Used as a positional target for in-game calculation, like jumppad targets.",
+	target_position_spawnflags,
+	target_position_keys
+};
 void SP_target_position( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 	/*
@@ -752,6 +939,20 @@ Set "count" to 0-7 for color.
 Closest target_location in sight used for the location, if none
 in site, closest in distance
 */
+const entityInfoData_t target_location_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_location_keys[] = {
+	{"message", "the name of this location"},
+	{"count", "0-7 for color. 0 - white, 1 - red, 2 - green, etc."},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_location_info = {
+	"Closest target_location in sight used for the location, if none in site, closest in distance",
+	target_location_spawnflags,
+	target_location_keys
+};
 void SP_target_location( gentity_t *self ){
 	self->think = target_location_linkup;
 	self->nextthink = level.time + 200;  // Let them all spawn first
@@ -770,6 +971,23 @@ After the counter has been triggered "count" times (default 2), it will fire all
 
 bounceCount - number of times the counter should reset to it's full count when it's done
 */
+const entityInfoData_t target_counter_spawnflags[] = {
+	{"1", "Start Inactive, must be hit by a target_activate to be able to be used."},
+	{NULL, NULL}
+};
+const entityInfoData_t target_counter_keys[] = {
+	{"target", "what to first fire at when the entity as been hit a certain amount of times."},
+	{"target2", "fires this every time you target the entity and it isnt at its count"},
+	{"count", "the amount of times to be hit for firing its target (default 2)"},
+	{"bounceCount", "set this at -1 so the entity will never stop working, otherwise after the first use it will stop working. if you set bouncecount to 5 then after the fifth use it will stop working."},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_counter_info = {
+	"You have to use this entity a specified amount of times for it to fire at its target, the default is 2 times ravensoft made it so it will deactivate after it gets hit a certain amount of times",
+	target_counter_spawnflags,
+	target_counter_keys
+};
 extern void G_DebugPrint( int level, const char *format, ... );
 void target_counter_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 {
@@ -843,7 +1061,20 @@ Randomly fires off only one of it's targets each time used
 
 USEONCE	set to never fire again
 */
-
+const entityInfoData_t target_random_spawnflags[] = {
+	{"1", "Fire once then disable itself"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_random_keys[] = {
+	{"target", "should target more than one entity, it will only fire at one of its targets."},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_random_info = {
+	"Randomly fires off only one of it\'s targets each time used",
+	target_random_spawnflags,
+	target_random_keys
+};
 void target_random_use(gentity_t *self, gentity_t *other, gentity_t *activator)
 {
 	int			t_count = 0, pick;
@@ -1038,6 +1269,24 @@ wait - can't be used again in this amount of seconds (Default is 1 second if it'
 delay - how long to wait after use to run script
 
 */
+const entityInfoData_t target_scriptrunner_spawnflags[] = {
+	{"1", "Will run the script on the entity that used this or tripped the trigger that used this"},
+	{"128", "Will start in the off state"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_scriptrunner_keys[] = {
+	{"useScript", "script to run when used. ex: close_door_cinematic"},
+	{"count", "how many times to run, -1 = infinite.  Default is once"},
+	{"wait", "can\'t be used again in this amount of seconds (Default is 1 second if it\'s multiple-use)"},
+	{"delay", "how long to wait after use to run script"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_scriptrunner_info = {
+	"Starts a script once used.",
+	target_scriptrunner_spawnflags,
+	target_scriptrunner_keys
+};
 void SP_target_scriptrunner( gentity_t *self )
 {
 	/*
@@ -1161,6 +1410,24 @@ void target_deactivate_use(gentity_t *self, gentity_t *other, gentity_t *activat
 /*QUAKED target_activate (1 0 0) (-4 -4 -4) (4 4 4)
 Will set the target(s) to be usable/triggerable
 */
+const entityInfoData_t target_activate_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_activate_keys[] = {
+	{"target", "the target to make usable/triggerable"},
+	{"target2", "a second target to make usable/triggerable"},
+	{"target3", "a third target to make usable/triggerable"},
+	{"target4", "a fourth target to make usable/triggerable"},
+	{"target5", "a fifth target to make usable/triggerable"},
+	{"target6", "a sixth target to make usable/triggerable"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_activate_info = {
+	"Will set the target(s) to be usable/triggerable. Accepts up to 6 targets.",
+	target_activate_spawnflags,
+	target_activate_keys
+};
 void SP_target_activate( gentity_t *self )
 {
 	G_SetOrigin( self, self->s.origin );
@@ -1170,6 +1437,24 @@ void SP_target_activate( gentity_t *self )
 /*QUAKED target_deactivate (1 0 0) (-4 -4 -4) (4 4 4)
 Will set the target(s) to be non-usable/triggerable
 */
+const entityInfoData_t target_deactivate_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_deactivate_keys[] = {
+	{"target", "the target to make non-usable/triggerable"},
+	{"target2", "a second target to make non-usable/triggerable"},
+	{"target3", "a third target to make non-usable/triggerable"},
+	{"target4", "a fourth target to make non-usable/triggerable"},
+	{"target5", "a fifth target to make non-usable/triggerable"},
+	{"target6", "a sixth target to make non-usable/triggerable"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_deactivate_info = {
+	"Will set the target(s) to be non-usable/triggerable. Accepts up to 6 targets.",
+	target_deactivate_spawnflags,
+	target_deactivate_keys
+};
 void SP_target_deactivate( gentity_t *self )
 {
 	G_SetOrigin( self, self->s.origin );
@@ -1189,6 +1474,19 @@ void target_level_change_use(gentity_t *self, gentity_t *other, gentity_t *activ
 /*QUAKED target_level_change (1 0 0) (-4 -4 -4) (4 4 4)
 "mapname" - Name of map to change to
 */
+const entityInfoData_t target_level_change_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_level_change_keys[] = {
+	{"mapname", "Name of map to change to"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_level_change_info = {
+	"changes the map to whatever you specify when this entity gets used. This is dangerous in older lugormod versions or if not used with OpenJK. Escape sequences and the \';\' can be used in the mapname key maliciously. Use with care and/or remove.",
+	target_level_change_spawnflags,
+	target_level_change_keys
+};
 void SP_target_level_change( gentity_t *self )
 {
 	//RoboPhred
@@ -1230,6 +1528,19 @@ If an intro file and loop file are specified, the intro plays first, then the lo
 portion will start and loop indefinetly.  If no introfile is entered, only the loopfile
 will play.
 */
+const entityInfoData_t target_play_music_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t target_play_music_keys[] = {
+	{"music", "music WAV or MP3 file ex: music/introfile.mp3 or music/loopfile.mp3"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_play_music_info = {
+	"Plays the requested music files when this target is used.",
+	target_play_music_spawnflags,
+	target_play_music_keys
+};
 void SP_target_play_music( gentity_t *self )
 {
 	char *s = NULL;
@@ -1251,6 +1562,18 @@ void SP_target_play_music( gentity_t *self )
 target_credits
 ==============
 */
+
+const entityInfoData_t target_credits_keys[] = {
+	{"count", "the amount of credits to give the activator"},
+	{"random", "the amount of credits you want to randomly receive. This number is added onto the count. If your count is 20 and you set this to 10 you will receive anywhere from 20-30 credits"},
+	{"targetname", "make the trigger target this value for the entity to be used, the person who triggers this will receive the set amount of credits"},
+	{NULL, NULL},
+};
+entityInfo_t target_credits_info = {
+	"Gives the person who fires this an amount of credits",
+	NULL,
+	target_credits_keys
+};
 
 void Use_Target_Credits (gentity_t *ent, gentity_t *other, gentity_t *activator){
 	//RoboPhred: silly lugor

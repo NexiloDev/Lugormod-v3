@@ -5,6 +5,7 @@
 
 #include "Lmd_EntityCore.h"
 #include "Lmd_Entities_Public.h"
+
 /*
 ===============================================================================
 
@@ -1645,6 +1646,48 @@ INACTIVE	must be used by a target_activate before it can be used
 //RoboPhred
 qboolean G_FindEntityTeam(gentity_t *e);
 
+const entityInfoData_t func_door_spawnflags[] = {
+  {"1", "Start open"},
+  {"2", "Moves when push/pull is used on it"},
+  {"4", "Crushes anything in it\'s path, instead of returning to it\'s position it came from"}, 
+  {"8", "Stops at the end of it\'s movement and doesn\'t return unless used again"},
+  {"16", "Starts locked with the shader animap at the first frame and inactive. Once used, the shader animap changes to the second frame and the door operates normally"},
+  {"", "Note that you cannot use the door again after this."},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_door_keys[] = {
+  {"target", "Door fires this when it starts moving from it\'s closed position to it\'s open position"},
+  {"opentarget", "Door fires this after reaching it\'s \'open\' position"},
+  {"target2", "Door fires this when it starts moving from it\'s open position to it\'s closed position"},
+  {"closetarget", "Door fires this after reaching it\'s \'closed\' position"},
+  {"model2", ".md3 model to also draw"},
+  {"angle", "determines the opening direction"},
+  {"targetname", "if set, no touch field will be spawned and a remote button or trigger field activates the door."},
+  {"speed", "movement speed (100 default)"},
+  {"wait", "wait before returning (3 default, -1 = never return)"},
+  {"lip", "lip remaining at the end of move (8 default)"},
+  {"dmg", "damage to inflict when blocked (2 default, set to negative for no damage)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight color"},
+  {"health", "if set, the door must be shot open"},
+  {"linear", "set to 1 and it will move linearly rather than with accelleration (default is 0)"},
+  {"teamallow", "even if locked, this team can always open and close it just by walking up to it"},
+  {"", "0 - none (locked to everyone)"},
+  {"", "1 - red"},
+  {"", "2 = blue"},
+  {"vehopen", "if non-0 vehicles/players riding vehicles can open"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_door_info = {
+  "A bmodel that opens and closes, can fire targets along the way. When this entity doesn\'t have a targetname it will autospawn another entity to trigger it called a \'trigger_door\'. To delete the trigger_door entity edit the func_door to have a targetname.",
+  func_door_spawnflags,
+  func_door_keys
+};
+
 void SP_func_door (gentity_t *ent) 
 {
 	//Lugormod
@@ -1797,6 +1840,17 @@ void SP_func_door (gentity_t *ent)
 		}
 	}
 }
+
+const entityInfoData_t target_fixdoor_keys[] = {
+	{"target", "targetname of the func_door to fix"},
+	{NULL, NULL}
+};
+
+const entityInfo_t target_fixdoor_info = {
+	"Spawns a trigger_door for a func_door that has no trigger to open it. Useful on SP maps for quick fixes.",
+	target_fixdoor_keys,
+	NULL
+};
 
 void fixdoor(gentity_t *self){
 	//void fixdoor ( gentity_t *self, gentity_t *other, gentity_t *activator ){
@@ -2052,6 +2106,39 @@ When a button is touched, it moves some distance in the direction of it's angle,
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+const entityInfoData_t func_button_spawnflags[] = {
+//  {"1", ""},
+//  {"2", ""},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_button_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"angle", "determines the opening direction"},
+  {"target", "all entities with a matching targetname will be used"},
+  {"speed", "override the default 40 speed"},
+  {"wait", "override the default 1 second wait (-1 = never return)"},
+  {"lip", "override the default 4 pixel lip remaining at end of move"},
+  {"health", "if set, the button must be killed instead of touched"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_button_info = {
+  "When a button is touched, it moves some distance in the direction of it\'s angle, triggers all of it\'s targets, waits some time, then returns to it\'s original position where it can be triggered again.",
+  func_button_spawnflags,
+  func_button_keys
+};
+
 void SP_func_button( gentity_t *ent ) {
 	vec3_t		abs_movedir;
 	float		distance;
@@ -2275,6 +2362,24 @@ Target: next path corner and other targets to fire
 "speed" speed to move to the next corner
 "wait" seconds to wait before behining move to next corner
 */
+const entityInfoData_t path_corner_spawnflags[] = {
+  {NULL, NULL}
+};
+
+const entityInfoData_t path_corner_keys[] = {
+  {"target", "the next path_corner to go to (required) and other targets to fire"},
+  {"targetname", "make the previus path_corner target this, if it is the first path_corner the func_train needs to target this. If it is the first path corner, the last path_corner needs to also target this"},
+  {"speed", "speed to move to the next corner"},
+  {"wait", "seconds to wait before begining move to the next corner"},
+  {NULL, NULL}
+};
+
+const entityInfo_t path_corner_info = {
+  "func_train path corners. These are the waypoints the train travels to.",
+  path_corner_spawnflags,
+  path_corner_keys
+};
+
 void SP_path_corner( gentity_t *self ) {
 	if ( !self->targetname ) {
 		G_Printf ("path_corner with no targetname at %s\n", vtos(self->s.origin));
@@ -2299,6 +2404,37 @@ entities and damage them on contact as well.
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+const entityInfoData_t func_train_spawnflags[] = {
+  {"1", "Start on"},
+  {"2", "?"},
+  {"4", "?"},
+  {"8", "?"},
+  {"16", "Damages anything in it\'s path"},
+  {"32", "?"},
+  {"64", "Can be used"},
+  {"128", "Starts deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_train_keys[] = {
+  {"model", "The bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", "Scale the model2"},
+  {"speed", "default 100"},
+  {"dmg", "default 2"},
+  {"target", "next path corner (required)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_train_info = {
+  "A train is a mover that moves between path_corner target points.",
+  func_train_spawnflags,
+  func_train_keys
+};
+
 void SP_func_train (gentity_t *self) {
 
 	//RoboPhred
@@ -2372,6 +2508,35 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 "dmg"		how much damage to do when it crushes (use with CRUSHER spawnflag)
 "linear" set to 1 and it will move linearly rather than with acceleration (default is 0)
 */
+
+const entityInfoData_t func_static_spawnflags[] = {
+  {"1", "Will be used when you Force-Push it"},
+  {"2", "Will be used when you force-Pull it"},
+  {"4", "Toggle the shader anim frame between 1 and 2 when used"},
+  {"8", "Make it do damage when it's blocked"},
+  {"16", "Make it do damage when it hits any entity"},
+//  {"32", "Player can use it with the use button"},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_static_keys[] = {
+  {"model", "The bmodel to use"},
+  {"model2","A .md3 model to also draw"},
+  {"model2scale","Precent of normal scale (on all x y z axii) to scale the model2"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"dmg", "how much damage to do when it crushes (use with spawnflags )"},
+  {"linear", "set to 1 and it will move linearly rather than with acceleration"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_static_info = {
+  "A bmodel that just sits there, does nothing. Can be used for conditional walls and models. On some levels like t2_rogue it can be used with a script to move.",
+  func_static_spawnflags,
+  func_static_keys
+};
 
 void SP_func_static( gentity_t *ent ) 
 {
@@ -2554,6 +2719,46 @@ Applicable only during Siege gametype:
 teamnodmg - if 1, team 1 can't damage this. If 2, team 2 can't damage this.
 
 */
+const entityInfoData_t func_rotating_spawnflags[] = {
+  {"1", "?"},
+  {"2", "?"},
+  {"4", "Moves on X-Axis"},
+  {"8", "Moves on Y-Axis"},
+  {"16", "Will hurt a player if blocked"},
+  {"32", "?"},
+  {"64", "Can be used"},
+  {"128", "Start deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_rotating_keys[] = {
+  {"model", "The bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", "percent of normal scale (on all x y and z axii) to scale the model2 if there is one. 100 is normal scale, min is 1 (100 times smaller than normal), max is 1000 (ten times normal)"},
+  {"speed", "determines how fast it moves (100 default)"},
+  {"dmg", "damage to inflict when blocked (2 default)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"spinangles", "instead of using \'speed\' you can use this to set rotation on all 3 axes (pitch yaw and roll)"},
+  {"health", "default is 0. if health is set, the follow key/values are available:"},
+  {"", "\'numchunks\' multiplies the number of chunks spawned. (1 default, .5 is half as many chunks, 2 is twice as many chunks)"},
+  {"", "\'chunksize\' scales up/down the chunk size (1 default)"},
+  {"", "\'showhealth\' if non-0, will display the health bar on the hud when crosshair is over this entity in seige"},
+  {"", "\'teamowner\' in seige this will specify which team this thing is owned by. Crosshair changes green/red"},
+  {"", "\'splashDamage\' damage to do"},
+  {"", "\'splashRadius\' radius for above damage"},
+  {"team", "if set, only this team can trip this trigger. (0 - any, 1 - red, 2 - blue)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+
+  {NULL, NULL}
+};
+const entityInfo_t func_rotating_info = {
+  "You need to have an origin brush as part of this entity. The center of that brush will be the point around which it is rotated. It will rotate around the Z axis by default. You can check either the X_AXIS or Y_AXIS box to change that.",
+  func_rotating_spawnflags,
+  func_rotating_keys
+};
+
 void SP_func_breakable( gentity_t *self );
 void SP_func_rotating (gentity_t *ent) {
 	vec3_t spinangles;
@@ -2661,6 +2866,37 @@ Normally bobs on the Z axis
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+const entityInfoData_t func_bobbing_spawnflags[] = {
+  {"1", "?"},
+  {"2", "?"},
+  {"4", "Move on X-Axis"},
+  {"8", "Move on Y-Axis"},
+  {"16", "Make it do damage when it hits any entity"},
+//  {"32", "Player can use it with the use button"},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_bobbing_keys[] = {
+  {"model", "The bmodel to use"},
+  {"model2","A .md3 model to also draw"},
+  {"model2scale","Precent of normal scale (on all x y z axii) to scale the model2"},
+  {"speed", "seconds to complete a bob cycle (4 default)"},
+  {"phase", "damage to inflict when blocked (2 default)"},
+  {"dmg", "how much damage to do when it crushes (use with spawnflags )"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_bobbing_info = {
+  "Normally bobs on the z-axis",
+  func_bobbing_spawnflags,
+  func_bobbing_keys
+};
+
 void SP_func_bobbing (gentity_t *ent) {
 	float		height;
 	float		phase;
@@ -2716,6 +2952,41 @@ Pendulum frequency is a physical constant based on the length of the beam and gr
 "color"		constantLight color
 "light"		constantLight radius
 */
+
+
+const entityInfoData_t func_pendulum_spawnflags[] = {
+//  {"1", ""},
+//  {"2", ""},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_pendulum_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"speed", "the number of degrees each way the pendulum swings, (30 default)"},
+  {"phase", "the 0.0 to 1.0 offset in the cycle to start at"},
+  {"dmg", "damage to inflict when blocked (2 default)"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_pendulum_info = {
+  "You need to have an origin brush as part of this entity. " 
+  "Pendulums always swing north / south on unrotated models. " 
+  "Add an angles field to the model to allow rotation in other directions. " 
+  "Pendulum frequency is a physical constant based on the length of the beam and gravity.",
+  func_pendulum_spawnflags,
+  func_pendulum_keys
+};
+
 void SP_func_pendulum(gentity_t *ent) {
 	float		freq;
 	float		length;
@@ -3189,6 +3460,52 @@ Applicable only during Siege gametype:
 teamnodmg - if 1, team 1 can't damage this. If 2, team 2 can't damage this.
 
 */
+
+const entityInfoData_t func_breakable_spawnflags[] = {
+  {"1", "can only be broken by being used"},
+  {"2", "does damage on impact"},
+  {"4", "won\'t reverse movement when hit an obstacle"},
+  {"8", "can be broken by impact damage, like glass"},
+  {"16", "only takes damage from sabers"},
+  {"32", "only takes damage by a heavy weapon, like an emplaced gun or AT-ST gun."},
+  {"64", "Using it doesn't make it break, still can be destroyed by damage"},
+  {"128", "Player can use it with the use button"},
+  {"256", "Does not play an explosion effect, though will still create chunks if specified"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_breakable_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 to also draw"},
+  {"model2scale", ""},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"target", "all entities with a matching targetname will be used when this is destoryed"},
+  {"targetname", "entities with matching target will fire it"},
+  {"paintaget", "target to fire when hit (but not destroyed)"},
+  {"wait", "how long minimum to wait between firing paintarget each time hit"},
+  {"delay", "When killed or used, how long (in seconds) to wait before blowing up (none by default)"},
+  {"health", "default is 10"},
+  {"numchunks", "Multiplies the number of chunks spawned.  Chunk code tries to pick a good volume of chunks, but you can alter this to scale the number of spawned chunks. (default 1)  (.5) is half as many chunks, (2) is twice as many chunks"},
+  {"chunksize", "scales up/down the chunk size by this number (default is 1)"},
+  {"playfx", "path of effect to play on death"},
+  {"showhealth", "if non-0, will display the health bar on the hud when the crosshair is over this ent (in siege)"},
+  {"teamowner", "in siege this will specify which team this thing is \'owned\' by. To that team the crosshair will be green, the other red."},
+  {"splashDamage", "damage to do (default none)"},
+  {"splashRadius", "radius for damage"},
+  {"team", "If set, only this team can trip this trigger. 0 - any, 1 - red, 2 - blue"},
+  {"material", "default is 0. 17 choices available (0-16)"},
+  {"teamnodmg", "Applicable only during siege gametype. If 1, team 1 can\'t damage this. If 2, team 2 can\'t damage this."},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_breakable_info = {
+  "When destroyed, fires it's trigger and chunks and plays sound \'noise\' or sound for type if no noise specified",
+  func_breakable_spawnflags,
+  func_breakable_keys
+};
+
+
 void SP_func_breakable( gentity_t *self ) 
 {
 	int t;
@@ -3430,6 +3747,35 @@ Breakable glass
 "light"		constantLight radius
 "maxshards"	Max number of shards to spawn on glass break
 */
+
+const entityInfoData_t func_glass_spawnflags[] = {
+ // {"1", ""},
+ // {"2", ""},
+ // {"4", ""},
+ // {"8", ""},
+ // {"16", ""},
+ // {"32", ""},
+  {"64", "Player can use"},
+  {"128", "Starts deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_glass_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"maxshards", "max number of shards to spawn on glass break"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_glass_info = {
+  "Breakable glass",
+  func_glass_spawnflags,
+  func_glass_keys
+};
+
 void SP_func_glass( gentity_t *ent ) {
 
 	//RoboPhred
@@ -3624,6 +3970,41 @@ teamuser - if 1, team 2 can't use this. If 2, team 1 can't use this.
 
 */
 
+const entityInfoData_t func_usable_spawnflags[] = {
+  {"1", "the wall will not be there"},
+  {"2", "doesn\'t toggle on and off when used, just runs usescript and fires target"},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Can be used"},
+  {"128", "Start deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_usable_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"targetname", "When used, will toggle on and off"},
+  {"target", "Will fire this target every time it is toggled OFF"},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {"usescript", "script to run when turned on"},
+  {"deathscript", "script to run when turned off"},
+  {"wait", "amount of time before the object is usable again (only valid with ALWAYS_ON flag)"},
+  {"health", "if it has health, it will be used whenever shot at/killed - if you want it to only be used once this way, set health to 1"},
+  {"endframe", "Will make it animate to next shader frame when used, not turn on/off... set this to number of frames in the shader, minus 1"},
+  {"teamuser", "Applicable only during Siege gametype: if 1, team 2 can't use this. If 2, team 1 can't use this."},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_usable_info = {
+  "A bmodel that just sits there, doing nothing. Can be used for conditional walls and models. Disappears when used and reappears when used again.",
+  func_usable_spawnflags,
+  func_usable_keys
+};
+
 //Lugormod
 /*
 void Touch_func_usable( gentity_t *ent, gentity_t *other, trace_t *trace ) 
@@ -3797,6 +4178,34 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 
 START_OFF - the wall will not be there
 */
+
+const entityInfoData_t func_wall_spawnflags[] = {
+//  {"1", ""},
+//  {"2", ""},
+//  {"4", ""},
+//  {"8", ""},
+//  {"16", ""},
+//  {"32", ""},
+  {"64", "Player can use it with the use button"},
+  {"128", "must be used by a target_activate before it can be used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t func_wall_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 model to also draw"},
+  {"model2scale", ""},
+  {"color", "constantLight color"},
+  {"light", "constantLight radius"},
+  {NULL, NULL}
+};
+
+const entityInfo_t func_wall_info = {
+  "A bmodel that just sits there, does nothing. can be used for conditional walls and models.",
+  func_wall_spawnflags,
+  func_wall_keys
+};
+
 void SP_func_wall( gentity_t *ent ) 
 {
 
@@ -3912,6 +4321,25 @@ void rail_mover_init (gentity_t *ent) {
 }
 
 
+const entityInfoData_t rail_mover_spawnflags[] = {
+  {"128", "Starts deactivated, is invisible until used"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t rail_mover_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"model2", ".md3 to also draw"},
+  {"model2scale", ""},
+  {"target", "target a rail_track or rail_lane or something"},
+  {"targetname", "use this to activate or deactivate the rail_mover ent"},
+  {NULL, NULL}
+};
+
+const entityInfo_t rail_mover_info = {
+  "A bmodel that\'s supposed to behave like the background skyscrapers in t1_rail. The entity that is drawn as a skyscraper passing y.",
+  rail_mover_spawnflags,
+  rail_mover_keys
+};
 void SP_rail_mover ( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
 	ent->reached = 0;
@@ -4123,6 +4551,32 @@ void rail_lane_use (gentity_t *self, gentity_t *other, gentity_t *activator) {
 	t->nextTrain = other;
 }
 
+
+const entityInfoData_t rail_track_spawnflags[] = {
+  {"1", "Starts deactivated"},
+  {"2", ""},
+  {"4", ""},
+  {"8", ""},
+  {"16", ""},
+  {"32", ""},
+  {"64", ""},
+  {"128", ""},
+  {NULL, NULL}
+};
+
+const entityInfoData_t rail_track_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"target", "the next something"},
+  {"targetname", "the targetname for the track"},
+  {NULL, NULL}
+};
+
+const entityInfo_t rail_track_info = {
+  "Looks to be the physical track model to draw for a rail_mover. Can be passed through, is not physical.",
+  rail_track_spawnflags,
+  rail_track_keys
+};
+
 void SP_rail_track ( gentity_t *ent ) {
 	ent->s.eFlags |= EF_NODRAW;
 	ent->s.eType = ET_INVISIBLE;
@@ -4137,6 +4591,24 @@ void SP_rail_track ( gentity_t *ent ) {
 	ent->think = rail_track_init;
 	ent->nextthink = level.time + 100;
 }
+
+const entityInfoData_t rail_lane_spawnflags[] = {
+  {"1", "Starts deactivated"},
+  {NULL, NULL}
+};
+
+const entityInfoData_t rail_lane_keys[] = {
+  {"model", "the bmodel to draw"},
+  {"target", "the next something"},
+  {"targetname", "the targetname for the track"},
+  {NULL, NULL}
+};
+
+const entityInfo_t rail_lane_info = {
+  "A bmodel entity that's used in t1_rail to spawn the rail_mover entities. Looks to use a bmodel but not render it.",
+  rail_lane_spawnflags,
+  rail_lane_keys
+};
 
 void SP_rail_lane ( gentity_t *ent ){
 	ent->s.eFlags |= EF_NODRAW;

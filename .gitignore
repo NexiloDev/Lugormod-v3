@@ -6,6 +6,7 @@
 *.user
 *.sln.docstates
 .vs/
+.vscode/
 
 # Build results
 [Dd]ebug/
@@ -247,3 +248,9 @@ $RECYCLE.BIN/
 
 # We can ignore *.txt files alright, but not CMakeLists.txt
 !CMakeLists.txt
+
+# Linux builds
+# =========================
+CMakeFiles
+cmake_install.cmake
+Makefile

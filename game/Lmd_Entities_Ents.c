@@ -359,10 +359,7 @@ void use_lmd_light(gentity_t* self, gentity_t* other, gentity_t* activator)
 
 const entityInfoData_t lmd_light_keys[] = {
     {"Light", "The intensity of the light when turned on."},
-    {
-        "Color",
-        "The colors in decimal precent form (0 to 1, 0.5 would be 50%) for the color to display.  Values are red, green, and blue, in that order.  Example: color,1 0 1, would be yellow."
-    },
+    {"Color", "The colors in decimal precent form (0 to 1, 0.5 would be 50 percent) for the color to display.  Values are red, green, and blue, in that order.  Example: color,1 0 1, would be yellow."},
     {"Offlight", "Same as light, but when toggled off."},
     {"Offcolor", "Same as color, but when toggled off."},
     {NULL, NULL}
@@ -606,6 +603,10 @@ void use_lmd_toggle(gentity_t* self, gentity_t* other, gentity_t* activator)
     self->painDebounceTime = level.time + self->wait;
 }
 
+const entityInfoData_t lmd_toggle_spawnflags[] = {
+  {NULL, NULL}
+};
+
 const entityInfoData_t lmd_toggle_keys[] = {
     {"Count", "The highest target number you are using.  Must be greater than 1."},
     {"Target-Target6", "Targets to fire."},
@@ -614,7 +615,7 @@ const entityInfoData_t lmd_toggle_keys[] = {
 
 entityInfo_t lmd_toggle_info = {
     "Targets 1 through \'count\' will be used in order.  One target will be fired per trigger.",
-    NULL,
+    lmd_toggle_spawnflags,
     lmd_toggle_keys
 };
 
@@ -718,6 +719,7 @@ entityInfo_t lmd_mover_info = {
     NULL,
     lmd_mover_keys
 };
+
 
 void lmd_mover(gentity_t* ent)
 {
@@ -1176,6 +1178,11 @@ void use_lmd_body(gentity_t* self, gentity_t* other, gentity_t* activator)
     self->nextthink = level.time + FRAMETIME; //give a delay so we dont instantly quit
     self->chain = body;
 }
+
+entityInfoData_t lmd_body_keys[] = {
+  {"targetname", "Activate the entity when targeted."},
+  {NULL, NULL}
+};
 
 entityInfo_t lmd_body_info = {
     "A false player body.  When a player uses this, a clone of their model will appear where they are, doing their last animation.  Damage to the body will transfer to the player.  If the player is not also teleported, they will be stuck inside the newly spawned body.\n"
@@ -4764,6 +4771,7 @@ void lmd_forceskillmenu_key(gentity_t* player, usercmd_t* cmd)
     }
 }
 
+
 void lmd_filteredskillmenu_show(gentity_t* player, gentity_t* menu, int filterMode)
 {
     if (!player || !player->client || !menu || !player->client->pers.Lmd.account)
@@ -5618,6 +5626,9 @@ void lmd_cskill_compare_use(gentity_t* self, gentity_t* other, gentity_t* activa
         G_UseTargets2(self, activator, self->target3);
 }
 
+const entityInfoData_t lmd_cskill_compare_spawnflags[] = {
+  {NULL, NULL}
+};
 const entityInfoData_t lmd_cskill_compare_keys[] = {
     {"Skill1", "Skill to compare."},
     {"Skill2", "Skill to compare."},
@@ -5628,7 +5639,7 @@ const entityInfoData_t lmd_cskill_compare_keys[] = {
 };
 entityInfo_t lmd_cskill_compare_info = {
     "Compares values of two customskills, and fires respective target.",
-    NULL,
+    lmd_cskill_compare_spawnflags,
     lmd_cskill_compare_keys
 };
 
@@ -5752,6 +5763,10 @@ void lmd_iterateplayers_use(gentity_t* self, gentity_t* other, gentity_t* activa
     }
 }
 
+const entityInfoData_t lmd_iterateplayers_spawnflags[] = {
+  {"128", "Entity must be hit with a target_activate before it can be used."},
+  {NULL, NULL}
+};
 const entityInfoData_t lmd_iterateplayers_keys[] = {
     {"#UKEYS", NULL},
     {"#HITBOX", NULL},
@@ -5760,7 +5775,7 @@ const entityInfoData_t lmd_iterateplayers_keys[] = {
 };
 entityInfo_t lmd_iterateplayers_info = {
     "Iterates among all connected players and fires its target for them.",
-    NULL,
+    lmd_iterateplayers_spawnflags,
     lmd_iterateplayers_keys
 };
 

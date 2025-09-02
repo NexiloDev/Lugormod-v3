@@ -3,6 +3,7 @@
 #include "q_shared.h"
 
 #include "Lmd_Accounts_Property.h"
+#include "Lmd_Entities_Public.h"
 
 void G_SetEnemy( gentity_t *self, gentity_t *enemy );
 void finish_spawning_turretG2( gentity_t *base );
@@ -1139,6 +1140,46 @@ customscale - custom scaling size. 100 is normal size, 1024 is the max scaling. 
 "icon" - icon that represents the objective on the radar
 */
 //-----------------------------------------------------
+
+const entityInfoData_t misc_turretG2_spawnflags[] = {
+	{"1", "Turret will start off and toggle turning on and off when used, requires the entity to have a targetname"},
+	{"2", "Turret will be upside-down (with foot part on floor)"},
+	{"4", "will respawn after being killed (use count)"},
+	{"8", "Big-ass, Boxy Death Star Turbo Laser version (yes this is a direct quote from ravensofts notes)"},
+	{"16", "Turret will aim in front of the enemy, or lead the entity, increases chance to hit"},
+	{"32", "Turret will appear on radar"},
+	{"64", "Target Fighters (I Believe This Means Air Vehicles)"},
+	{"128", "Target Ground Vehicles"},
+	{"256", "Target Players Who Are Armed"},
+	{"512", "If set, turret will only attack players who fit the profession/level/maxlevel keys (By default people on property list are not attacked)"},
+    {NULL, NULL}
+};
+
+const entityInfoData_t misc_turretG2_keys[] = {
+	{"radius", "maximum distance of targeting enemies (default 512)"},
+	{"wait", "time to wait between firing (default 150ms)"},
+	{"dmg", "damage per shot (default 5)"},
+	{"health", "health of the turret (default 100)"},
+	{"count", "time to wait between respawning"},
+	{"paintarget", "in the words of Lugor: target to fire off upon being hurt"},
+	{"painwait", "in the words of Lugor: ms to wait between firing off pain targets"},
+	{"random", "random value (in degrees) of aiming off target when firing at targets (default 2)"},
+	{"shotspeed", "speed of the projectile the Turret fired (defaults 1,100 regular, 20,000 Big-ass Boxy Death Star turret)"},
+	{"splashDamage", "how much the damage the explosion does"},
+	{"splashRadius", "how far the explosion will reach"},
+	{"targetname", "name to be used to activate/deactivate"},
+	{"target", "target to activate upon being destroyed (opening a door when turret is destroyed)"},
+	{"target2", "target to activate upon firing at targets"},
+	{"showhealth", "Will show health when person aims at the turret if set to 1"},
+	{"customscale", "1024 is the maximum (default 100)"},
+	{NULL, NULL}
+};
+
+const entityInfo_t misc_turretG2_info = {
+	"Spawns a turret that will fire at a person. This entity is finicky, some spawnflags don't always work together. Use cvar lmd_spturrets to change turret behavior. MP maps have different turret spawnflag behavior than SP maps.",
+	misc_turretG2_spawnflags,
+	misc_turretG2_keys
+};
 
 //RoboPhred
 extern vmCvar_t lmd_spturrets;

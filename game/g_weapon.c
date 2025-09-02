@@ -15,6 +15,7 @@
 #include "Lmd_Weapons.h"
 #include "Lmd_Accounts_Core.h"
 #include "Lmd_Accounts_Friends.h"
+#include "Lmd_Entities_Public.h"
 
 qboolean isBuddy(gentity_t *ent, gentity_t *other);
 
@@ -4991,6 +4992,26 @@ teamnodmg - team that turret does not take damage from or do damage to
 */
 
 //----------------------------------------------------------
+const entityInfoData_t emplaced_gun_spawnflags[] = {
+ 	{NULL, NULL}
+};
+
+const entityInfoData_t emplaced_gun_keys[] = {
+	{"count", "if spawnflag 1 is set, decides how long it is before gun respawns (in ms)"},
+    {"constraint", "number of degrees gun is constrained from base angles on each side (default 60.0)"},
+	{"showhealth", "set to 1 to show health bar on this entity when crosshair is over it"},
+	{"teamowner", "crosshair shows green for this team, red for opposite team\n0 - none\n1 - red\n2 - blue"},
+	{"alliedTeam", "team that can use this 0 - any, 1 - red, 2 - blue"},
+	{"teamnodmg", "team that turret does not take damage from or do damage to\n0 - none\n1 - red\n2 - blue"},
+	{NULL, NULL}
+};
+
+const entityInfo_t emplaced_gun_info = {
+    "Spawns a turret gun that can be used if you're a non jedi profession",
+ 	emplaced_gun_spawnflags,
+ 	emplaced_gun_keys
+};
+
 extern qboolean TryHeal(gentity_t *ent, gentity_t *target); //g_utils.c
 
 //RoboPhred
@@ -5261,6 +5282,8 @@ void emplaced_gun_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 }
 
 //RoboPhred
+
+
 void PlayerUsableGetKeys(gentity_t *ent);
 void SP_emplaced_gun( gentity_t *ent )
 {

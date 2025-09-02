@@ -11,6 +11,7 @@
  *****************************************************************************/
 #include "g_local.h"
 #include "bg_saga.h"
+#include "Lmd_Entities_Public.h" // for entityInfo_t
 
 #define SIEGEITEM_STARTOFFRADAR 8
 
@@ -1137,6 +1138,21 @@ STARTOFFRADAR - start not displaying on radar, don't display until used.
 "side" - set to 1 to specify an imperial goal, 2 to specify rebels
 "icon" - icon that represents the objective on the radar
 */
+const entityInfoData_t info_siege_objective_spawnflags[] = {
+	{"8", "start not displaying on radar, don't display until used"}, // STARTOFFRADAR at top of file
+	{NULL, NULL}
+};
+const entityInfoData_t info_siege_objective_keys[] = {
+	{"objective", "specifies the objective to complete upon activation"},
+	{"side", "set to 1 to specify an imperial goal, 2 to specify rebels"},
+	{"icon", "icon that represents the objective on the radar"},
+	{NULL, NULL}
+};
+const entityInfo_t info_siege_objective_info = {
+	"An objective to complete in a siege.",
+	info_siege_objective_spawnflags,
+	info_siege_objective_keys
+};
 void SP_info_siege_objective (gentity_t *ent)
 {
 	char* s = NULL;
@@ -1203,6 +1219,21 @@ to toggle on and off.
 "icon" - icon that represents the objective on the radar
 "startoff" - if 1 start off
 */
+const entityInfoData_t info_siege_radaricon_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_siege_radaricon_keys[] = {
+	{"icon", "icon that represents the objective on the radar"},
+	{"startoff", "if 1 start off"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t info_siege_radaricon_info = {
+	"Used to arbitrarily display radar icons at placed location. Can be used to toggle on and off.",
+	info_siege_radaricon_spawnflags,
+	info_siege_radaricon_keys
+};
 void SP_info_siege_radaricon (gentity_t *ent)
 {
 	char* s;
@@ -1297,6 +1328,20 @@ void decompTriggerUse(gentity_t *ent, gentity_t *other, gentity_t *activator)
 "objective" - specifies the objective to decomplete upon activation
 "side" - set to 1 to specify an imperial (team1) goal, 2 to specify rebels (team2)
 */
+const entityInfoData_t info_siege_decomplete_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_siege_decomplete_keys[] = {
+	{"objective", "specifies the objective to decomplete upon activation"},
+	{"side", "set to 1 to specify an imperial (team1) goal, 2 to specify rebels (team2)"},
+	{NULL, NULL}
+};
+const entityInfo_t info_siege_decomplete_info = {
+	"QUAKED info_siege_decomplete (1 0 1) (-16 -16 -24) (16 16 32)",
+	info_siege_decomplete_spawnflags,
+	info_siege_decomplete_keys
+};
 void SP_info_siege_decomplete (gentity_t *ent)
 {
 	if (!siege_valid || g_gametype.integer != GT_SIEGE)
@@ -1325,6 +1370,19 @@ void siegeEndUse(gentity_t *ent, gentity_t *other, gentity_t *activator)
 /*QUAKED target_siege_end (1 0 1) (-16 -16 -24) (16 16 32)
 Do a logexit for siege when used.
 */
+const entityInfoData_t target_siege_end_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t target_siege_end_keys[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t target_siege_end_info = {
+	"Do a logexit (Round Ended) for siege when used",
+	target_siege_end_spawnflags,
+	target_siege_end_keys
+};
 void SP_target_siege_end (gentity_t *ent)
 {
 	if (!siege_valid || g_gametype.integer != GT_SIEGE)
@@ -1675,6 +1733,48 @@ health charge things only work with showhealth 1 on siege items that take damage
 "health_chargeamt"	if non-0 will recharge this much health every...
 "health_chargerate"	...this many milliseconds
 */
+const entityInfoData_t misc_siege_item_spawnflags[] = {
+	{"8", "start not displaying on radar, don't display until used"}, // STARTOFFRADAR at top of file
+	{NULL, NULL}
+};
+const entityInfoData_t misc_siege_item_keys[] = {
+	{"model", "Name of model to use for the object"},
+	{"mins", "Default is -16 -16 -24"},
+	{"maxs", "Default value is 16 16 32"},
+	{"usephysics", "If non-0, run standard physics on the object. Default is 1"},
+	{"mass", "If usephysics, this will be the factored object mass. Default is 0.09"},
+	{"gravity", "If usephysics, this will be the factored gravitational pull. Default is 3.0"},
+	{"bounce", "If usephysics, this will be the factored bounce amount. Default is 1.3"},
+	{"goaltarget", "Must be the targetname of a trigger_multi/trigger_once. Once a player carrying this object is brought inside the specified trigger, then that trigger will be allowed to fire. Ideally it will target a siege objective or something like that"},
+	{"target2", "Target to fire upon pickup"},
+	{"target3", "Target to fire upon delivery of the item to the goal point. If none, nothing will happen. (but you should always want something to happen)"},
+	{"target4", "Target to fire upon death, if damageable. Default is none"},
+	{"target5", "target to fire when respawning"},
+	{"target6", "target to fire when dropped by someone carrying this item"},
+	{"targetname", "If it has a targetname, it will only spawn upon being used"},
+	{"paintarget", "plop self on top of this guy\'s origin when we are used (only applies if the siege item has a targetname)"},
+	{"noradar", "if non-0 this thing iwll not show up on radar"},
+	{"forcelimit", "if non-0, while carrying this item the carrier\'s force powers will be crippled"},
+	{"canpickup", "If non-0, item can be picked up. Otherwise it will just be solid and sit on the ground. Default is 1"},
+	{"pickuponlyonce", "If non-0, target2 will only be fired on the first pickup. If the item is dropped and picked up again later, the target will not be fired off on the sequential pickup. Default value is 1"},
+	{"pickupsound", "Sound to play on pickup, if any"},
+	{"teamowner", "Which team owns this item, used only for deciding what color to make health meter"},
+	{"teamnotouch", "If 1 don't let team 1 pickup, if 2 don't let team 2. By default both teams can pick this object up and carry it around until death."},
+	{"teamnocomplete", "Same values as above, but controls if this object can be taken into the objective area by said team"},
+	{"deathfx", "Effect to play on death, if damageable. Default is none"},
+	{"respawnfx", "Plays this effect when respawning (if left in an unknown area too long and goes back to the original spot)"},
+	{"icon", "icon that represents the gametype item on the radar"},
+	{"health", "If > 0, object can be damaged and will die once health reaches 0. Default is 0"},
+	{"showhealth", "if health > 0, will show a health meter for this item"},
+	{"health_chargeamt", "if non-0 will charge this much health (requires showhealth 1)"},
+	{"health_chargerate", "this many milliseconds (requires showhealth 1)"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_siege_item_info = {
+	"An item spawned in siege that can be picked up or captured. Must be siege gametype, must have a model.",
+	misc_siege_item_spawnflags,
+	misc_siege_item_keys
+};
 void SP_misc_siege_item (gentity_t *ent)
 {
 	int		canpickup;

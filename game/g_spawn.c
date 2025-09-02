@@ -281,15 +281,21 @@ void SP_gametype_item ( gentity_t* ent )
 }
 
 void SP_emplaced_gun( gentity_t *ent );
+extern entityInfo_t emplaced_gun_info;
 #define SP (~(1 << GT_SINGLE_PLAYER) & ~(1 << GT_SIEGE))
 
 void SP_target_credits( gentity_t *ent ); //Lugormod
+extern entityInfo_t target_credits_info; // Lugormod
 void SP_random_spot (gentity_t *ent); //Lugormod
-void SP_money_dispenser (gentity_t *ent);//Lugormod
-void SP_control_point (gentity_t *ent);//Lugormod
+extern entityInfo_t random_spot_info; //Lugormod
+void SP_money_dispenser (gentity_t *ent); //Lugormod
+extern entityInfo_t money_dispenser_info; //Lugormod
+void SP_control_point (gentity_t *ent); //Lugormod
+extern entityInfo_t control_point_info; //Lugormod
 void SP_misc_camera (gentity_t *ent); //Lugormod
+extern entityInfo_t misc_camera_info;
 void SP_info_player_jail (gentity_t *ent); //Lugormod
-extern entityInfo_t info_player_jail_info;
+extern entityInfo_t info_player_jail_info; //Lugormod
 
 void SP_info_player_start (gentity_t *ent);
 extern entityInfo_t info_player_start_info;
@@ -307,48 +313,78 @@ void SP_info_player_deathmatch (gentity_t *ent);
 extern entityInfo_t info_player_deathmatch_info;
 
 void SP_info_player_siegeteam1 (gentity_t *ent);
+extern entityInfo_t info_player_siegeteam1_info;
 void SP_info_player_siegeteam2 (gentity_t *ent);
+extern entityInfo_t info_player_siegeteam2_info;
 void SP_info_player_intermission (gentity_t *ent);
+extern entityInfo_t info_player_intermission_info;
 void SP_info_player_intermission_red (gentity_t *ent);
+extern entityInfo_t info_player_intermission_red_info;
 void SP_info_player_intermission_blue (gentity_t *ent);
+extern entityInfo_t info_player_intermission_blue_info;
 void SP_info_jedimaster_start (gentity_t *ent);
+extern entityInfo_t info_jedimaster_start_info;
 void SP_info_player_start_red (gentity_t *ent);
+extern entityInfo_t info_player_start_red_info;
 void SP_info_player_start_blue (gentity_t *ent);
+extern entityInfo_t info_player_start_blue_info;
 void SP_info_firstplace(gentity_t *ent);
 void SP_info_secondplace(gentity_t *ent);
 void SP_info_thirdplace(gentity_t *ent);
 void SP_info_podium(gentity_t *ent);
 
 void SP_info_siege_objective (gentity_t *ent);
+extern entityInfo_t info_siege_objective_info;
 void SP_info_siege_radaricon (gentity_t *ent);
+extern entityInfo_t info_siege_radaricon_info;
 void SP_info_siege_decomplete (gentity_t *ent);
+extern entityInfo_t info_siege_decomplete_info;
 void SP_target_siege_end (gentity_t *ent);
+extern entityInfo_t target_siege_end_info;
 void SP_misc_siege_item (gentity_t *ent);
+extern entityInfo_t misc_siege_item_info;
 void SP_target_powerup (gentity_t *ent);
+extern entityInfo_t target_powerup_info;
 
 void SP_func_plat (gentity_t *ent);
 extern entityInfo_t func_plat_info;
-
 void SP_func_static (gentity_t *ent);
+extern entityInfo_t func_static_info;
 void SP_func_rotating (gentity_t *ent);
+extern entityInfo_t func_rotating_info;
 void SP_func_bobbing (gentity_t *ent);
+extern entityInfo_t func_bobbing_info;
 void SP_func_pendulum( gentity_t *ent );
+extern entityInfo_t func_pendulum_info;
 void SP_func_button (gentity_t *ent);
+extern entityInfo_t func_button_info;
 void SP_func_door (gentity_t *ent);
+extern entityInfo_t func_door_info;
 void SP_func_train (gentity_t *ent);
+extern entityInfo_t func_train_info;
+
 void SP_func_timer (gentity_t *self);
+extern entityInfo_t func_timer_info;
 void SP_func_breakable (gentity_t *ent);
+extern entityInfo_t func_breakable_info;
 void SP_func_glass (gentity_t *ent);
+extern entityInfo_t func_glass_info;
 void SP_func_usable( gentity_t *ent);
+extern entityInfo_t func_usable_info;
 void SP_func_wall( gentity_t *ent );
+extern entityInfo_t func_wall_info;
 void SP_rail_mover (gentity_t *ent); //Lugormod
+extern entityInfo_t rail_mover_info;
 void SP_rail_track (gentity_t *ent); //Lugormod
+extern entityInfo_t rail_track_info;
 void SP_rail_lane (gentity_t *ent); //Lugormod
+extern entityInfo_t rail_lane_info;
 
 void SP_trigger_lightningstrike( gentity_t *ent );
 extern entityInfo_t trigger_lightningstrike_info;
 
 void SP_trigger_once( gentity_t *ent );
+extern entityInfo_t trigger_once_info;
 
 qboolean trigger_multiple_allowlogical();
 void SP_trigger_multiple (gentity_t *ent);
@@ -360,89 +396,151 @@ extern entityInfo_t trigger_push_info;
 void SP_trigger_space(gentity_t *self);
 extern entityInfo_t trigger_space_info;
 void SP_trigger_shipboundary(gentity_t *self);
+extern entityInfo_t trigger_shipboundary_info;
 void SP_trigger_hyperspace(gentity_t *self);
+extern entityInfo_t trigger_hyperspace_info;
 void SP_trigger_asteroid_field(gentity_t *self);
+extern entityInfo_t trigger_asteroid_field_info;
 
 void SP_trigger_always (gentity_t *ent);
+extern entityInfo_t trigger_always_info;
 void SP_trigger_visible (gentity_t *ent);
+extern entityInfo_t trigger_visible_info;
 void SP_trigger_teleport (gentity_t *ent);
+extern entityInfo_t trigger_teleport_info;
 void SP_trigger_hurt (gentity_t *ent);
+extern entityInfo_t trigger_hurt_info;
 
 void SP_target_remove_powerups( gentity_t *ent );
+extern entityInfo_t target_remove_powerups_info;
 void SP_target_give (gentity_t *ent);
+extern entityInfo_t target_give_info;
 void SP_target_delay (gentity_t *ent);
+extern entityInfo_t target_delay_info;
 
 qboolean target_speaker_allowlogical();
 void SP_target_speaker (gentity_t *ent);
+extern entityInfo_t target_speaker_info;
 
 void SP_target_print (gentity_t *ent);
+extern entityInfo_t target_print_info;
 void SP_target_laser (gentity_t *self);
-void SP_target_character (gentity_t *ent);
+extern entityInfo_t target_laser_info;
+void SP_target_character (gentity_t *ent); // no doc
 void SP_target_score( gentity_t *ent );
+extern entityInfo_t target_score_info;
 void SP_target_teleporter( gentity_t *ent );
+extern entityInfo_t target_teleporter_info;
 void SP_target_relay (gentity_t *ent);
+extern entityInfo_t target_relay_info;
 void SP_target_kill (gentity_t *ent);
+extern entityInfo_t target_kill_info;
 void SP_target_position (gentity_t *ent);
+extern entityInfo_t target_position_info;
 void SP_target_location (gentity_t *ent);
+extern entityInfo_t target_location_info;
 void SP_target_counter (gentity_t *self);
+extern entityInfo_t target_counter_info;
 void SP_target_random (gentity_t *self);
+extern entityInfo_t target_random_info;
 void SP_target_scriptrunner( gentity_t *self );
+extern entityInfo_t target_scriptrunner_info;
 void SP_target_interest (gentity_t *self);
 void SP_target_activate (gentity_t *self);
+extern entityInfo_t target_activate_info;
 void SP_target_deactivate (gentity_t *self);
+extern entityInfo_t target_deactivate_info;
 void SP_target_level_change( gentity_t *self );
+extern entityInfo_t target_level_change_info;
 void SP_target_play_music( gentity_t *self );
+extern entityInfo_t target_play_music_info;
 void SP_target_push (gentity_t *ent);
+extern entityInfo_t target_push_info;
 
 void SP_light (gentity_t *self);
+extern entityInfo_t SP_light_info;
 void SP_info_null (gentity_t *self);
+extern entityInfo_t SP_info_null_info;
 void SP_info_notnull (gentity_t *self);
+extern entityInfo_t SP_info_notnull_info;
 void SP_info_camp (gentity_t *self);
+extern entityInfo_t SP_info_camp_info;
+
+extern entityInfo_t path_corner_info;
 void SP_path_corner (gentity_t *self);
 
 void SP_misc_teleporter_dest (gentity_t *self);
+extern entityInfo_t misc_teleporter_dest_info;
 void SP_misc_model_breakable(gentity_t *ent); //Lugormod
+extern entityInfo_t misc_model_breakable_info;
 void SP_misc_exploding_crate(gentity_t *ent); //Lugormod
+extern entityInfo_t misc_exploding_crate_info;
 void SP_misc_security_panel(gentity_t *ent);
+extern entityInfo_t misc_security_panel_info;
 void SP_defender(gentity_t *ent);
 void SP_misc_model(gentity_t *ent);
+extern entityInfo_t misc_model_info;
 void SP_misc_model_static(gentity_t *ent);
+extern entityInfo_t misc_model_static_info;
 void SP_misc_G2model(gentity_t *ent);
+extern entityInfo_t misc_G2model_info;
 void SP_misc_portal_camera(gentity_t *ent);
+extern entityInfo_t misc_portal_camera_info;
 void SP_misc_portal_surface(gentity_t *ent);
+extern entityInfo_t misc_portal_surface_info;
 void SP_misc_weather_zone( gentity_t *ent );
+extern entityInfo_t misc_weather_zone_info;
 
 void SP_misc_bsp (gentity_t *ent);
+extern entityInfo_t misc_bsp_info;
 void SP_terrain (gentity_t *ent);
+extern entityInfo_t terrain_info;
 void SP_misc_skyportal_orient (gentity_t *ent);
+extern entityInfo_t misc_skyportal_orient_info;
 void SP_misc_skyportal (gentity_t *ent);
+extern entityInfo_t misc_skyportal_info;
 
 void SP_misc_ammo_floor_unit(gentity_t *ent);
+extern entityInfo_t misc_ammo_floor_unit_info;
 void SP_misc_shield_floor_unit( gentity_t *ent );
+extern entityInfo_t misc_shield_floor_unit_info;
 void SP_misc_model_shield_power_converter( gentity_t *ent );
+extern entityInfo_t misc_model_shield_power_converter_info;
 void SP_misc_model_ammo_power_converter( gentity_t *ent );
+extern entityInfo_t misc_model_ammo_power_converter_info;
 void SP_misc_model_health_power_converter( gentity_t *ent );
+extern entityInfo_t misc_model_health_power_converter_info;
 
 void SP_fx_runner( gentity_t *ent );
+extern entityInfo_t fx_runner_info;
 
 void SP_target_screenshake(gentity_t *ent);
+extern entityInfo_t target_screenshake_info;
 void SP_target_escapetrig(gentity_t *ent);
 
 void SP_misc_maglock ( gentity_t *self );
+extern entityInfo_t misc_maglock_info;
 
 void SP_misc_faller(gentity_t *ent);
+extern entityInfo_t misc_faller_info;
 
 void SP_misc_holocron(gentity_t *ent);
+extern entityInfo_t misc_holocron_info;
 
 void SP_reference_tag ( gentity_t *ent );
+extern entityInfo_t ref_tag_info;
 
 void SP_misc_weapon_shooter( gentity_t *self );
+extern entityInfo_t misc_weapon_shooter_info;
 
 void SP_NPC_spawner( gentity_t *self );
+extern entityInfo_t NPC_spawner_info;
 
 void SP_LMD_spawner( gentity_t *NPCspawner );
+extern entityInfo_t LMD_spawner_info;
 
 void SP_NPC_Vehicle( gentity_t *self);
+extern entityInfo_t NPC_Vehicle_info;
 
 void SP_NPC_Kyle( gentity_t *self );
 void SP_NPC_Lando( gentity_t *self );
@@ -522,13 +620,18 @@ void SP_waypoint_navgoal_2 (gentity_t *ent);
 void SP_waypoint_navgoal_1 (gentity_t *ent);
 
 void SP_CreateSpaceDust( gentity_t *ent );
+extern entityInfo_t fx_spacedust_info;
 void SP_CreateSnow( gentity_t *ent );
+extern entityInfo_t fx_snow_info;
 void SP_CreateRain( gentity_t *ent );
-void SP_CreateWind( gentity_t *ent ); //Lugormod
+extern entityInfo_t fx_rain_info;
+void SP_CreateWind( gentity_t *ent ); //Lugormod, unused not spawnable
+extern entityInfo_t fx_wind_info; // Lugormod, unused not spawnable
 
 void SP_point_combat( gentity_t *self );
 
 void SP_shooter_blaster( gentity_t *ent );
+extern entityInfo_t shooter_blaster_info;
 
 void SP_team_CTF_redplayer( gentity_t *ent );
 void SP_team_CTF_blueplayer( gentity_t *ent );
@@ -536,13 +639,15 @@ void SP_team_CTF_blueplayer( gentity_t *ent );
 void SP_team_CTF_redspawn( gentity_t *ent );
 void SP_team_CTF_bluespawn( gentity_t *ent );
 
-extern entityInfo_t misc_turret_info;
 void SP_misc_turret( gentity_t *ent );
-
+extern entityInfo_t misc_turret_info;
 void SP_misc_turretG2( gentity_t *base );
+extern entityInfo_t misc_turretG2_info;
 void SP_misc_slotmachine (gentity_t *ent);//Lugormod
+extern entityInfo_t misc_slotmachine_info;
 void SP_ghost_exit (gentity_t *ent);//Lugormod
 void SP_target_fixdoor (gentity_t *ent); //Lugormod
+extern entityInfo_t target_fixdoor_info;
 
 //RoboPhred
 
@@ -731,6 +836,7 @@ spawn_t	spawnInitValues[] = {
 
 	{"lmd_scale", lmd_scale, Logical_True, &lmd_scale_info},
 
+  // TODO: info keys
 	{"lmd_stashdepo", lmd_stashdepo, Logical_False},
 	{"lmd_stashspawnpoint", lmd_stashspawnpoint, Logical_True},
 	{"lmd_stashzone", lmd_stashzone, Logical_False},
@@ -759,38 +865,41 @@ spawn_t	spawnInitValues[] = {
 	{"info_player_duel1", SP_info_player_duel1, Logical_True, &info_player_duel1_info},
 	{"info_player_duel2", SP_info_player_duel2, Logical_True, &info_player_duel2_info},
 	{"info_player_deathmatch", SP_info_player_deathmatch, Logical_True, &info_player_deathmatch_info},
-	{"info_player_siegeteam1", SP_info_player_siegeteam1, Logical_True},
-	{"info_player_siegeteam2", SP_info_player_siegeteam2, Logical_True},
-	{"info_player_intermission", SP_info_player_intermission, Logical_True},
-	{"info_player_intermission_red", SP_info_player_intermission_red, Logical_True},
-	{"info_player_intermission_blue", SP_info_player_intermission_blue, Logical_True},
-	{"info_jedimaster_start", SP_info_jedimaster_start, Logical_True},
-	{"info_player_start_red", SP_info_player_start_red, Logical_True},
-	{"info_player_start_blue", SP_info_player_start_blue, Logical_True},
-	{"info_null", SP_info_null, Logical_True},
-	{"info_notnull", SP_info_notnull, Logical_True},		// use target_position instead
-	{"info_camp", SP_info_camp, Logical_True},
+	
+  // TODO: Info keys
+  	{"info_player_siegeteam1", SP_info_player_siegeteam1, Logical_True, &info_player_siegeteam1_info},
+	{"info_player_siegeteam2", SP_info_player_siegeteam2, Logical_True, &info_player_siegeteam2_info},
+	{"info_player_intermission", SP_info_player_intermission, Logical_True, &info_player_intermission_info},
+	{"info_player_intermission_red", SP_info_player_intermission_red, Logical_True, &info_player_intermission_red_info},
+	{"info_player_intermission_blue", SP_info_player_intermission_blue, Logical_True, &info_player_intermission_blue_info},
+	{"info_jedimaster_start", SP_info_jedimaster_start, Logical_True, &info_jedimaster_start_info},
+	{"info_player_start_red", SP_info_player_start_red, Logical_True, &info_player_start_red_info},
+	{"info_player_start_blue", SP_info_player_start_blue, Logical_True, &info_player_start_blue_info},
+	{"info_null", SP_info_null, Logical_True, &SP_info_null_info},
+	{"info_notnull", SP_info_notnull, Logical_True, &SP_info_notnull_info},		// use target_position instead
+	{"info_camp", SP_info_camp, Logical_True, &SP_info_camp_info},
 
-	{"info_siege_objective", SP_info_siege_objective, Logical_False},
-	{"info_siege_radaricon", SP_info_siege_radaricon, Logical_False},
-	{"info_siege_decomplete", SP_info_siege_decomplete, Logical_True},
-	{"target_siege_end", SP_target_siege_end, Logical_True},
-	{"misc_siege_item", SP_misc_siege_item, Logical_False},
+	{"info_siege_objective", SP_info_siege_objective, Logical_False, &info_siege_objective_info},
+	{"info_siege_radaricon", SP_info_siege_radaricon, Logical_False, &info_siege_radaricon_info},
+	{"info_siege_decomplete", SP_info_siege_decomplete, Logical_True, &info_siege_decomplete_info},
+	{"target_siege_end", SP_target_siege_end, Logical_True, &target_siege_end_info},
+	{"misc_siege_item", SP_misc_siege_item, Logical_False, &misc_siege_item_info},
 
+  // TODO: Info keys
 	{"func_plat", SP_func_plat, Logical_False, &func_plat_info},
-	{"func_button", SP_func_button, Logical_False},
-	{"func_door", SP_func_door, Logical_False},
-	{"func_static", SP_func_static, Logical_False},
-	{"func_rotating", SP_func_rotating, Logical_False},
-	{"func_bobbing", SP_func_bobbing, Logical_False},
-	{"func_pendulum", SP_func_pendulum, Logical_False},
-	{"func_train", SP_func_train, Logical_False},
-	{"func_group", SP_info_null, Logical_False},
-	{"func_timer", SP_func_timer, Logical_False},			// rename trigger_timer?
-	{"func_breakable", SP_func_breakable, Logical_False},
-	{"func_glass", SP_func_glass, Logical_False},
-	{"func_usable", SP_func_usable, Logical_False},
-	{"func_wall", SP_func_wall, Logical_False},
+	{"func_button", SP_func_button, Logical_False, &func_button_info},
+	{"func_door", SP_func_door, Logical_False, &func_door_info},
+	{"func_static", SP_func_static, Logical_False, &func_static_info},
+	{"func_rotating", SP_func_rotating, Logical_False, &func_rotating_info},
+	{"func_bobbing", SP_func_bobbing, Logical_False, &func_bobbing_info},
+	{"func_pendulum", SP_func_pendulum, Logical_False, &func_pendulum_info},
+	{"func_train", SP_func_train, Logical_False, &func_train_info},
+	{"func_group", SP_info_null, Logical_False, &SP_info_null_info},
+	{"func_timer", SP_func_timer, Logical_False, &func_timer_info},			// rename trigger_timer?
+	{"func_breakable", SP_func_breakable, Logical_False, &func_breakable_info},
+	{"func_glass", SP_func_glass, Logical_False, &func_glass_info},
+	{"func_usable", SP_func_usable, Logical_False, &func_usable_info},
+	{"func_wall", SP_func_wall, Logical_False, &func_wall_info},
 
 	// Triggers are brush objects that cause an effect when contacted
 	// by a living player, usually involving firing targets.
@@ -799,96 +908,96 @@ spawn_t	spawnInitValues[] = {
 	// could not be client side predicted (push and teleport).
 
 	{"trigger_lightningstrike", SP_trigger_lightningstrike, Logical_True, &trigger_lightningstrike_info},
-	{"trigger_once", SP_trigger_once, Logical_False},
+	{"trigger_once", SP_trigger_once, Logical_False, &trigger_once_info},
 	{"trigger_multiple", SP_trigger_multiple, {qtrue, trigger_multiple_allowlogical}, &trigger_multiple_info},
 	{"trigger_push", SP_trigger_push, Logical_False, &trigger_push_info},
 
 	{"trigger_space", SP_trigger_space, Logical_False, &trigger_space_info},
-	{"trigger_shipboundary", SP_trigger_shipboundary, Logical_False},
-	{"trigger_hyperspace", SP_trigger_hyperspace, Logical_False},
-	{"trigger_asteroid_field", SP_trigger_asteroid_field, Logical_False},
+	{"trigger_shipboundary", SP_trigger_shipboundary, Logical_False, &trigger_shipboundary_info},
+	{"trigger_hyperspace", SP_trigger_hyperspace, Logical_False, &trigger_hyperspace_info},
+	{"trigger_asteroid_field", SP_trigger_asteroid_field, Logical_False, &trigger_asteroid_field_info},
 
-	{"trigger_teleport", SP_trigger_teleport, Logical_False},
-	{"trigger_hurt", SP_trigger_hurt, Logical_False},
-	{"trigger_always", SP_trigger_always, Logical_True},
-	{"trigger_visible", SP_trigger_visible, Logical_True},
+	{"trigger_teleport", SP_trigger_teleport, Logical_False, &trigger_teleport_info},
+	{"trigger_hurt", SP_trigger_hurt, Logical_False, &trigger_hurt_info},
+	{"trigger_always", SP_trigger_always, Logical_True, &trigger_always_info},
+	{"trigger_visible", SP_trigger_visible, Logical_True, &trigger_visible_info},
 
 
 	// targets perform no action by themselves, but must be triggered
 	// by another entity
-	{"target_give", SP_target_give, Logical_True},
-	{"target_remove_powerups", SP_target_remove_powerups, Logical_True},
-	{"target_delay", SP_target_delay, Logical_True},
-	{"target_speaker", SP_target_speaker, {qtrue, target_speaker_allowlogical}},
-	{"target_print", SP_target_print, Logical_True},
-	{"target_laser", SP_target_laser, Logical_True},
-	{"target_score", SP_target_score, Logical_True},
-	{"target_teleporter", SP_target_teleporter, Logical_True},
-	{"target_relay", SP_target_relay, Logical_True},
-	{"target_kill", SP_target_kill, Logical_True},
-	{"target_position", SP_target_position, Logical_True},
-	{"target_location", SP_target_location, Logical_True},
-	{"target_counter", SP_target_counter, Logical_True},
-	{"target_random", SP_target_random, Logical_True},
-	{"target_scriptrunner", SP_target_scriptrunner, qfalse},
+	{"target_give", SP_target_give, Logical_True, &target_give_info},
+	{"target_remove_powerups", SP_target_remove_powerups, Logical_True, &target_remove_powerups_info},
+	{"target_delay", SP_target_delay, Logical_True, &target_delay_info},
+	{"target_speaker", SP_target_speaker, {qtrue, target_speaker_allowlogical}, &target_speaker_info},
+	{"target_print", SP_target_print, Logical_True, &target_print_info},
+	{"target_laser", SP_target_laser, Logical_True, &target_laser_info},
+	{"target_score", SP_target_score, Logical_True, &target_score_info},
+	{"target_teleporter", SP_target_teleporter, Logical_True, &target_teleporter_info},
+	{"target_relay", SP_target_relay, Logical_True, &target_relay_info},
+	{"target_kill", SP_target_kill, Logical_True, &target_kill_info},
+	{"target_position", SP_target_position, Logical_True, &target_position_info},
+	{"target_location", SP_target_location, Logical_True, &target_location_info},
+	{"target_counter", SP_target_counter, Logical_True, &target_counter_info},
+	{"target_random", SP_target_random, Logical_True, &target_random_info},
+	{"target_scriptrunner", SP_target_scriptrunner, qfalse, &target_scriptrunner_info},
 	{"target_interest", SP_target_interest, Logical_True},
-	{"target_activate", SP_target_activate, Logical_True},
-	{"target_deactivate", SP_target_deactivate, Logical_True},
-	{"target_level_change", SP_target_level_change, Logical_True},
-	{"target_play_music", SP_target_play_music, Logical_True},
-	{"target_push", SP_target_push, Logical_True},
-	{"target_powerup", SP_target_powerup, Logical_True}, //Lugormod
+	{"target_activate", SP_target_activate, Logical_True, &target_activate_info},
+	{"target_deactivate", SP_target_deactivate, Logical_True, &target_deactivate_info},
+	{"target_level_change", SP_target_level_change, Logical_True, &target_level_change_info},
+	{"target_play_music", SP_target_play_music, Logical_True, &target_play_music_info},
+	{"target_push", SP_target_push, Logical_True, &target_push_info},
+	{"target_powerup", SP_target_powerup, Logical_True, &target_powerup_info}, //Lugormod
 
-	{"light", SP_light, Logical_True},
-	{"path_corner", SP_path_corner, Logical_True},
+	{"light", SP_light, Logical_True, &SP_light_info},
+	{"path_corner", SP_path_corner, Logical_True, &path_corner_info},
 		
-	{"misc_teleporter_dest", SP_misc_teleporter_dest, Logical_True},
+	{"misc_teleporter_dest", SP_misc_teleporter_dest, Logical_True, &misc_teleporter_dest_info},
 	{"defender", SP_defender, Logical_False},
-	{"misc_security_panel", SP_misc_security_panel, Logical_False},
+	{"misc_security_panel", SP_misc_security_panel, Logical_False, &misc_security_panel_info},
 	{"misc_stuff", SP_misc_model_breakable, Logical_False}, //Lugormod
-	{"misc_exploding_crate", SP_misc_exploding_crate, Logical_False}, //Lugormod
-	{"misc_model", SP_misc_model, Logical_False},
-	{"misc_model_static", SP_misc_model_static, Logical_False},
-	{"misc_model_breakable", SP_misc_model_breakable, Logical_False},
+	{"misc_exploding_crate", SP_misc_exploding_crate, Logical_False, &misc_exploding_crate_info}, //Lugormod
+	{"misc_model", SP_misc_model, Logical_False, &misc_model_info},
+	{"misc_model_static", SP_misc_model_static, Logical_False, &misc_model_static_info},
+	{"misc_model_breakable", SP_misc_model_breakable, Logical_False, &misc_model_breakable_info},
 	//{"misc_model_breakable", SP_misc_model_static},
-	{"misc_G2model", SP_misc_G2model, Logical_False},
-	{"misc_portal_surface", SP_misc_portal_surface, Logical_False},
-	{"misc_portal_camera", SP_misc_portal_camera, Logical_False},
-	{"misc_weather_zone", SP_misc_weather_zone, Logical_False},
+	{"misc_G2model", SP_misc_G2model, Logical_False, &misc_G2model_info},
+	{"misc_portal_surface", SP_misc_portal_surface, Logical_False, &misc_portal_surface_info},
+	{"misc_portal_camera", SP_misc_portal_camera, Logical_False, &misc_portal_camera_info},
+	{"misc_weather_zone", SP_misc_weather_zone, Logical_False, &misc_weather_zone_info},
 
-	{"misc_bsp", SP_misc_bsp, Logical_False},
-	{"terrain", SP_terrain, Logical_False},
-	{"misc_skyportal_orient", SP_misc_skyportal_orient, Logical_True},
-	{"misc_skyportal", SP_misc_skyportal, Logical_True},
+	{"misc_bsp", SP_misc_bsp, Logical_False, &misc_bsp_info},
+	{"terrain", SP_terrain, Logical_False, &terrain_info},
+	{"misc_skyportal_orient", SP_misc_skyportal_orient, Logical_True, &misc_skyportal_orient_info},
+	{"misc_skyportal", SP_misc_skyportal, Logical_True, &misc_skyportal_info},
 
 	//rwwFIXMEFIXME: only for testing rmg team stuff
 	{"gametype_item", SP_gametype_item, Logical_False},
 
-	{"misc_ammo_floor_unit", SP_misc_ammo_floor_unit, Logical_False},
-	{"misc_shield_floor_unit", SP_misc_shield_floor_unit, Logical_False},
-	{"misc_model_shield_power_converter", SP_misc_model_shield_power_converter, Logical_False},
-	{"misc_model_ammo_power_converter", SP_misc_model_ammo_power_converter, Logical_False},
-	{"misc_model_health_power_converter", SP_misc_model_health_power_converter, Logical_False},
+	{"misc_ammo_floor_unit", SP_misc_ammo_floor_unit, Logical_False, &misc_ammo_floor_unit_info},
+	{"misc_shield_floor_unit", SP_misc_shield_floor_unit, Logical_False, &misc_shield_floor_unit_info},
+	{"misc_model_shield_power_converter", SP_misc_model_shield_power_converter, Logical_False, &misc_model_shield_power_converter_info},
+	{"misc_model_ammo_power_converter", SP_misc_model_ammo_power_converter, Logical_False, &misc_model_ammo_power_converter_info},
+	{"misc_model_health_power_converter", SP_misc_model_health_power_converter, Logical_False, &misc_model_health_power_converter_info},
 
-	{"fx_runner", SP_fx_runner, Logical_False},
+	{"fx_runner", SP_fx_runner, Logical_False, &fx_runner_info},
 
-	{"target_screenshake", SP_target_screenshake, Logical_True},
+	{"target_screenshake", SP_target_screenshake, Logical_True, &target_screenshake_info},
 	{"target_escapetrig", SP_target_escapetrig, Logical_True},
 
-	{"misc_maglock", SP_misc_maglock, Logical_False},
+	{"misc_maglock", SP_misc_maglock, Logical_False, &misc_maglock_info},
 
-	{"misc_faller", SP_misc_faller, Logical_True},
+	{"misc_faller", SP_misc_faller, Logical_True, &misc_faller_info},
 
-	{"ref_tag",	SP_reference_tag, Logical_True},
+	{"ref_tag",	SP_reference_tag, Logical_True, &ref_tag_info},
 	{"ref_tag_huge", SP_reference_tag, Logical_True},
 
-	{"misc_weapon_shooter", SP_misc_weapon_shooter, Logical_True},
+	{"misc_weapon_shooter", SP_misc_weapon_shooter, Logical_True, &misc_weapon_shooter_info},
 
-	{"lmd_spawner", SP_LMD_spawner, Logical_True},
+	{"lmd_spawner", SP_LMD_spawner, Logical_True, &LMD_spawner_info},
 
 	//new NPC ents
-	{"NPC_spawner", SP_NPC_spawner, Logical_True},
-	{"NPC_Vehicle", SP_NPC_Vehicle, Logical_True},
+	{"NPC_spawner", SP_NPC_spawner, Logical_True, &NPC_spawner_info},
+	{"NPC_Vehicle", SP_NPC_Vehicle, Logical_True, &NPC_Vehicle_info},
 	{"NPC_Kyle", SP_NPC_Kyle, Logical_True},
 	{"NPC_Lando", SP_NPC_Lando, Logical_True},
 	{"NPC_Jan", SP_NPC_Jan, Logical_True},
@@ -979,16 +1088,18 @@ spawn_t	spawnInitValues[] = {
 	{"waypoint_navgoal_2", SP_waypoint_navgoal_2, Logical_True},
 	{"waypoint_navgoal_1", SP_waypoint_navgoal_1, Logical_True},
 
-	{"fx_spacedust", SP_CreateSpaceDust, Logical_True},
-	{"fx_rain", SP_CreateRain, Logical_True},
-	{"fx_snow", SP_CreateSnow, Logical_True},
-	//{"fx_wind", SP_CreateWind}, //Lugormod
+	{"fx_spacedust", SP_CreateSpaceDust, Logical_True, &fx_spacedust_info},
+	{"fx_rain", SP_CreateRain, Logical_True, &fx_rain_info},
+	{"fx_snow", SP_CreateSnow, Logical_True, &fx_snow_info},
+	//{"fx_wind", SP_CreateWind, Logical_True, &fx_wind_info}, //Lugormod
+	// if ever used in the future
+
 
 	{"point_combat", SP_point_combat, Logical_True},
 
-	{"misc_holocron", SP_misc_holocron, Logical_False},
+	{"misc_holocron", SP_misc_holocron, Logical_False, &misc_holocron_info},
 
-	{"shooter_blaster", SP_shooter_blaster, Logical_True},
+	{"shooter_blaster", SP_shooter_blaster, Logical_True, &shooter_blaster_info},
 
 	{"team_CTF_redplayer", SP_team_CTF_redplayer, Logical_True},
 	{"team_CTF_blueplayer", SP_team_CTF_blueplayer, Logical_True},
@@ -998,21 +1109,21 @@ spawn_t	spawnInitValues[] = {
 
 	{"item_botroam", SP_item_botroam, Logical_True},
 
-	{"emplaced_gun", SP_emplaced_gun, Logical_False},
+	{"emplaced_gun", SP_emplaced_gun, Logical_False, &emplaced_gun_info},
 
-	{ "misc_turret", SP_misc_turret, Logical_False, &misc_turret_info },
-	{"misc_turretG2", SP_misc_turretG2, Logical_False},
-	{"misc_camera", SP_misc_camera, Logical_False},//Lugormod
-	{"random_spot", SP_random_spot, Logical_True},//Lugormod
-	{"money_dispenser", SP_money_dispenser, Logical_False},//Lugormod
-	{"control_point", SP_control_point, Logical_False},//Lugormod
-	{"emplaced_eweb", SP_emplaced_gun, Logical_False},//Lugormod
-	{"target_fixdoor", SP_target_fixdoor, Logical_False}, //Lugormod
-	{"target_credits", SP_target_credits, Logical_True}, //Lugormod
-	{"rail_mover", SP_rail_mover, Logical_False}, //Lugormod
-	{"rail_track", SP_rail_track, Logical_True}, //Lugormod
-	{"rail_lane", SP_rail_lane, Logical_True}, //Lugormod
-	{"misc_slotmachine", SP_misc_slotmachine, Logical_False}, //Lugormod
+	{"misc_turret", SP_misc_turret, Logical_False, &misc_turret_info},
+	{"misc_turretG2", SP_misc_turretG2, Logical_False, &misc_turretG2_info},
+	{"misc_camera", SP_misc_camera, Logical_False, &misc_camera_info},//Lugormod
+	{"random_spot", SP_random_spot, Logical_True, &random_spot_info},//Lugormod
+	{"money_dispenser", SP_money_dispenser, Logical_False, &money_dispenser_info},//Lugormod
+	{"control_point", SP_control_point, Logical_False, &control_point_info},//Lugormod
+	{"emplaced_eweb", SP_emplaced_gun, Logical_False, &emplaced_gun_info},//Lugormod
+	{"target_fixdoor", SP_target_fixdoor, Logical_False, &target_fixdoor_info}, //Lugormod
+	{"target_credits", SP_target_credits, Logical_True, &target_credits_info}, //Lugormod
+	{"rail_mover", SP_rail_mover, Logical_False, &rail_mover_info}, //Lugormod
+	{"rail_track", SP_rail_track, Logical_True, &rail_track_info}, //Lugormod
+	{"rail_lane", SP_rail_lane, Logical_True, &rail_lane_info}, //Lugormod
+	{"misc_slotmachine", SP_misc_slotmachine, Logical_False, &misc_slotmachine_info}, //Lugormod
 	{"ghost_exit_red", SP_ghost_exit, Logical_True}, //Lugormod
 	{"ghost_exit_blue", SP_ghost_exit, Logical_True}, //Lugormod
 	

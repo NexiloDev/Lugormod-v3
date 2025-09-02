@@ -505,7 +505,7 @@ extern entityInfo_t misc_ammo_floor_unit_info;
 void SP_misc_shield_floor_unit( gentity_t *ent );
 extern entityInfo_t misc_shield_floor_unit_info;
 void SP_misc_model_shield_power_converter( gentity_t *ent );
-extern entityInfo_t misc_model_shield_power_convert_info;
+extern entityInfo_t misc_model_shield_power_converter_info;
 void SP_misc_model_ammo_power_converter( gentity_t *ent );
 extern entityInfo_t misc_model_ammo_power_converter_info;
 void SP_misc_model_health_power_converter( gentity_t *ent );
@@ -975,7 +975,7 @@ spawn_t	spawnInitValues[] = {
 
 	{"misc_ammo_floor_unit", SP_misc_ammo_floor_unit, Logical_False, &misc_ammo_floor_unit_info},
 	{"misc_shield_floor_unit", SP_misc_shield_floor_unit, Logical_False, &misc_shield_floor_unit_info},
-	{"misc_model_shield_power_converter", SP_misc_model_shield_power_converter, Logical_False, &misc_model_shield_power_convert_info},
+	{"misc_model_shield_power_converter", SP_misc_model_shield_power_converter, Logical_False, &misc_model_shield_power_converter_info},
 	{"misc_model_ammo_power_converter", SP_misc_model_ammo_power_converter, Logical_False, &misc_model_ammo_power_converter_info},
 	{"misc_model_health_power_converter", SP_misc_model_health_power_converter, Logical_False, &misc_model_health_power_converter_info},
 

@@ -416,7 +416,7 @@ void Force_Lightning_Damage(gentity_t *self, gentity_t *target, vec3_t dir, cons
 	}
 }
 
-extern vmCvar_t lmd_lightning_below_level_3_range;
+extern vmCvar_t lmd_lightningBelowLevel3Range;
 
 
 qboolean Force_Lightning_Run(gentity_t *self, const void* vData) {
@@ -526,9 +526,9 @@ qboolean Force_Lightning_Run(gentity_t *self, const void* vData) {
 		VectorCopy(self->client->ps.origin, tfrom);
 		tfrom[2] += self->client->ps.viewheight;
 		AngleVectors(self->client->ps.viewangles, fwd, NULL, NULL);
-		tto[0] = tfrom[0] + fwd[0] * lmd_lightning_below_level_3_range.integer;
-		tto[1] = tfrom[1] + fwd[1] * lmd_lightning_below_level_3_range.integer;
-		tto[2] = tfrom[2] + fwd[2] * lmd_lightning_below_level_3_range.integer;
+		tto[0] = tfrom[0] + fwd[0] * lmd_lightningBelowLevel3Range.integer;
+		tto[1] = tfrom[1] + fwd[1] * lmd_lightningBelowLevel3Range.integer;
+		tto[2] = tfrom[2] + fwd[2] * lmd_lightningBelowLevel3Range.integer;
 
 		trap_Trace(&tr, tfrom, NULL, NULL, tto, self->s.number, MASK_PLAYERSOLID);
 		
@@ -851,7 +851,7 @@ void Force_Drain_Damage( gentity_t *self, gentity_t *target, vec3_t dir, vec3_t 
 	}
 }
 
-extern vmCvar_t lmd_drain_below_level_3_range;
+extern vmCvar_t lmd_drainBelowLevel3Range;
 
 qboolean Force_Drain_Run(gentity_t *self, const void *vData) {
 	GETFORCEDATA(forceDrain_t);
@@ -949,9 +949,9 @@ qboolean Force_Drain_Run(gentity_t *self, const void *vData) {
 		VectorCopy(self->client->ps.origin, tfrom);
 		tfrom[2] += self->client->ps.viewheight;
 		AngleVectors(self->client->ps.viewangles, fwd, NULL, NULL);
-		tto[0] = tfrom[0] + fwd[0] * lmd_drain_below_level_3_range.integer;
-		tto[1] = tfrom[1] + fwd[1] * lmd_drain_below_level_3_range.integer;
-		tto[2] = tfrom[2] + fwd[2] * lmd_drain_below_level_3_range.integer;
+		tto[0] = tfrom[0] + fwd[0] * lmd_drainBelowLevel3Range.integer;
+		tto[1] = tfrom[1] + fwd[1] * lmd_drainBelowLevel3Range.integer;
+		tto[2] = tfrom[2] + fwd[2] * lmd_drainBelowLevel3Range.integer;
 
 		trap_Trace(&tr, tfrom, NULL, NULL, tto, self->s.number, MASK_PLAYERSOLID);
 		

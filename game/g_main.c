@@ -63,6 +63,7 @@ const char *verMods =
 #include "Lmd_Commands_Auths.h"
 #include "Lmd_Bans.h"
 #include "Lmd_EntityCore.h"
+#include "Lmd_Medilevitate.h"
 
 level_locals_t	level;
 
@@ -393,8 +394,22 @@ vmCvar_t lmd_enableCorpseDrag;
 
 vmCvar_t lmd_rewardcr_kill;
 
-vmCvar_t lmd_lightning_below_level_3_range;
-vmCvar_t lmd_drain_below_level_3_range;
+vmCvar_t lmd_lightningBelowLevel3Range;
+vmCvar_t lmd_drainBelowLevel3Range;
+
+// Lmd_MediLevitate
+vmCvar_t lmd_levitateInitialUpVelocity;
+vmCvar_t lmd_levitateInitialBounceMultiplier;
+vmCvar_t lmd_levitateHealAmount;
+vmCvar_t lmd_levitateHealInterval;
+vmCvar_t lmd_levitateBreathSway;
+vmCvar_t lmd_levitateJediFx;
+vmCvar_t lmd_levitateSithFx;
+vmCvar_t lmd_levitateJediSound;
+vmCvar_t lmd_levitateSithSound;
+vmCvar_t lmd_levitateFinish;
+vmCvar_t lmd_levitateMaxHealth;
+vmCvar_t lmd_levitateMaxForcePoints;
 
 // lumaya: SetSaber enable use time
 vmCvar_t lmd_set_saber_delay;
@@ -620,12 +635,49 @@ static cvarTable_t		gameCvarTable[] = {
 		"Give a player credits for killing other players.  Does not work for killing NPCs.",
 	},
 
-	{ &lmd_lightning_below_level_3_range, "lmd_lightning_below_level_3_range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
+
+{ &lmd_lightningBelowLevel3Range, "lmd_lightningBelowLevel3Range", "600", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force lightning below level 3.",
-	},
-	{ &lmd_drain_below_level_3_range, "lmd_drain_below_level_3_range", "512", CVAR_ARCHIVE, 0, qtrue, qfalse,
+},
+	{ &lmd_drainBelowLevel3Range, "lmd_drainBelowLevel3Range", "512", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the range for force drain below level 3.",
 	},
+	{ &lmd_levitateInitialUpVelocity, "lmd_levitateInitialUpVelocity", "50", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the initial upwards velocity for MediLevitate.",
+	},
+	{ &lmd_levitateInitialBounceMultiplier, "lmd_levitateInitialBounceMultiplier", "0.35", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the bounce multiplier for MediLevitate. 0 - 1.0!",
+	},
+	{ &lmd_levitateHealAmount, "lmd_levitateHealAmount", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"How much we heal per tick of lmd_medilevitate_heal_interval while levitate.",
+	},
+	{ &lmd_levitateHealInterval, "lmd_levitateHealInterval", "2000", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The interval for lmd_levitateHealAmount to heal us during MediLevitate.",
+	},
+	{ &lmd_levitateBreathSway, "lmd_levitateBreathSway", "10.0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the breath sway for levitate.",
+	},
+	{ &lmd_levitateJediFx, "lmd_levitateJediFx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 then levitate plays an effect when on jedi.",
+	},
+	{ &lmd_levitateSithFx, "lmd_levitateSithFx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 then levitate plays an effect when on sith.",
+	},
+	{ &lmd_levitateJediSound, "lmd_levitateJediSound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 levitate plays a sound when on jedi.",
+	},
+	{ &lmd_levitateSithSound, "lmd_levitateSithSound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 levitate plays a sound when on sith.",
+	},
+	{ &lmd_levitateFinish, "lmd_levitateFinish", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"If 1 levitate finishes if lmd_levitateMaxHealth or lmd_levitateMaxForcePoints is greater than 100 and their values are reached.",
+	},
+	{ &lmd_levitateMaxHealth, "lmd_levitateMaxHealth", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The amount a jedi's HP can go up to when levitating.",
+	},
+	{ &lmd_levitateMaxForcePoints, "lmd_levitateMaxForcePoints", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"The amount a Sith's FP can go up to when levitating.",
+  },
 	{ &lmd_set_saber_delay, "lmd_set_saber_delay", "750", CVAR_ARCHIVE, 0, qtrue, qfalse,
 		"Set the delay for instant saber switch for when to be able to use saber again after swapping.",
 	},
@@ -5651,6 +5703,10 @@ ContinueThink:
 				WP_ForcePowersUpdate(ent, &ent->client->pers.cmd );
 				WP_SaberPositionUpdate(ent, &ent->client->pers.cmd);
 				WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
+
+				// lumaya: MediLevitate
+				lmd_meditate_levitate_update(ent);
+
 				
 				if (ent->client->Lmd.lmdMenu.entityNum != 0)
 				{

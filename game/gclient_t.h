@@ -554,6 +554,19 @@ struct gclient_s {
 
 		struct 
 		{
+			int state;
+			unsigned int runTime;
+			unsigned int sithFxTimer;
+			float phase;
+			qboolean enabled;
+			unsigned int humSoundTimer;
+			unsigned int autoHealTimer;
+			vec3_t startOrigin;
+			qboolean effectFullFxPlayed;
+		} mediLevitate;
+
+		struct 
+		{
 			unsigned int delayTime;
 			qboolean openAgain;
 			unsigned int cooldownTime;
@@ -593,6 +606,7 @@ struct gclient_s {
 
 		int crosshairEntNum;
 		unsigned int grabbing;
+
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

@@ -126,7 +126,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
             {
                 const int isSith = (Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE);
 
-                if (lmd_levitateMaxHealth.integer > 100 && !isSith)
+                if (lmd_levitateMaxHealth.integer >= 100 && !isSith)
                 {
                     if (self->health < lmd_levitateMaxHealth.integer)
                     {
@@ -137,7 +137,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
                         self->client->ps.stats[STAT_MAX_HEALTH] = self->health;
                     }
                 }
-                else if (lmd_levitateMaxForcePoints.integer > 100 && isSith)
+                else if (lmd_levitateMaxForcePoints.integer >= 100 && isSith)
                 {
                     if (self->client->ps.fd.forcePower < lmd_levitateMaxForcePoints.integer)
                     {

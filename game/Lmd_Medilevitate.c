@@ -21,6 +21,7 @@ extern vmCvar_t lmd_levitateSithSound;
 extern vmCvar_t lmd_levitateFinish;
 extern vmCvar_t lmd_levitateMaxHealth;
 extern vmCvar_t lmd_levitateMaxForcePoints;
+extern vmCvar_t lmd_levitateRegen;
 
 extern int rageLoopSound;
 extern int protectLoopSound;
@@ -138,26 +139,24 @@ void lmd_meditate_levitate_update(gentity_t* self)
             float swayOffset = cosf(self->client->Lmd.mediLevitate.phase) * swayAmplitude;
             self->client->ps.origin[0] += (swayOffset - (self->client->ps.origin[0] - self->client->Lmd.mediLevitate.startOrigin[0])) * 0.1f;
 
-            if (self->client->Lmd.mediLevitate.autoHealTimer < level.time)
+            if (lmd_levitateRegen.integer && self->client->Lmd.mediLevitate.autoHealTimer < level.time)
             {
-                if (lmd_levitateMaxHealth.integer >= 100 && !isSith)
+                if (!isSith && self->health < lmd_levitateMaxHealth.integer)
                 {
-                    if (self->health < lmd_levitateMaxHealth.integer)
+                    self->health += lmd_levitateHealAmount.integer;
+                    if (self->health > lmd_levitateMaxHealth.integer)
                     {
-                        self->health += lmd_levitateHealAmount.integer;
-                        if (self->health > lmd_levitateMaxHealth.integer)
-                            self->health = lmd_levitateMaxHealth.integer;
-
-                        self->client->ps.stats[STAT_MAX_HEALTH] = self->health;
+                        self->health = lmd_levitateMaxHealth.integer;
                     }
+
+                    self->client->ps.stats[STAT_MAX_HEALTH] = self->health;
                 }
-                else if (lmd_levitateMaxForcePoints.integer >= 100 && isSith)
+                else if (isSith && self->client->ps.fd.forcePower < lmd_levitateMaxForcePoints.integer)
                 {
-                    if (self->client->ps.fd.forcePower < lmd_levitateMaxForcePoints.integer)
+                    self->client->ps.fd.forcePower += lmd_levitateHealAmount.integer;
+                    if (self->client->ps.fd.forcePower > lmd_levitateMaxForcePoints.integer)
                     {
-                        self->client->ps.fd.forcePower += lmd_levitateHealAmount.integer;
-                        if (self->client->ps.fd.forcePower > lmd_levitateMaxForcePoints.integer)
-                            self->client->ps.fd.forcePower = lmd_levitateMaxForcePoints.integer;
+                        self->client->ps.fd.forcePower = lmd_levitateMaxForcePoints.integer;
                     }
                 }
                 
@@ -173,7 +172,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
                 self->client->Lmd.mediLevitate.autoHealTimer = level.time + heal_interval;
             }
             
-            if (!self->client->Lmd.mediLevitate.effectFullFxPlayed)
+            if (lmd_levitateRegen.integer && !self->client->Lmd.mediLevitate.effectFullFxPlayed)
             {
                 if (!isSith && self->health >= lmd_levitateMaxHealth.integer)
                 {
@@ -189,7 +188,6 @@ void lmd_meditate_levitate_update(gentity_t* self)
                     G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/drain.mp3"));
                 }
             }
-
 
             G_SetAnim(self, SETANIM_BOTH, BOTH_STAND5TOSIT2,
                       SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_HOLDLESS, 100);

@@ -412,6 +412,7 @@ vmCvar_t lmd_levitateSithSound;
 vmCvar_t lmd_levitateFinish;
 vmCvar_t lmd_levitateMaxHealth;
 vmCvar_t lmd_levitateMaxForcePoints;
+vmCvar_t lmd_levitateRegen;
 
 // lumaya: SetSaber enable use time
 vmCvar_t lmd_set_saber_delay;
@@ -686,6 +687,9 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &lmd_levitateMaxForcePoints, "lmd_levitateMaxForcePoints", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"The amount a Sith's FP can go up to when levitating.",
   },
+	{ &lmd_levitateRegen, "lmd_levitateRegen", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
+"1 to enable health regeneration (for Jedi) and force regeneration (for Sith), 0 to disable it.",
+	},
 	{ &lmd_set_saber_delay, "lmd_set_saber_delay", "750", CVAR_ARCHIVE, 0, qtrue, qfalse,
 		"Set the delay for instant saber switch for when to be able to use saber again after swapping.",
 	},

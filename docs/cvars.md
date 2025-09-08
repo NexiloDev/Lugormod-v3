@@ -238,13 +238,15 @@ If set to 1, Levitate plays an effect when used by Sith.
 ## lmd_levitateJediSound
 ### Default value: 0
 ```
-If set to 1, Levitate plays a sound when used by Jedi.
+If set to 1, Levitate plays a continuous sound when used by Jedi.
 ```
+
 ## lmd_levitateSithSound
 ### Default value: 0
 ```
-If set to 1, Levitate plays a sound when used by Sith.
+If set to 1, Levitate plays a continuous sound when used by Sith.
 ```
+
 ## lmd_levitateFinish
 ### Default value: 0
 ```
@@ -260,6 +262,13 @@ Maximum health a Jedi can reach while levitating.
 ```
 Maximum force points a Sith can reach while levitating.
 ```
+
+## lmd_levitateRegen
+### Default value: 1
+```
+1 to enable health regeneration (for Jedi) and force regeneration (for Sith), 0 to disable it.
+```
+
 ## lmd_lightningBelowLevel3Range
 ### Default value: 600
 ```

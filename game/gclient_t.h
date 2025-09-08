@@ -559,7 +559,7 @@ struct gclient_s {
 			unsigned int sithFxTimer;
 			float phase;
 			qboolean enabled;
-			unsigned int humSoundTimer;
+			qboolean soundStarted;
 			unsigned int autoHealTimer;
 			vec3_t startOrigin;
 			qboolean effectFullFxPlayed;

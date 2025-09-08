@@ -222,6 +222,19 @@ If set to 1, Levitate plays an effect when used by Jedi.
 ```
 If set to 1, Levitate plays an effect when used by Sith.
 ```
+
+## lmd_levitateAscentSound
+### Default value: 1
+```
+1 to enable a sound effect during the ascending phase of /levitate (starting animation), 0 to disable.
+```
+
+## lmd_levitateDescentSound
+### Default value: 1
+```
+1 to enable a sound effect during the descending phase of /levitate (ending animation), 0 to disable.
+```
+
 ## lmd_levitateJediSound
 ### Default value: 0
 ```

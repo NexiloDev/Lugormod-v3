@@ -179,6 +179,12 @@ void lmd_meditate_levitate_update(gentity_t* self)
                     self->client->Lmd.mediLevitate.effectFullFxPlayed = qtrue;
                     G_PlayEffectID(G_EffectIndex("force/heal2"), self->client->ps.origin, vec3_origin);
                     G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/absorb.mp3"));
+
+                    if (lmd_levitateFinish.integer)
+                    {
+                        lmd_meditate_levitate_end(self);
+                        break;
+                    }
                 }
 
                 if (isSith && self->client->ps.fd.forcePower >= lmd_levitateMaxForcePoints.integer)
@@ -186,6 +192,12 @@ void lmd_meditate_levitate_update(gentity_t* self)
                     self->client->Lmd.mediLevitate.effectFullFxPlayed = qtrue;
                     G_PlayEffectID(G_EffectIndex("force/rage2"), self->client->ps.origin, vec3_origin);
                     G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/drain.mp3"));
+
+                    if (lmd_levitateFinish.integer)
+                    {
+                        lmd_meditate_levitate_end(self);
+                        break;
+                    }
                 }
             }
 
@@ -247,6 +259,18 @@ int lmd_meditate_levitate_abort(gentity_t* self)
 void lmd_meditate_levitate_end(gentity_t* self)
 {
     G_SetAnim(self, SETANIM_BOTH, BOTH_MEDITATE_END, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 100);
+
+    G_MuteSound(self->client->ps.fd.killSoundEntIndex[TRACK_CHANNEL_3-50], CHAN_VOICE);
+    if (
+        lmd_levitateDescentSound.integer
+        && !(lmd_levitateFinish.integer && self->client->Lmd.mediLevitate.effectFullFxPlayed)
+    ) {
+        // Play the sound for the descending phase,
+        // if enabled AND not currently playing the "full" sound effect because of lmd_levitateFinish,
+        // (to avoid playing both sounds at the same time).
+        G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
+    }
+
     self->client->ps.stats[STAT_MAX_HEALTH] = 100;
     self->client->ps.forceHandExtendTime = level.time + self->client->ps.legsTimer;
     self->client->ps.weaponTime = self->client->ps.legsTimer;
@@ -255,9 +279,4 @@ void lmd_meditate_levitate_end(gentity_t* self)
     self->client->Lmd.mediLevitate.effectFullFxPlayed = qfalse;
     self->client->Lmd.mediLevitate.enabled = qfalse;
     self->client->Lmd.mediLevitate.state = 0;
-    G_MuteSound(self->client->ps.fd.killSoundEntIndex[TRACK_CHANNEL_3-50], CHAN_VOICE);
-    if (lmd_levitateDescentSound.integer)
-    {
-        G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
-    }
 }

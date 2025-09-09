@@ -250,8 +250,9 @@ If set to 1, Levitate plays a continuous sound when used by Sith.
 ## lmd_levitateFinish
 ### Default value: 0
 ```
-If set to 1, Levitate will stop once lmd_levitateMaxHealth or lmd_levitateMaxForcePoints is reached.
+If set to 1, Levitate will stop once lmd_levitateMaxHealth (Jedi) or lmd_levitateMaxForcePoints (Sith) is reached.
 ```
+
 ## lmd_levitateMaxHealth
 ### Default value: 100
 ```

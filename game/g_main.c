@@ -679,7 +679,7 @@ static cvarTable_t		gameCvarTable[] = {
 	"If 1 levitate plays a continuous sound when on sith.",
 	},
 	{ &lmd_levitateFinish, "lmd_levitateFinish", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"Set to 1 to automatically end /levitate when lmd_levitateMaxHealth (Jedi) or lmd_levitateMaxForcePoints (Sith) are reached (and lmd_levitateRegen is enabled).",
+	"If set to 1, Levitate will stop once lmd_levitateMaxHealth (Jedi) or lmd_levitateMaxForcePoints (Sith) is reached.",
 	},
 	{ &lmd_levitateMaxHealth, "lmd_levitateMaxHealth", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"The amount a jedi's HP can go up to when levitating.",

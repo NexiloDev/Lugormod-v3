@@ -160,12 +160,12 @@ void lmd_meditate_levitate_update(gentity_t* self)
                     }
                 }
                 
-                float jedi_level = Accounts_Prof_GetLevel(self->client->pers.Lmd.account);
+                float jedi_level = (float)Accounts_Prof_GetLevel(self->client->pers.Lmd.account);
                 jedi_level *= 0.5f;
                 if (jedi_level < 1.0f)
                     jedi_level = 1.0f;
 
-                int heal_interval = (int)(lmd_levitateHealInterval.integer / jedi_level);
+                int heal_interval = (int)((float)lmd_levitateHealInterval.integer / jedi_level);
                 if (heal_interval < 300)
                     heal_interval = 300;
 
@@ -236,7 +236,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
     }
 }
 
-int lmd_meditate_levitate_abort(gentity_t* self)
+qboolean lmd_meditate_levitate_abort(gentity_t* self)
 {
     if (!self || !self->client || !self->inuse)
         return qfalse;

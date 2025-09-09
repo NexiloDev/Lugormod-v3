@@ -8,6 +8,7 @@
 #include "Lmd_Accounts_Friends.h"
 
 #include "Lmd_Commands_Auths.h"
+#include "Lmd_Medilevitate.h"
 
 #include "../ui/menudef.h"			// for the voice chats
 
@@ -3584,6 +3585,16 @@ void Cmd_EngageDuel_f(gentity_t *ent){
 			ent->client->ps.duelInProgress = qtrue;
 			challenged->client->ps.duelInProgress = qtrue;
 			//}
+
+			if (ent->client->Lmd.mediLevitate.enabled)
+			{
+				lmd_meditate_levitate_end(ent);
+			}
+
+			if (challenged->client->Lmd.mediLevitate.enabled)
+			{
+				lmd_meditate_levitate_end(challenged);
+			}
 
 			ent->client->ps.duelTime = level.time + 2000;
 			challenged->client->ps.duelTime = level.time + 2000;

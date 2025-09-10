@@ -14,12 +14,17 @@ extern vmCvar_t lmd_levitateHealInterval;
 extern vmCvar_t lmd_levitateBreathSway;
 extern vmCvar_t lmd_levitateJediFx;
 extern vmCvar_t lmd_levitateSithFx;
+extern vmCvar_t lmd_levitateAscentSound;
+extern vmCvar_t lmd_levitateDescentSound;
 extern vmCvar_t lmd_levitateJediSound;
 extern vmCvar_t lmd_levitateSithSound;
 extern vmCvar_t lmd_levitateFinish;
 extern vmCvar_t lmd_levitateMaxHealth;
 extern vmCvar_t lmd_levitateMaxForcePoints;
+extern vmCvar_t lmd_levitateRegen;
 
+extern int rageLoopSound;
+extern int protectLoopSound;
 void lmd_meditate_levitate_update(gentity_t* self)
 {
     if (!self || !self->client || !self->inuse || !self->client->Lmd.mediLevitate.enabled ||
@@ -58,6 +63,31 @@ void lmd_meditate_levitate_update(gentity_t* self)
             self->client->Lmd.customSpeed.time = level.time + FRAMETIME;
             G_SetAnim(self, SETANIM_BOTH, BOTH_FORCE_RAGE,
                       SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_HOLDLESS, 500);
+
+            if (!self->client->Lmd.mediLevitate.soundStarted)
+            {
+                self->client->Lmd.mediLevitate.soundStarted = qtrue;
+
+                // Play the initial "rising" sound
+                if (lmd_levitateAscentSound.integer)
+                {
+                    G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/jumpbuild.mp3"));
+                }
+
+                // Start the "hum" sound loop (if not yet started)
+                const int isSith = (Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE);
+                if (lmd_levitateSithSound.integer > 0 && isSith)
+                {
+                    G_Sound( self, TRACK_CHANNEL_3, rageLoopSound );
+                    // Will be stopped by G_MuteSound() in lmd_meditate_levitate_end()
+                }
+                else if (lmd_levitateJediSound.integer > 0 && !isSith)
+                {
+                    G_Sound( self, TRACK_CHANNEL_3, protectLoopSound );
+                    // Will be stopped by G_MuteSound() in lmd_meditate_levitate_end()
+                }
+            }
+
             if (level.time > self->client->Lmd.mediLevitate.runTime + 1500)
             {
                 self->client->Lmd.mediLevitate.state = 2;
@@ -81,7 +111,9 @@ void lmd_meditate_levitate_update(gentity_t* self)
             self->client->Lmd.customGravity.time = level.time + FRAMETIME;
             self->client->Lmd.customSpeed.time = level.time + FRAMETIME;
 
-            if (lmd_levitateSithFx.integer > 0 && Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE)
+            const int isSith = (Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE);
+
+            if (lmd_levitateSithFx.integer > 0 && isSith)
             {
                 if (level.time > self->client->Lmd.mediLevitate.sithFxTimer)
                 {
@@ -89,7 +121,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
                     G_PlayEffectID(G_EffectIndex("force/kothos_recharge"), self->client->ps.origin, self->client->ps.viewangles);
                 }
             }
-            else if (lmd_levitateJediFx.integer > 0)
+            else if (lmd_levitateJediFx.integer > 0 && !isSith)
             {
                 self->client->pushEffectTime = level.time + FRAMETIME;
             }
@@ -107,79 +139,67 @@ void lmd_meditate_levitate_update(gentity_t* self)
             float swayOffset = cosf(self->client->Lmd.mediLevitate.phase) * swayAmplitude;
             self->client->ps.origin[0] += (swayOffset - (self->client->ps.origin[0] - self->client->Lmd.mediLevitate.startOrigin[0])) * 0.1f;
 
-
-            if (level.time > self->client->Lmd.mediLevitate.humSoundTimer)
+            if (lmd_levitateRegen.integer && self->client->Lmd.mediLevitate.autoHealTimer < level.time)
             {
-                self->client->Lmd.mediLevitate.humSoundTimer = level.time + 3500;
-
-                if (lmd_levitateSithSound.integer > 0 && Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE)
+                if (!isSith && self->health < lmd_levitateMaxHealth.integer)
                 {
-                    G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/rageloop.wav"));
-                }
-                else if (lmd_levitateJediSound.integer > 0)
-                {
-                    G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/protectloop.wav"));
-                }
-            }
-            
-            if (self->client->Lmd.mediLevitate.autoHealTimer < level.time)
-            {
-                const int isSith = (Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE);
-
-                if (lmd_levitateMaxHealth.integer > 100 && !isSith)
-                {
-                    if (self->health < lmd_levitateMaxHealth.integer)
+                    self->health += lmd_levitateHealAmount.integer;
+                    if (self->health > lmd_levitateMaxHealth.integer)
                     {
-                        self->health += lmd_levitateHealAmount.integer;
-                        if (self->health > lmd_levitateMaxHealth.integer)
-                            self->health = lmd_levitateMaxHealth.integer;
-
-                        self->client->ps.stats[STAT_MAX_HEALTH] = self->health;
+                        self->health = lmd_levitateMaxHealth.integer;
                     }
+
+                    self->client->ps.stats[STAT_MAX_HEALTH] = self->health;
                 }
-                else if (lmd_levitateMaxForcePoints.integer > 100 && isSith)
+                else if (isSith && self->client->ps.fd.forcePower < lmd_levitateMaxForcePoints.integer)
                 {
-                    if (self->client->ps.fd.forcePower < lmd_levitateMaxForcePoints.integer)
+                    self->client->ps.fd.forcePower += lmd_levitateHealAmount.integer;
+                    if (self->client->ps.fd.forcePower > lmd_levitateMaxForcePoints.integer)
                     {
-                        self->client->ps.fd.forcePower += lmd_levitateHealAmount.integer;
-                        if (self->client->ps.fd.forcePower > lmd_levitateMaxForcePoints.integer)
-                            self->client->ps.fd.forcePower = lmd_levitateMaxForcePoints.integer;
+                        self->client->ps.fd.forcePower = lmd_levitateMaxForcePoints.integer;
                     }
                 }
                 
-                float jedi_level = Accounts_Prof_GetLevel(self->client->pers.Lmd.account);
+                float jedi_level = (float)Accounts_Prof_GetLevel(self->client->pers.Lmd.account);
                 jedi_level *= 0.5f;
                 if (jedi_level < 1.0f)
                     jedi_level = 1.0f;
 
-                int heal_interval = (int)(lmd_levitateHealInterval.integer / jedi_level);
+                int heal_interval = (int)((float)lmd_levitateHealInterval.integer / jedi_level);
                 if (heal_interval < 300)
                     heal_interval = 300;
 
                 self->client->Lmd.mediLevitate.autoHealTimer = level.time + heal_interval;
             }
             
-            if (!self->client->Lmd.mediLevitate.effectFullFxPlayed)
+            if (lmd_levitateRegen.integer && !self->client->Lmd.mediLevitate.effectFullFxPlayed)
             {
-                int isSith = (Jedi_GetAccSide(self->client->pers.Lmd.account) == FORCE_DARKSIDE);
-
-                if ((!isSith && self->health >= 135) || (isSith && self->client->ps.fd.forcePower >= 200))
+                if (!isSith && self->health >= lmd_levitateMaxHealth.integer)
                 {
                     self->client->Lmd.mediLevitate.effectFullFxPlayed = qtrue;
+                    G_PlayEffectID(G_EffectIndex("force/heal2"), self->client->ps.origin, vec3_origin);
+                    G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/absorb.mp3"));
 
-                    if (isSith)
+                    if (lmd_levitateFinish.integer)
                     {
-                        G_PlayEffectID(G_EffectIndex("force/rage2"), self->client->ps.origin, vec3_origin);
-                        G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/drainloop.wav"));
+                        lmd_meditate_levitate_end(self);
+                        break;
                     }
-                    else
+                }
+
+                if (isSith && self->client->ps.fd.forcePower >= lmd_levitateMaxForcePoints.integer)
+                {
+                    self->client->Lmd.mediLevitate.effectFullFxPlayed = qtrue;
+                    G_PlayEffectID(G_EffectIndex("force/rage2"), self->client->ps.origin, vec3_origin);
+                    G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/drain.mp3"));
+
+                    if (lmd_levitateFinish.integer)
                     {
-                        G_PlayEffectID(G_EffectIndex("force/heal2"), self->client->ps.origin, vec3_origin);
-                        G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/absorploop.wav"));
+                        lmd_meditate_levitate_end(self);
+                        break;
                     }
                 }
             }
-
 
             G_SetAnim(self, SETANIM_BOTH, BOTH_STAND5TOSIT2,
                       SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_HOLDLESS, 100);
@@ -216,7 +236,7 @@ void lmd_meditate_levitate_update(gentity_t* self)
     }
 }
 
-int lmd_meditate_levitate_abort(gentity_t* self)
+qboolean lmd_meditate_levitate_abort(gentity_t* self)
 {
     if (!self || !self->client || !self->inuse)
         return qfalse;
@@ -239,10 +259,23 @@ int lmd_meditate_levitate_abort(gentity_t* self)
 void lmd_meditate_levitate_end(gentity_t* self)
 {
     G_SetAnim(self, SETANIM_BOTH, BOTH_MEDITATE_END, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 100);
+
+    G_MuteSound(self->client->ps.fd.killSoundEntIndex[TRACK_CHANNEL_3-50], CHAN_VOICE);
+    if (
+        lmd_levitateDescentSound.integer
+        && !(lmd_levitateFinish.integer && self->client->Lmd.mediLevitate.effectFullFxPlayed)
+    ) {
+        // Play the sound for the descending phase,
+        // if enabled AND not currently playing the "full" sound effect because of lmd_levitateFinish,
+        // (to avoid playing both sounds at the same time).
+        G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
+    }
+
     self->client->ps.stats[STAT_MAX_HEALTH] = 100;
     self->client->ps.forceHandExtendTime = level.time + self->client->ps.legsTimer;
     self->client->ps.weaponTime = self->client->ps.legsTimer;
     self->client->Lmd.customSpeed.time = level.time + self->client->ps.legsTimer;
+    self->client->Lmd.mediLevitate.soundStarted = qfalse;
     self->client->Lmd.mediLevitate.effectFullFxPlayed = qfalse;
     self->client->Lmd.mediLevitate.enabled = qfalse;
     self->client->Lmd.mediLevitate.state = 0;

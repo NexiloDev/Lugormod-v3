@@ -405,11 +405,14 @@ vmCvar_t lmd_levitateHealInterval;
 vmCvar_t lmd_levitateBreathSway;
 vmCvar_t lmd_levitateJediFx;
 vmCvar_t lmd_levitateSithFx;
+vmCvar_t lmd_levitateAscentSound;
+vmCvar_t lmd_levitateDescentSound;
 vmCvar_t lmd_levitateJediSound;
 vmCvar_t lmd_levitateSithSound;
 vmCvar_t lmd_levitateFinish;
 vmCvar_t lmd_levitateMaxHealth;
 vmCvar_t lmd_levitateMaxForcePoints;
+vmCvar_t lmd_levitateRegen;
 
 // lumaya: SetSaber enable use time
 vmCvar_t lmd_set_saber_delay;
@@ -663,14 +666,20 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &lmd_levitateSithFx, "lmd_levitateSithFx", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"If 1 then levitate plays an effect when on sith.",
 	},
+	{ &lmd_levitateAscentSound, "lmd_levitateAscentSound", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
+"1 to enable a sound effect during the ascending phase of /levitate (starting animation), 0 to disable.",
+	},
+	{ &lmd_levitateDescentSound, "lmd_levitateDescentSound", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
+"1 to enable a sound effect during the descending phase of /levitate (ending animation), 0 to disable.",
+	},
 	{ &lmd_levitateJediSound, "lmd_levitateJediSound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 levitate plays a sound when on jedi.",
+	"If 1 levitate plays a continuous sound when on jedi.",
 	},
 	{ &lmd_levitateSithSound, "lmd_levitateSithSound", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 levitate plays a sound when on sith.",
+	"If 1 levitate plays a continuous sound when on sith.",
 	},
 	{ &lmd_levitateFinish, "lmd_levitateFinish", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
-	"If 1 levitate finishes if lmd_levitateMaxHealth or lmd_levitateMaxForcePoints is greater than 100 and their values are reached.",
+	"If set to 1, Levitate will stop once lmd_levitateMaxHealth (Jedi) or lmd_levitateMaxForcePoints (Sith) is reached.",
 	},
 	{ &lmd_levitateMaxHealth, "lmd_levitateMaxHealth", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"The amount a jedi's HP can go up to when levitating.",
@@ -678,6 +687,9 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &lmd_levitateMaxForcePoints, "lmd_levitateMaxForcePoints", "100", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"The amount a Sith's FP can go up to when levitating.",
   },
+	{ &lmd_levitateRegen, "lmd_levitateRegen", "1", CVAR_ARCHIVE, 0, qtrue, qfalse,
+"1 to enable health regeneration (for Jedi) and force regeneration (for Sith), 0 to disable it.",
+	},
 	{ &lmd_set_saber_delay, "lmd_set_saber_delay", "750", CVAR_ARCHIVE, 0, qtrue, qfalse,
 		"Set the delay for instant saber switch for when to be able to use saber again after swapping.",
 	},

@@ -1083,6 +1083,12 @@ void Cmd_MediLevitate_f(gentity_t* ent, int iArg)
 		return;
 	}
 
+	if (duelInProgress(&ent->client->ps))
+	{
+		Disp(ent, "^3You cannot do this while in a duel.");
+		return;
+	}
+
 	if (ent->client->Lmd.mediLevitate.enabled)
 	{
 		Disp(ent, "^3You are already doing this.");

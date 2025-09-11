@@ -37,14 +37,14 @@ Lugormod v3 is primarily written in **C**, with some **C++** components, and is 
 ### Primary Developers (Alphabetical)
 - **Dave**
 - **Jakendary**
-- **Lumaya:**
+- **Lumaya**
 - **Slash**
 
 ### Contributors (Alphabetical)
 Special thanks to:
 - **Daggo:** *For ongoing support as an advisor and for code contributions.*
 - **GCJ:** *For help configuring CMake to streamline the build process.*
-- **mhehmsoth** *For documentation contributions.*
+- **mhehmsoth:** *For documentation contributions.*
 - **RoboPhred:** *For providing their un-released codebase & blessing.*
 - **Tayst:** *For implementing Lugormod v3 client-side enhancements/fixes into TaystJK.*
 

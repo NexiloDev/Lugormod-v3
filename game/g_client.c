@@ -2603,6 +2603,7 @@ void ClientUserinfoChanged_Do( int clientNum ) {
 	char	className[MAX_QPATH]; //name of class type to use in siege
 	char	saberName[MAX_QPATH];
 	char	saber2Name[MAX_QPATH];
+	char cp_sbRGB1[MAX_QPATH]={0}, cp_sbRGB2[MAX_QPATH]={0};
 	//char	*value;
 	qboolean modelChanged;
 	char model[MAX_QPATH];
@@ -2782,26 +2783,28 @@ void ClientUserinfoChanged_Do( int clientNum ) {
 	// colors
 	strcpy(c1, Info_ValueForKey( userinfo, "color1" ));
 	strcpy(c2, Info_ValueForKey( userinfo, "color2" ));
+	Q_strncpyz( cp_sbRGB1, Info_ValueForKey( userinfo, "cp_sbRGB1" ), sizeof(cp_sbRGB1) );//rgbsabers
+	Q_strncpyz( cp_sbRGB2, Info_ValueForKey( userinfo, "cp_sbRGB2" ), sizeof(cp_sbRGB2) );//rgbsabers
 
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
 	if ( ent->r.svFlags & SVF_BOT ) {
-		s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
-			client->pers.netname, team, model,  c1, c2, 
+		s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\c3\\%s\\c4\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
+			client->pers.netname, team, model,  c1, c2, cp_sbRGB1, cp_sbRGB2,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
 			Info_ValueForKey( userinfo, "skill" ), teamTask, teamLeader, className, saberName, saber2Name, client->sess.duelTeam, client->sess.siegeDesiredTeam );
 	} else {
 		if (g_gametype.integer == GT_SIEGE 
 			|| g_gametype.integer == GT_BATTLE_GROUND) //Lugormod
 		{ //more crap to send
-			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
-				client->pers.netname, client->sess.sessionTeam, model, c1, c2, 
+			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\c3\\%s\\c4\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
+				client->pers.netname, client->sess.sessionTeam, model, c1, c2, cp_sbRGB1, cp_sbRGB2,
 				client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader, className, saberName, saber2Name, client->sess.duelTeam, client->sess.siegeDesiredTeam);
 		}
 		else
 		{
-			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\st\\%s\\st2\\%s\\dt\\%i",
-				client->pers.netname, client->sess.sessionTeam, model, c1, c2, 
+			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\c3\\%s\\c4\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\st\\%s\\st2\\%s\\dt\\%i",
+				client->pers.netname, client->sess.sessionTeam, model, c1, c2, cp_sbRGB1, cp_sbRGB2,
 				client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader, saberName, saber2Name, client->sess.duelTeam);
 		}
 	}

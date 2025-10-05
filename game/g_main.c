@@ -203,6 +203,7 @@ vmCvar_t	g_useWhileThrowing;
 vmCvar_t	g_RMG;
 
 vmCvar_t	g_svfps;
+vmCvar_t	taystJKinfo;
 
 vmCvar_t	g_forceRegenTime;
 vmCvar_t	g_spawnInvulnerability;
@@ -793,6 +794,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_RMG, "RMG", "0", 0, 0, qtrue  },
 
 	{ &g_svfps, "sv_fps", "20", 0, 0, qtrue },
+
+	{ &taystJKinfo, "taystJKinfo", "0", CVAR_SERVERINFO|CVAR_ROM, 0, qfalse },
 
 	{ &g_forceRegenTime, "g_forceRegenTime", "200", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
 
@@ -1771,6 +1774,14 @@ void Lmd_Startup(void);
 qboolean AllForceDisabled(int force);
 void InitializeSpawnTable();
 
+void G_SetTaystJKFlags( void)
+{
+	int taystJKFeatures = 0;
+	taystJKFeatures |= TAYSTJK_INFO_RGBSABERS;
+	taystJKFeatures |= TAYSTJK_INFO_BLACKSABERS;
+	trap_Cvar_Set("taystJKinfo", va("%d", taystJKFeatures));
+}
+
 void G_SiegeRegisterWeaponsAndHoldables(int team); //Lugormod GT_BATTLE_GROUND
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
@@ -1784,6 +1795,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 #endif
 
+	G_SetTaystJKFlags();
 	G_InitMemory();
 
 	//RoboPhred:

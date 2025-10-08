@@ -853,6 +853,7 @@ spawn_t	spawnInitValues[] = {
 	{"lmd_customskill", lmd_customskill, Logical_True, &lmd_customskill_info},
 
 	{"lmd_event", lmd_event, Logical_True, &lmd_event_info},
+	{"lmd_forcepower", lmd_event, Logical_True, &lmd_event_info},
 
 	{"lmd_interact", lmd_interact, Logical_True, &lmd_interact_info},
 	

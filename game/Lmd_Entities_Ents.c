@@ -3213,6 +3213,7 @@ const entityInfoData_t lmd_restrict_spawnflags[] = {
 };
 const entityInfoData_t lmd_restrict_keys[] = {
     {"#HITBOX", NULL},
+    {"ModifyPowers", "E.g. ModifyPowers,heal2 -> would set force heal to level 2"},
     NULL
 };
 
@@ -5278,6 +5279,47 @@ entityInfo_t lmd_event_info = {
     lmd_event_keys
 };
 
+
+typedef struct {
+    const char *name;
+    int id;
+} forcePowerMap_t;
+
+static const forcePowerMap_t forcePowerMap[] = {
+    {"jump", FP_LEVITATION},
+    {"push", FP_PUSH},
+    {"pull", FP_PULL},
+    {"speed", FP_SPEED},
+    {"seeing", FP_SEE},
+    
+    {"heal", FP_HEAL},
+    {"protect", FP_PROTECT},
+    {"absorb", FP_ABSORB},
+    {"mindtrick", FP_TELEPATHY},
+    {"theal", FP_TELEPATHY},
+    
+    {"grip", FP_GRIP},
+    {"lightning", FP_LIGHTNING},
+    {"rage", FP_RAGE},
+    {"drain", FP_DRAIN},
+    {"tforce", FP_TEAM_FORCE},
+    
+    {"sattack", FP_SABER_OFFENSE},
+    {"sdefend", FP_SABER_DEFENSE},
+    {"sthrow", FP_SABERTHROW},
+    {NULL, -1}
+};
+
+int ForcePowerIndex(const char *token) {
+    for (int i = 0; forcePowerMap[i].name; i++) {
+        if (!Q_stricmp(forcePowerMap[i].name, token)) {
+            return forcePowerMap[i].id;
+        }
+    }
+    return -1;
+}
+
+
 /*
 	genericValue1: remembered clients 1
 	genericValue2: remembered clients 2
@@ -5328,6 +5370,37 @@ void lmd_event_think(gentity_t* ent)
                 {
                     //Entered
                     G_UseTargets(ent, targ);
+
+                    const char *mods = ent->Lmd.selectsnd; // e.g. "heal2rage0jump2"
+                    if (mods)
+                    {
+                        // Duplicate string so strtok doesn't trash the original
+                        char buffer[MAX_QPATH];
+                        Q_strncpyz(buffer, mods, sizeof(buffer));
+
+                        char *token = strtok(buffer, ".");
+                        while (token)
+                        {
+                            char powerName[32];
+                            int level = -1;
+
+                            // Parse name and level (heal2, rage0, jump3, etc.)
+                            if (sscanf(token, "%31[a-zA-Z]%d", powerName, &level) == 2)
+                            {
+                                int fpIndex = ForcePowerIndex(powerName);
+                                if (fpIndex >= 0 && level >= 0 && level <= FORCE_LEVEL_5)
+                                {
+                                    targ->client->ps.fd.forcePowerLevel[fpIndex] = level;
+                                    if (level > 0)
+                                        targ->client->ps.fd.forcePowersKnown |= (1 << fpIndex);
+                                    else
+                                        targ->client->ps.fd.forcePowersKnown &= ~(1 << fpIndex);
+                                }
+                            }
+
+                            token = strtok(NULL, ".");
+                        }
+                    }
                 }
             }
 
@@ -5347,6 +5420,37 @@ void lmd_event_think(gentity_t* ent)
                 {
                     //Entered
                     G_UseTargets(ent, targ);
+
+                    const char *mods = ent->Lmd.selectsnd; // e.g. "heal2rage0jump2"
+                    if (mods)
+                    {
+                        // Duplicate string so strtok doesn't trash the original
+                        char buffer[MAX_QPATH];
+                        Q_strncpyz(buffer, mods, sizeof(buffer));
+
+                        char *token = strtok(buffer, ".");
+                        while (token)
+                        {
+                            char powerName[32];
+                            int level = -1;
+
+                            // Parse name and level (heal2, rage0, jump3, etc.)
+                            if (sscanf(token, "%31[a-zA-Z]%d", powerName, &level) == 2)
+                            {
+                                int fpIndex = ForcePowerIndex(powerName);
+                                if (fpIndex >= 0 && level >= 0 && level <= FORCE_LEVEL_5)
+                                {
+                                    targ->client->ps.fd.forcePowerLevel[fpIndex] = level;
+                                    if (level > 0)
+                                        targ->client->ps.fd.forcePowersKnown |= (1 << fpIndex);
+                                    else
+                                        targ->client->ps.fd.forcePowersKnown &= ~(1 << fpIndex);
+                                }
+                            }
+
+                            token = strtok(NULL, ".");
+                        }
+                    }
                 }
             }
         }
@@ -5410,6 +5514,7 @@ void lmd_event(gentity_t* ent)
     G_SpawnString("exittarget", "", &ent->target2);
     G_SpawnString("deathtarget", "", &ent->target5);
     G_SpawnString("killtarget", "", &ent->target6);
+    G_SpawnString("modifyPowers", "", &ent->Lmd.selectsnd);
 
     G_SpawnVector("mins", "0 0 0", ent->r.mins);
     G_SpawnVector("maxs", "0 0 0", ent->r.maxs);

@@ -1483,32 +1483,20 @@ FIXME: make this buffer size safe someday
 //[OverflowProtection]
 //Ensiform provided this new version which apprenently can't overflow and gives the char array pool circular indexing to
 //provide better protection against multiple va strings stepping on each other's data.
-char	* QDECL va( char *format, ... ) {
+#define MAX_VA_STRING 32000
+#define MAX_VA_BUFFERS 2
+char	* QDECL va( const char *format, ... ) {
 	va_list		argptr;
-#define	MAX_VA_STRING	32000
-	static char		temp_buffer[MAX_VA_STRING];
-	static char		string[MAX_VA_STRING];	// in case va is called by nested functions
+	static char		string[MAX_VA_BUFFERS][MAX_VA_STRING];	// in case va is called by nested functions
 	static int		index = 0;
 	char	*buf;
-	int len;
 
+	buf = string[index & 1];
+	index++;
 
 	va_start (argptr, format);
-	vsprintf (temp_buffer, format,argptr);
+	Q_vsnprintf (buf, MAX_VA_STRING, format,argptr);
 	va_end (argptr);
-
-	if ((len = strlen(temp_buffer)) >= MAX_VA_STRING) {
-		Com_Error( ERR_DROP, "Attempted to overrun string in call to va()\n" );
-	}
-
-	if (len + index >= MAX_VA_STRING-1) {
-		index = 0;
-	}
-
-	buf = &string[index];
-	memcpy( buf, temp_buffer, len+1 );
-
-	index += len + 1;
 
 	return buf;
 }

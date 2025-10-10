@@ -772,6 +772,7 @@ void Team_CheckDroppedItem( gentity_t *dropped );
 //
 void G_ReadSessionData( gclient_t *client );
 void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot, qboolean newSession );
+void G_WriteClientSessionData( gclient_t *client );
 
 void G_InitWorldSession( void );
 void G_WriteSessionData( void );

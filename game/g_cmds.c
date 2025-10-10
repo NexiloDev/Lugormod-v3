@@ -976,16 +976,55 @@ void SetTeam( gentity_t *ent, char *s ) {
 	{
 		team = TEAM_SPECTATOR;
 	}
-	else if ( g_maxGameClients.integer > 0 && 
-		level.numNonSpectatorClients >= g_maxGameClients.integer )
-	{
-		team = TEAM_SPECTATOR;
-	}
+        else if ( g_maxGameClients.integer > 0 &&
+                level.numNonSpectatorClients >= g_maxGameClients.integer )
+        {
+                team = TEAM_SPECTATOR;
+        }
 
-	//
-	// decide if we will allow the change
-	//
-	oldTeam = client->sess.sessionTeam;
+        if (client->sess.Lmd.forcedTeam < TEAM_FREE || client->sess.Lmd.forcedTeam >= TEAM_NUM_TEAMS)
+        {
+                client->sess.Lmd.forcedTeam = TEAM_NUM_TEAMS;
+                client->sess.Lmd.forcedTeamExpires = 0;
+        }
+        else if (client->sess.Lmd.forcedTeamExpires != -1 && client->sess.Lmd.forcedTeamExpires <= level.time)
+        {
+                client->sess.Lmd.forcedTeam = TEAM_NUM_TEAMS;
+                client->sess.Lmd.forcedTeamExpires = 0;
+                G_WriteClientSessionData(client);
+        }
+        else if (team != client->sess.Lmd.forcedTeam)
+        {
+                if (client->sess.Lmd.forcedTeamExpires == -1)
+                {
+                        Disp(ent, "^3You are locked to this team until the match ends.");
+                }
+                else
+                {
+                        int remainingMs = client->sess.Lmd.forcedTeamExpires - level.time;
+                        int remainingSec;
+
+                        if (remainingMs < 0)
+                        {
+                                remainingMs = 0;
+                        }
+
+                        remainingSec = (remainingMs + 999) / 1000;
+                        if (remainingSec < 1)
+                        {
+                                remainingSec = 1;
+                        }
+
+                        Disp(ent, va("^3You are locked to this team for %i more second%s.",
+                                remainingSec, (remainingSec == 1) ? "" : "s"));
+                }
+                return;
+        }
+
+        //
+        // decide if we will allow the change
+        //
+        oldTeam = client->sess.sessionTeam;
 	if ( team == oldTeam && team != TEAM_SPECTATOR ) {
 		return;
 	}

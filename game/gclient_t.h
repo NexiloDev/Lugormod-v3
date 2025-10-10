@@ -606,7 +606,7 @@ struct gclient_s {
 
 		int crosshairEntNum;
 		unsigned int grabbing;
-
+		qboolean lockSaber;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

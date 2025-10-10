@@ -12,6 +12,8 @@ void lmd_checkSaberChanges(gentity_t* ent)
 {
     if (!ent || !ent->client || !ent->inuse) return;
 
+    if (ent->client->Lmd.lockSaber) return;
+    
     if (!lmd_allow_set_saber.integer
             || (ent->client->ps.duelInProgress && !lmd_set_saber_duels.integer)
             || level.time - ent->client->ps.forceHandExtendTime < 750

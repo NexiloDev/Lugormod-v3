@@ -2795,6 +2795,10 @@ qboolean PM_SaberMoveOkayForKata( void )
 
 qboolean PM_CanDoKata( void )
 {
+	gentity_t* ent = &g_entities[pm->ps->clientNum];
+	if (ent && ent->client && ent->client->Lmd.lmd_restrict & 1024)
+		return qfalse;
+	
 	if ( PM_InSecondaryStyle() )
 	{
 		return qfalse;

@@ -331,10 +331,15 @@ targetWeaponsName_t targetWeaponsTable[] = {
 
 const entityInfoData_t target_weapons_spawnflags[] = {
     {"1", "Don't lock the saber, meaning the given saber can be switched from duals to staff for instance."},
+    {"2", "Just allow the weapons but don't give them."},
+    {"4", "Add the ammo instead of setting it."},
     {NULL, NULL}
 };
 const entityInfoData_t target_weapons_keys[] = {
-    {"weapons", "Given Weapons. Example: weapons,detpack5.concussion5000.single - this would give the activator detpack with 5 ammo concussion with 5000 ammo. if no number is given then its infinite. staff|duals|single take no ammo. if 0 is given then it removes the weapon\n"},
+    {
+        "weapons",
+        "Given Weapons. Example: weapons,detpack5.concussion5000.single - this would give the activator detpack with 5 ammo concussion with 5000 ammo. if no number is given then its infinite. staff|duals|single take no ammo. if 0 is given then it removes the weapon\n"
+    },
     {"targetname", "make the trigger target this value for the entity to be used"},
     {NULL, NULL}
 };
@@ -364,7 +369,7 @@ extern qboolean WP_SaberStyleValidForSaber(saberInfo_t* saber1, saberInfo_t* sab
 extern qboolean WP_UseFirstValidSaberStyle(saberInfo_t* saber1, saberInfo_t* saber2, int saberHolstered,
                                            int* saberAnimLevel);
 
-static void TargetWeapons_ParseAndGive(gentity_t* activator, const char* input, qboolean forceGive)
+static void TargetWeapons_ParseAndGive(gentity_t* activator, const char* input, qboolean forceGive, qboolean justAllow, qboolean addAmmo)
 {
     char buffer[1024];
     Q_strncpyz(buffer, input, sizeof(buffer));
@@ -392,99 +397,111 @@ static void TargetWeapons_ParseAndGive(gentity_t* activator, const char* input, 
         int weaponID = TargetWeapons_FindID(weaponName);
         if (weaponID != -1)
         {
-            if (qtrue)
+            if (ammoAmount == 0)
             {
-                if (ammoAmount == 0)
+                if (justAllow)
+                {
+                    activator->client->Lmd.canPickUpWeapons &= ~(1 << weaponID);
                     activator->client->ps.stats[STAT_WEAPONS] &= ~(1 << weaponID);
+                }
+                else
+                {
+                    activator->client->ps.stats[STAT_WEAPONS] &= ~(1 << weaponID);
+                }
+            }
+            else
+            {
+                if (justAllow)
+                    activator->client->Lmd.canPickUpWeapons |= (1 << weaponID);
                 else
                     activator->client->ps.stats[STAT_WEAPONS] |= (1 << weaponID);
-                
-                if (weaponID != WP_SABER && weaponID != WP_BRYAR_PISTOL)
-                    activator->client->ps.ammo[weaponData[weaponID].ammoIndex] = ammoAmount;
+            }
 
-                if (weaponID == WP_SABER)
+            if (weaponID != WP_SABER && weaponID != WP_BRYAR_PISTOL)
+                activator->client->ps.ammo[weaponData[weaponID].ammoIndex] = addAmmo ? activator->client->ps.ammo[weaponData[weaponID].ammoIndex] + ammoAmount : ammoAmount;
+
+            if (weaponID == WP_SABER && !justAllow)
+            {
+                activator->client->Lmd.lockSaber = forceGive;
+                char userinfo[MAX_INFO_STRING];
+                const char* saber1;
+                const char* saber2;
+
+                // Choose saber models based on type
+                if (!Q_stricmp(weaponName, "duals"))
                 {
-                    activator->client->Lmd.lockSaber = forceGive;
-                    char userinfo[MAX_INFO_STRING];
-                    const char* saber1;
-                    const char* saber2;
+                    saber1 = "single_2";
+                    saber2 = "single_2";
+                }
+                else if (!Q_stricmp(weaponName, "staff"))
+                {
+                    saber1 = "dual_2";
+                    saber2 = "none";
+                }
+                else // single
+                {
+                    saber1 = "single_2";
+                    saber2 = "none";
+                }
 
-                    // Choose saber models based on type
-                    if (!Q_stricmp(weaponName, "duals"))
-                    {
-                        saber1 = "single_2";
-                        saber2 = "single_2";
-                    }
-                    else if (!Q_stricmp(weaponName, "staff"))
-                    {
-                        saber1 = "dual_2";
-                        saber2 = "none";
-                    }
-                    else // single
-                    {
-                        saber1 = "single_2";
-                        saber2 = "none";
-                    }
+                trap_GetUserinfo(activator->s.number, userinfo, sizeof(userinfo));
+                Info_SetValueForKey(userinfo, "saber1", saber1);
+                G_SetSaber(activator, 0, saber1, qfalse);
+                Info_SetValueForKey(userinfo, "saber2", saber2);
+                G_SetSaber(activator, 1, saber2, qfalse);
+                trap_SetUserinfo(activator->s.number, userinfo);
+                ClientUserinfoChanged(activator->s.number);
 
-                    trap_GetUserinfo(activator->s.number, userinfo, sizeof(userinfo));
-                    Info_SetValueForKey(userinfo, "saber1", saber1);
-                    G_SetSaber(activator, 0, saber1, qfalse);
-                    Info_SetValueForKey(userinfo, "saber2", saber2);
-                    G_SetSaber(activator, 1, saber2, qfalse);
-                    trap_SetUserinfo(activator->s.number, userinfo);
-                    ClientUserinfoChanged(activator->s.number);
+                G_SaberModelSetup(activator);
 
-                    G_SaberModelSetup(activator);
-
-                    // update saber anim levels
-                    if (activator->client->saber[0].model[0] && activator->client->saber[1].model[0]) // dual
-                    {
-                        activator->client->ps.fd.saberAnimLevelBase =
-                            activator->client->ps.fd.saberAnimLevel =
-                            activator->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
-                    }
-                    else if (activator->client->saber[0].saberFlags & SFL_TWO_HANDED) // staff
-                    {
+                // update saber anim levels
+                if (activator->client->saber[0].model[0] && activator->client->saber[1].model[0]) // dual
+                {
+                    activator->client->ps.fd.saberAnimLevelBase =
                         activator->client->ps.fd.saberAnimLevel =
-                            activator->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
-                    }
-                    else // single
+                        activator->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
+                }
+                else if (activator->client->saber[0].saberFlags & SFL_TWO_HANDED) // staff
+                {
+                    activator->client->ps.fd.saberAnimLevel =
+                        activator->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
+                }
+                else // single
+                {
+                    if (activator->client->sess.saberLevel < SS_FAST)
                     {
-                        if (activator->client->sess.saberLevel < SS_FAST)
-                        {
-                            activator->client->sess.saberLevel = SS_FAST;
-                        }
-                        else if (activator->client->sess.saberLevel > SS_STRONG)
-                        {
-                            activator->client->sess.saberLevel = SS_STRONG;
-                        }
+                        activator->client->sess.saberLevel = SS_FAST;
+                    }
+                    else if (activator->client->sess.saberLevel > SS_STRONG)
+                    {
+                        activator->client->sess.saberLevel = SS_STRONG;
+                    }
+                    activator->client->ps.fd.saberAnimLevelBase =
+                        activator->client->ps.fd.saberAnimLevel =
+                        activator->client->ps.fd.saberDrawAnimLevel =
+                        activator->client->sess.saberLevel;
+
+                    if (activator->client->ps.fd.saberAnimLevel >
+                        activator->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE])
+                    {
                         activator->client->ps.fd.saberAnimLevelBase =
                             activator->client->ps.fd.saberAnimLevel =
                             activator->client->ps.fd.saberDrawAnimLevel =
-                            activator->client->sess.saberLevel;
-
-                        if (activator->client->ps.fd.saberAnimLevel >
-                            activator->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE])
-                        {
-                            activator->client->ps.fd.saberAnimLevelBase =
-                                activator->client->ps.fd.saberAnimLevel =
-                                activator->client->ps.fd.saberDrawAnimLevel =
-                                activator->client->sess.saberLevel =
-                                activator->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE];
-                        }
+                            activator->client->sess.saberLevel =
+                            activator->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE];
                     }
+                }
 
-                    if (!WP_SaberStyleValidForSaber(&activator->client->saber[0], &activator->client->saber[1],
-                                                    2, activator->client->ps.fd.saberAnimLevel))
-                    {
-                        WP_UseFirstValidSaberStyle(&activator->client->saber[0], &activator->client->saber[1],
-                                                   2,
-                                                   &activator->client->ps.fd.saberAnimLevel);
+                if (!WP_SaberStyleValidForSaber(&activator->client->saber[0], &activator->client->saber[1],
+                                                2, activator->client->ps.fd.saberAnimLevel))
+                {
+                    WP_UseFirstValidSaberStyle(&activator->client->saber[0], &activator->client->saber[1],
+                                               2,
+                                               &activator->client->ps.fd.saberAnimLevel);
 
-                        activator->client->ps.fd.saberAnimLevelBase =
-                            activator->client->saberCycleQueue =
-                            activator->client->ps.fd.saberAnimLevel;
-                    }
+                    activator->client->ps.fd.saberAnimLevelBase =
+                        activator->client->saberCycleQueue =
+                        activator->client->ps.fd.saberAnimLevel;
                 }
             }
         }
@@ -498,11 +515,9 @@ void Use_Target_Weapons(gentity_t* ent, gentity_t* other, gentity_t* activator)
     if (!activator || !activator->client)
         return;
 
-    qboolean forceGive = (ent->spawnflags & 1) ? qtrue : qfalse;
-
     if (ent->target2 && ent->target2[0])
     {
-        TargetWeapons_ParseAndGive(activator, ent->target2, forceGive);
+        TargetWeapons_ParseAndGive(activator, ent->target2, (ent->spawnflags & 1), ent->spawnflags & 2, ent->spawnflags & 4);
     }
 }
 

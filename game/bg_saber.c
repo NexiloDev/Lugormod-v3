@@ -2653,6 +2653,10 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 		}
 	}
 
+	gentity_t* ent = &g_entities[pm->ps->clientNum];
+	if (ent && ent->client && ent->client->Lmd.lmd_restrict & 1024 && (BG_SaberInSpecialAttack(newmove) || BG_SaberInSpecial(newmove) || BG_SaberInKata(newmove)))
+		return LS_NONE;
+
 	return newmove;
 }
 
@@ -2894,6 +2898,10 @@ qboolean PM_SaberPowerCheck(void)
 
 qboolean PM_CanDoRollStab( void )
 {
+	gentity_t* ent = &g_entities[pm->ps->clientNum];
+	if (ent && ent->client && ent->client->Lmd.lmd_restrict & 1024)
+		return qfalse;
+
 	if ( pm->ps->weapon == WP_SABER )
 	{
                 //Lugormod: A little hack

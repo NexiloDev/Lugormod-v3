@@ -8,6 +8,7 @@
 #include "Lmd_Accounts_Friends.h"
 
 #include "Lmd_Commands_Auths.h"
+#include "Lmd_Data.h"
 
 #include "../ui/menudef.h"			// for the voice chats
 
@@ -2531,12 +2532,39 @@ void CallVote (gentity_t *ent, char *arg1, char *arg2)
 			return;
 		}
 
+		char suffix[MAX_QPATH];
+		char entityPrefix[MAX_STRING_CHARS];
+		qboolean suffixProvided = qfalse;
+
+		suffix[0] = '\0';
+		entityPrefix[0] = '\0';
+
+		if (trap_Argc() > 3) {
+			trap_Argv(3, suffix, sizeof(suffix));
+			if (suffix[0]) {
+				if (!Lmd_Data_IsCleanPath(suffix)) {
+					if (ent) {
+						Disp(ent, "^3Invalid entity suffix.");
+					} else {
+						Com_Printf("Invalid entity suffix.\n");
+					}
+					return;
+				}
+				Com_sprintf(entityPrefix, sizeof(entityPrefix), "set lmd_mapEntitySuffix \"%s\"; ", suffix);
+				suffixProvided = qtrue;
+			}
+		}
+		if (!suffixProvided) {
+			Q_strncpyz(entityPrefix, "set lmd_mapEntitySuffix \"\"; ", sizeof(entityPrefix));
+		}
+
 		trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
 		if (*s) {
-			Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s; set nextmap \"%s\"", arg1, arg2, s );
+			Com_sprintf( level.voteString, sizeof( level.voteString ), "%s%s %s; set nextmap \"%s\"", entityPrefix, arg1, arg2, s );
 		} else {
-			Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s", arg1, arg2 );
+			Com_sprintf( level.voteString, sizeof( level.voteString ), "%s%s %s", entityPrefix, arg1, arg2 );
 		}
+
 
 		arenaInfo	= G_GetArenaInfoByMap(arg2);
 		if (arenaInfo)

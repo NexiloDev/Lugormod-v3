@@ -679,12 +679,40 @@ void Cmd_Nearby_f(gentity_t *ent, int iArg){
 
 void Cmd_NewMap_f (gentity_t *ent, int iArg)
 {
+	char mapName[MAX_QPATH];
+	char suffix[MAX_QPATH];
+	qboolean hasSuffix = qfalse;
+
 	if (trap_Argc() < 2) {
 		return;
 	}
-	char *arg;
-	arg = ConcatArgs(1);
-	trap_SendConsoleCommand(EXEC_APPEND, va("map \"%s\"\n", arg));       
+
+	trap_Argv(1, mapName, sizeof(mapName));
+	if (!mapName[0]) {
+		return;
+	}
+
+	if (trap_Argc() >= 3) {
+		trap_Argv(2, suffix, sizeof(suffix));
+		if (suffix[0]) {
+			if (!Lmd_Data_IsCleanPath(suffix)) {
+				if (ent) {
+					Disp(ent, "^3Invalid entity suffix.");
+				} else {
+					Com_Printf("Invalid entity suffix.\n");
+				}
+				return;
+			}
+			trap_Cvar_Set("lmd_mapEntitySuffix", suffix);
+			hasSuffix = qtrue;
+		}
+	}
+
+	if (!hasSuffix) {
+		trap_Cvar_Set("lmd_mapEntitySuffix", "");
+	}
+
+	trap_SendConsoleCommand(EXEC_APPEND, va("map \"%s\"\n", mapName));
 }
 
 void Cmd_NextMap_f(gentity_t *ent, int iArg) {

@@ -34,6 +34,8 @@ struct Account_s{
 	int score;
 	int credits;
 	int bounty;
+	int saberCloseAnimation;
+	int saberOpenAnimation;
 	int flags;
 
 	struct {
@@ -570,6 +572,30 @@ char* Accounts_NewSeccode(Account_t *acc) {
 	acc->secCode = G_NewString2(code);
 	Lmd_Accounts_Modify(acc);
 	return acc->secCode;
+}
+
+int Accounts_GetSaberOpenBehaviour(Account_t *acc)
+{
+	if(!acc) return 0;
+	return acc->saberOpenAnimation;
+}
+
+void Accounts_SetSaberOpenBehaviour(Account_t *acc, int value)
+{
+	if(!acc) return;
+	acc->saberOpenAnimation = value;
+}
+
+int Accounts_GetSaberCloseBehaviour(Account_t *acc)
+{
+	if(!acc) return 0;
+	return acc->saberCloseAnimation;
+}
+
+void Accounts_SetSaberCloseBehaviour(Account_t *acc, int value)
+{
+	if(!acc) return;
+	acc->saberCloseAnimation = value;
 }
 
 int Accounts_GetBounty(Account_t *acc)

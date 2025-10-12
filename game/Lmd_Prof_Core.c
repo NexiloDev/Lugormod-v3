@@ -1111,6 +1111,47 @@ void Cmd_MediLevitate_f(gentity_t* ent, int iArg)
 	ent->client->Lmd.mediLevitate.enabled = qtrue;
 }
 
+void Cmd_SaberToggleBehaviour_f(gentity_t* ent, int iArg)
+{
+	if (!ent || !ent->client)
+		return;
+
+	Account_t *acc = ent->client->pers.Lmd.account;
+	if (!acc)
+		return;
+    
+	char arg1[64], arg2[64];
+	trap_Argv(1, arg1, sizeof(arg1));
+	
+	if (!arg1[0])
+	{
+		Disp(ent, "^3Usage: /SaberToggleBehaviour <^5open | close^3> <^50 | 1^3>");
+		return;
+	}
+
+	trap_Argv(2, arg2, sizeof(arg2));
+	int value = atoi(arg2);
+	
+	if (value < 0) value = 0;
+	if (value > 1) value = 1;
+
+	if (!Q_stricmp(arg1, "open"))
+	{
+		Accounts_SetSaberOpenBehaviour(acc, value);
+		Disp(ent, "^3Saber open animation set to ^5%d^3.", value);
+	}
+	else if (!Q_stricmp(arg1, "close"))
+	{
+		Accounts_SetSaberCloseBehaviour(acc, value);
+		Disp(ent, "^3Saber close animation set to ^5%d^3.", value);
+	}
+	else
+	{
+		Disp(ent, "^3Usage: /SaberToggleBehaviour <^5open | close^3> <^50 | 1^3>");
+	}
+}
+
+
 void Cmd_Cortosis_f(gentity_t *ent, int iArg);
 void Cmd_Flame_f(gentity_t *ent, int iArg);
 void Cmd_Ionlysaber_f(gentity_t *ent, int iArg);
@@ -1122,6 +1163,7 @@ cmdEntry_t professionCommandEntries[] = {
 	{"cortosis", "Equips an armor that turns off hostile lightsabers and lowers incoming splash damage. Prevents usability of heavy splash weapons.", Cmd_Cortosis_f, 0, qfalse, 0, 64, ~(1 << GT_FFA), PROF_MERC},
 	{"flame", "Shoots out a spew of flames.", Cmd_Flame_f, 0, qfalse, 1, 257, 0, PROF_MERC},
 	{"ionlysaber", "You can't use forcepowers other than heal or drain - but you're also immune to them. Greatly reduces received splash damage.", Cmd_Ionlysaber_f, 0, qfalse, 0, 64, ~(1 << GT_FFA), PROF_JEDI},
+	{"sabertogglebehaviour", "Set if open and close animations are wanted.", Cmd_SaberToggleBehaviour_f, 0, qfalse, 0, 64, ~(1 << GT_FFA), PROF_JEDI},
 	{"levitate", "Enter deep meditation, levitating gently above the ground. You become immune to most Force attacks except Heal and Drain, and significantly resist splash damage. A state of serene invulnerability, but with limited aggression.", Cmd_MediLevitate_f, 0, qfalse, 0, 64, 0, PROF_JEDI},
 	{"profession", "Choose a profession. ^1You will start from level one and lose your score and half your money if you choose a new profession.", Cmd_Profession_f, 0, qfalse, 1, 256, 0, 0},
 	{"resetskills", "Reset your skills. This costs money; if no argument is provided the cost will be displayed.", Cmd_ResetSkills_f, 0, qfalse, 2, 257, 0, 0},

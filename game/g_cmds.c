@@ -3162,11 +3162,18 @@ void Cmd_ToggleSaber_f(gentity_t *ent){
 			//RoboPhred: this probably shouldn't be here
 			//else{
 			//hack, don't do while moving
-			if(ent->client->saber[0].saberFlags & SFL_TWO_HANDED && !(ent->client->pers.cmd.upmove || ent->client->pers.cmd.forwardmove || 
-				ent->client->pers.cmd.rightmove || ent->client->ps.m_iVehicleNum || ent->client->ps.groundEntityNum == ENTITYNUM_NONE))
-				G_SetAnim(ent, SETANIM_TORSO, BOTH_S1_S7, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			else if (!(ent->client->ps.m_iVehicleNum || ent->client->ps.groundEntityNum == ENTITYNUM_NONE))
-				G_SetAnim(ent, SETANIM_BOTH, BOTH_STAND1TO2, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			qboolean useSaberOpenAnimation = qtrue;
+			Account_t *acc = ent->client->pers.Lmd.account;
+			if (acc && Accounts_GetSaberOpenBehaviour(acc) == 1)
+				useSaberOpenAnimation = qfalse;
+			if (useSaberOpenAnimation)
+			{
+				if(ent->client->saber[0].saberFlags & SFL_TWO_HANDED && !(ent->client->pers.cmd.upmove || ent->client->pers.cmd.forwardmove || 
+					ent->client->pers.cmd.rightmove || ent->client->ps.m_iVehicleNum || ent->client->ps.groundEntityNum == ENTITYNUM_NONE))
+					G_SetAnim(ent, SETANIM_TORSO, BOTH_S1_S7, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+				else if (!(ent->client->ps.m_iVehicleNum || ent->client->ps.groundEntityNum == ENTITYNUM_NONE))
+					G_SetAnim(ent, SETANIM_BOTH, BOTH_STAND1TO2, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			}
 			//}
 		}
 		else{
@@ -3178,13 +3185,21 @@ void Cmd_ToggleSaber_f(gentity_t *ent){
 			//RoboPhred: this probably shouldn't be here
 			//else{
 			//hack, don't do while moving
-			if(ent->client->saber[0].saberFlags & SFL_TWO_HANDED && (!(ent->client->pers.cmd.upmove || ent->client->pers.cmd.forwardmove ||
-				ent->client->pers.cmd.rightmove))){
+			qboolean useSaberCloseAnimation = qtrue;
+			Account_t *acc = ent->client->pers.Lmd.account;
+			if (acc && Accounts_GetSaberCloseBehaviour(acc) == 1)
+				useSaberCloseAnimation = qfalse;
+			if (useSaberCloseAnimation)
+			{
+				if(ent->client->saber[0].saberFlags & SFL_TWO_HANDED && (!(ent->client->pers.cmd.upmove || ent->client->pers.cmd.forwardmove ||
+					ent->client->pers.cmd.rightmove))){
 					//G_SetAnim(ent, NULL, SETANIM_TORSO, BOTH_S7_S1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+					}
+				else if(!(ent->client->ps.m_iVehicleNum || ent->client->ps.groundEntityNum == ENTITYNUM_NONE)) //hack, don't do while moving
+					G_SetAnim(ent, SETANIM_BOTH, BOTH_STAND2TO1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+				//}
+				
 			}
-			else if(!(ent->client->ps.m_iVehicleNum || ent->client->ps.groundEntityNum == ENTITYNUM_NONE)) //hack, don't do while moving
-				G_SetAnim(ent, SETANIM_BOTH, BOTH_STAND2TO1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			//}
 			//prevent anything from being done for 400ms after holster
 			ent->client->ps.weaponTime = 400;
 		}

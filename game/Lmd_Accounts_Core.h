@@ -42,6 +42,11 @@ void GiveCredits(gentity_t *ent, int cr, char *reason);
 int Accounts_GetCredits(Account_t *acc);
 #define PlayerAcc_GetCredits(ent) Accounts_GetCredits(ent->client->pers.Lmd.account)
 
+int Accounts_GetSaberOpenBehaviour(Account_t *acc);
+void Accounts_SetSaberOpenBehaviour(Account_t *acc, int value);
+int Accounts_GetSaberCloseBehaviour(Account_t *acc);
+void Accounts_SetSaberCloseBehaviour(Account_t *acc, int value);
+
 int Accounts_GetBounty(Account_t *acc);
 void Accounts_SetBounty(Account_t *acc, int value);
 void Accounts_PrintBountyList(gentity_t* ent);

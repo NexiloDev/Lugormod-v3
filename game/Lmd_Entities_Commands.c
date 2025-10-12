@@ -740,74 +740,21 @@ void Cmd_Mapents_f(gentity_t* ent, int iArg)
         LoadEntitiesData(arg, nodefaults);
         return;
     }
-    else if (Q_stricmp(arg, "snapshot") == 0)
+    else if (!Q_stricmp(arg, "snapshot")
+        || !Q_stricmp(arg, "snap"))
     {
-        qboolean snapshotMembers[MAX_GENTITIES];
-        int uniqueSnapshotCount = 0;
-        int activeClients = 0;
-        int busiestClient = -1;
-        int busiestLoad = 0;
-        int i;
+        int sequence = 0;
+        int count = 0;
 
-        memset(snapshotMembers, 0, sizeof(snapshotMembers));
-
-        for (i = 0; i < level.maxclients; i++)
+        while (trap_BotGetSnapshotEntity(ent->s.number, sequence) != -1)
         {
-            gentity_t* clientEnt = &g_entities[i];
-
-            if (!clientEnt->inuse || !clientEnt->client || clientEnt->client->pers.connected != CON_CONNECTED)
-            {
-                continue;
-            }
-
-            activeClients++;
-
-            {
-                int sequence = 0;
-                int perClientCount = 0;
-
-                for (;;)
-                {
-                    int entNum = trap_BotGetSnapshotEntity(i, sequence);
-
-                    if (entNum == -1)
-                    {
-                        break;
-                    }
-
-                    sequence++;
-                    perClientCount++;
-
-                    if (entNum < 0 || entNum >= level.num_entities)
-                    {
-                        continue;
-                    }
-
-                    if (!snapshotMembers[entNum])
-                    {
-                        snapshotMembers[entNum] = qtrue;
-                        uniqueSnapshotCount++;
-                    }
-                }
-
-                if (perClientCount > busiestLoad || busiestClient == -1)
-                {
-                    busiestLoad = perClientCount;
-                    busiestClient = i;
-                }
-            }
+            sequence++;
+            count++;
         }
 
-        if (!activeClients)
-        {
-            Disp(ent, "^3Snapshot entities: ^1No connected clients to sample.");
-        }
-        else
-        {
-            Disp(ent, va("^3Snapshot entities: ^2%i", uniqueSnapshotCount));
-        }
-        
+        Disp(ent, va("^3Snapshot Entities: ^2%i", count));
     }
+
     else
         Disp(ent, "^3Unknown argument.  For usage information, enter the command without args.");
 }

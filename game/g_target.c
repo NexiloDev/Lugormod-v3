@@ -480,7 +480,7 @@ static const forcePowerMap_t forcePowerMap[] = {
 	{"protect", FP_PROTECT},
 	{"absorb", FP_ABSORB},
 	{"mindtrick", FP_TELEPATHY},
-	{"theal", FP_TELEPATHY},
+	{"theal", FP_TEAM_HEAL},
     
 	{"grip", FP_GRIP},
 	{"lightning", FP_LIGHTNING},

@@ -197,6 +197,11 @@ Set the initial upwards velocity for Levitate.
 ```
 Set the bounce multiplier for Levitate. 0 - 1.0!
 ```
+## lmd_levitateAmplitude
+### Default value: 10
+```
+Set the up/down amplitude!
+```
 ## lmd_levitateHealAmount
 ### Default value: 2
 ```

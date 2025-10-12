@@ -22,6 +22,7 @@ extern vmCvar_t lmd_levitateFinish;
 extern vmCvar_t lmd_levitateMaxHealth;
 extern vmCvar_t lmd_levitateMaxForcePoints;
 extern vmCvar_t lmd_levitateRegen;
+extern vmCvar_t lmd_levitateAmplitude;
 
 extern int rageLoopSound;
 extern int protectLoopSound;
@@ -130,9 +131,8 @@ void lmd_meditate_levitate_update(gentity_t* self)
                 value;
             if (self->client->Lmd.mediLevitate.phase > 2.0f * M_PI)
                 self->client->Lmd.mediLevitate.phase -= 2.0f * M_PI;
-
-            float amplitude = 40.0f;
-            float verticalVelocity = sinf(self->client->Lmd.mediLevitate.phase) * amplitude;
+            
+            float verticalVelocity = sinf(self->client->Lmd.mediLevitate.phase) * lmd_levitateAmplitude.value;
             self->client->ps.velocity[2] = savedVelocity[2] + (verticalVelocity - savedVelocity[2]) * 0.1f;
 
             float swayAmplitude = lmd_levitateBreathSway.value;

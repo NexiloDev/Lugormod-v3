@@ -401,6 +401,7 @@ vmCvar_t lmd_drainBelowLevel3Range;
 // Lmd_MediLevitate
 vmCvar_t lmd_levitateInitialUpVelocity;
 vmCvar_t lmd_levitateInitialBounceMultiplier;
+vmCvar_t lmd_levitateAmplitude;
 vmCvar_t lmd_levitateHealAmount;
 vmCvar_t lmd_levitateHealInterval;
 vmCvar_t lmd_levitateBreathSway;
@@ -651,6 +652,9 @@ static cvarTable_t		gameCvarTable[] = {
 	},
 	{ &lmd_levitateInitialBounceMultiplier, "lmd_levitateInitialBounceMultiplier", "0.35", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"Set the bounce multiplier for MediLevitate. 0 - 1.0!",
+	},
+	{ &lmd_levitateAmplitude, "lmd_levitateAmplitude", "10", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"Set the up/down amplitude!",
 	},
 	{ &lmd_levitateHealAmount, "lmd_levitateHealAmount", "2", CVAR_ARCHIVE, 0, qtrue, qfalse,
 	"How much we heal per tick of lmd_medilevitate_heal_interval while levitate.",

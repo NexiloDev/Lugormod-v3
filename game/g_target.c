@@ -538,13 +538,6 @@ void SP_target_fp( gentity_t *ent )
 	G_SpawnString("ModifyPowers", "", &ent->target2);
 	G_SpawnFloat("ForceRegenTimeMultiplier", "1.0", &ent->modelScale[0]);
 	
-	if (!Q_stricmp(ent->target2, ""))
-	{
-		EntitySpawnError("ModifyPowers key is empty.");
-		G_FreeEntity(ent);
-		return;
-	}
-	
 	ent->use = Use_Target_Fp;
 }
 

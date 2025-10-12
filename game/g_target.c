@@ -454,6 +454,7 @@ const entityInfoData_t target_fp_keys[] = {
 	{"targetname", "make the trigger target this value for the entity to be used"},
 	{"ModifyPowers", "E.g. ModifyPowers,heal2.rage2 -> would set force heal and rage to level 2. Available keys are: jump, push, pull, speed, seeing, heal, protect, absorb"
 				  "mindtrick, theal, grip, lightning, rage, drain, tforce, sattack, sdefend, sthrow."},
+	{"ForceRegenTimeMultiplier", "Multiply the existing force regen time by the given amount. E.g: 1.25"},
 	{NULL, NULL}
 };
 
@@ -506,6 +507,8 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 {
 	if (!activator || !activator->client)
 		return;
+
+	activator->client->Lmd.customForceRegenTimeMultiplier = ent->modelScale[0];
 	
 	char *token = strtok(ent->target2, ".");
 	while (token)
@@ -533,6 +536,7 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 void SP_target_fp( gentity_t *ent )
 {
 	G_SpawnString("ModifyPowers", "", &ent->target2);
+	G_SpawnFloat("ForceRegenTimeMultiplier", "1.0", &ent->modelScale[0]);
 	
 	if (!Q_stricmp(ent->target2, ""))
 	{

@@ -1473,16 +1473,10 @@ void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 /*
 ============
 va
-
 does a varargs printf into a temp buffer, so I don't need to have
 varargs versions of all text functions.
-FIXME: make this buffer size safe someday
 ============
 */
-//RoboPhred
-//[OverflowProtection]
-//Ensiform provided this new version which apprenently can't overflow and gives the char array pool circular indexing to
-//provide better protection against multiple va strings stepping on each other's data.
 #define MAX_VA_STRING 32000
 #define MAX_VA_BUFFERS 2
 char	* QDECL va( const char *format, ... ) {

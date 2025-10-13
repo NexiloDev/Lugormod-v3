@@ -6,6 +6,7 @@
   - `\bounty list` and `\bounty <name> <amount>` - Commands for a new Bounty system allowing you to set a bounty on another player for a certain amount of money. You must be logged into an account to do this, and the target must also have an account. Note that bounties can stack on each other, so for example two players could set a bounty of 5000 credits on the same player, meaning that player will now have a 10,000 credit bounty on them that someone can collect by killing them.
   - `\levitate` - New command allowing you to meditate but instead of sitting on the ground, you're character will hover in the air. Many additional cvars added to allow you to adjust the movement distance and velocity of the hover, along with enable FX and sounds, and even health regen for Jedi and Force regen for Sith. See the Cvars List (cvars.md).
   - `\grab` command updated to allow you to use Push\Pull binds to move the entity towards or away from you.
+- Improved and expanded on the `entityinfo` command documentation on a huge amount of entities where there were errors, outdated information, or information was missing entirely.
 ---
 ### Lugormod v3.2.0 - *Released 14 June 2025*
 - Updated Commands

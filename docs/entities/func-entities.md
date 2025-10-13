@@ -1,3 +1,7 @@
+**Last Update:** 13 October 2025
+
+**Note:** This documentation relates to the latest version of Lugormod v3. Some entities may differ or not exist in prior versions of Lugormod. (https://lugormod.com/downloads/).
+
 ### Key Chart:
 ```
 * = Entity is triggerable.

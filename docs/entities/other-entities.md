@@ -1,3 +1,7 @@
+**Last Update:** 13 October 2025
+
+**Note:** This documentation relates to the latest version of Lugormod v3. Some entities may differ or not exist in prior versions of Lugormod. (https://lugormod.com/downloads/).
+
 ### Key Chart:
 ```
 * = Entity is triggerable.
@@ -8,7 +12,7 @@
 
 - So if an entity has **(L) by it that means that it was created for Lugormod, or was edited, and has to be targeted to work.
 
-# Miscellaneous Entities
+# Other Entities
 
 ## path_corner **
 these are the waypoints for func_train

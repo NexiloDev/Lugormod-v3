@@ -663,6 +663,12 @@ void ReturnToPos1( gentity_t *ent ) {
 	ent->nextthink = 0;
 	ent->s.time = level.time;
 
+	if ( ent->target2 && ent->target2[0] )
+	{
+		gentity_t *activator = ent->activator ? ent->activator : ent;
+		G_UseTargets2( ent, activator, ent->target2 );
+	}
+
 	MatchTeam( ent, MOVER_2TO1, level.time );
 
 	// starting sound
@@ -803,7 +809,6 @@ void Use_BinaryMover_Go( gentity_t *ent )
 		{
 			ent->nextthink = level.time + ent->wait;
 		}
-		G_UseTargets2( ent, ent->activator, ent->target2 );
 		return;
 	}
 

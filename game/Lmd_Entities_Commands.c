@@ -1395,7 +1395,6 @@ void Lmdp_Grabbed_Think(gentity_t* self)
 				VectorCopy(dest, self->s.pos.trBase);
 				self->s.pos.trTime = player->s.pos.trTime;
 				self->s.pos.trDuration = level.time + Q3_INFINITE;
-				self->s.pos.trType = TR_STATIONARY;
 
 				VectorCopy(dest, self->r.currentOrigin);
 			}
@@ -1475,7 +1474,6 @@ void Lmdp_Grabbed_Think(gentity_t* self)
 				VectorAdd(positionOffset, self->s.pos.trBase, self->s.pos.trBase);
 				self->s.pos.trTime = player->s.pos.trTime;
 				self->s.pos.trDuration = level.time + Q3_INFINITE;
-				self->s.pos.trType = TR_STATIONARY;
 
 				VectorAdd(positionOffset, self->r.currentOrigin, self->r.currentOrigin);
 			}
@@ -1642,7 +1640,7 @@ int Lmdp_Grabbed_Set(gentity_t* player, gentity_t* ent, int mode, qboolean msg, 
 		// initialize s.pos
 		VectorCopy(ent->s.pos.trBase, player->s.pos.trBase);
 		ent->s.pos.trTime = level.time;
-		ent->s.pos.trType = TR_LINEAR_STOP;
+		ent->s.pos.trType = TR_STATIONARY; // Anything else than TR_STATIONARY causes side effects
 
 		// initialize r.currentAngles
 		VectorCopy(ent->s.angles, ent->r.currentAngles);

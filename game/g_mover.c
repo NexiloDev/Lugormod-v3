@@ -2891,7 +2891,7 @@ const entityInfoData_t func_bobbing_spawnflags[] = {
   {NULL, NULL}
 };
 
-const entityInfoData_t func_bobbing_keys[] = 
+const entityInfoData_t func_bobbing_keys[] = {
   {"model", "The bmodel to use"},
   {"model2","A .md3 model to also draw"},
   {"model2scale","Precent of normal scale (on all x y z axii) to scale the model2"},

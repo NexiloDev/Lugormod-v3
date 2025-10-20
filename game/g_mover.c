@@ -809,7 +809,6 @@ void Use_BinaryMover_Go( gentity_t *ent )
 		{
 			ent->nextthink = level.time + ent->wait;
 		}
-		G_UseTargets2( ent, ent->activator, ent->target2 );
 		return;
 	}
 

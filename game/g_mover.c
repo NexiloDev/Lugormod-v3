@@ -1679,6 +1679,8 @@ const entityInfoData_t func_door_keys[] = {
   {"", "1 - red"},
   {"", "2 = blue"},
   {"vehopen", "if non-0 vehicles/players riding vehicles can open"},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -2002,6 +2004,8 @@ const entityInfoData_t func_plat_keys[] = {
 	{"Dmg", "Damage to apply when blocked from moving.  Default 2."},
 	{"Color", "The vector color to emit.  May flicker and randomize when in motion."},
 	{"Light", "The light intensity of the color to emit."},
+		{"CrosshairText", "Displays this text when a player looks at this entity."},
+		{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
 	{NULL, NULL},
 };
 entityInfo_t func_plat_info = {
@@ -2130,6 +2134,8 @@ const entityInfoData_t func_button_keys[] = {
   {"health", "if set, the button must be killed instead of touched"},
   {"color", "constantLight color"},
   {"light", "constantLight radius"},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -2426,6 +2432,8 @@ const entityInfoData_t func_train_keys[] = {
   {"target", "next path corner (required)"},
   {"color", "constantLight color"},
   {"light", "constantLight radius"},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -2529,6 +2537,8 @@ const entityInfoData_t func_static_keys[] = {
   {"light", "constantLight radius"},
   {"dmg", "how much damage to do when it crushes (use with spawnflags )"},
   {"linear", "set to 1 and it will move linearly rather than with acceleration"},
+{"CrosshairText", "Displays this text when a player looks at this entity."},
+{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -2750,6 +2760,8 @@ const entityInfoData_t func_rotating_keys[] = {
   {"team", "if set, only this team can trip this trigger. (0 - any, 1 - red, 2 - blue)"},
   {"color", "constantLight color"},
   {"light", "constantLight radius"},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
 
   {NULL, NULL}
 };
@@ -2879,7 +2891,7 @@ const entityInfoData_t func_bobbing_spawnflags[] = {
   {NULL, NULL}
 };
 
-const entityInfoData_t func_bobbing_keys[] = {
+const entityInfoData_t func_bobbing_keys[] = 
   {"model", "The bmodel to use"},
   {"model2","A .md3 model to also draw"},
   {"model2scale","Precent of normal scale (on all x y z axii) to scale the model2"},
@@ -2888,6 +2900,8 @@ const entityInfoData_t func_bobbing_keys[] = {
   {"dmg", "how much damage to do when it crushes (use with spawnflags )"},
   {"color", "constantLight color"},
   {"light", "constantLight radius"},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -2967,14 +2981,16 @@ const entityInfoData_t func_pendulum_spawnflags[] = {
 };
 
 const entityInfoData_t func_pendulum_keys[] = {
-  {"model", "the bmodel to draw"},
-  {"model2", ".md3 model to also draw"},
-  {"model2scale", ""},
-  {"speed", "the number of degrees each way the pendulum swings, (30 default)"},
-  {"phase", "the 0.0 to 1.0 offset in the cycle to start at"},
-  {"dmg", "damage to inflict when blocked (2 default)"},
-  {"color", "constantLight color"},
-  {"light", "constantLight radius"},
+	{"model", "the bmodel to draw"},
+	{"model2", ".md3 model to also draw"},
+	{"model2scale", ""},
+	{"speed", "the number of degrees each way the pendulum swings, (30 default)"},
+	{"phase", "the 0.0 to 1.0 offset in the cycle to start at"},
+	{"dmg", "damage to inflict when blocked (2 default)"},
+	{"color", "constantLight color"},
+	{"light", "constantLight radius"},
+{"CrosshairText", "Displays this text when a player looks at this entity."},
+{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -3496,6 +3512,8 @@ const entityInfoData_t func_breakable_keys[] = {
   {"team", "If set, only this team can trip this trigger. 0 - any, 1 - red, 2 - blue"},
   {"material", "default is 0. 17 choices available (0-16)"},
   {"teamnodmg", "Applicable only during siege gametype. If 1, team 1 can\'t damage this. If 2, team 2 can\'t damage this."},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -3767,6 +3785,8 @@ const entityInfoData_t func_glass_keys[] = {
   {"color", "constantLight color"},
   {"light", "constantLight radius"},
   {"maxshards", "max number of shards to spawn on glass break"},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -3996,6 +4016,8 @@ const entityInfoData_t func_usable_keys[] = {
   {"health", "if it has health, it will be used whenever shot at/killed - if you want it to only be used once this way, set health to 1"},
   {"endframe", "Will make it animate to next shader frame when used, not turn on/off... set this to number of frames in the shader, minus 1"},
   {"teamuser", "Applicable only during Siege gametype: if 1, team 2 can't use this. If 2, team 1 can't use this."},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 
@@ -4197,6 +4219,8 @@ const entityInfoData_t func_wall_keys[] = {
   {"model2scale", ""},
   {"color", "constantLight color"},
   {"light", "constantLight radius"},
+	{"CrosshairText", "Displays this text when a player looks at this entity."},
+	{"CrosshairTextRange", "Displays the CrosshairText if we are at least this close to the entity."},
   {NULL, NULL}
 };
 

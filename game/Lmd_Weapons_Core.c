@@ -1627,7 +1627,7 @@ void Weapon_Concussion_AltFire(gentity_t *ent, gentity_t *missile, weaponFire_t 
 						if ( pushDir[2] < 0.2f )
 							pushDir[2] = 0.2f;
 
-						if ( traceEnt->health > 0 )
+						if ( traceEnt->health > 0 && !(traceEnt->NPC && traceEnt->spawnflags & 1024))
 						{//alive
 							//if ( G_HasKnockdownAnims( traceEnt ) )
 							if (!noKnockBack && !traceEnt->localAnimIndex && traceEnt->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN &&

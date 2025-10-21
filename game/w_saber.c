@@ -5579,6 +5579,9 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vec3_t pHitloc
 void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime );
 void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd  )
 {
+	if (self && self->NPC && self->spawnflags & 1024)
+		return;
+		
 	float		dist;
 	gentity_t	*ent, *incoming = NULL;
 	int			entityList[MAX_GENTITIES];

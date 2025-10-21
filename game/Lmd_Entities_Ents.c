@@ -1803,6 +1803,9 @@ void lmd_menu_exit(gentity_t* player)
 {
     if (!player || !player->client)
         return;
+
+    player->client->Lmd.lmdMenu.lastUsedEntityNum = player->client->Lmd.lmdMenu.entityNum;
+    player->client->Lmd.lmdMenu.lastUsedTime = level.time;
     player->client->Lmd.lmdMenu.entityNum = 0;
     player->client->Lmd.lmdMenu.selection = 0;
     player->client->Lmd.lmdMenu.stoppedPressingUsing = qfalse;

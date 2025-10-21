@@ -32,9 +32,16 @@ void lmd_crosshairEntText(const gentity_t* ent)
     {
         ent->client->Lmd.crosshairText.debounceTime = 0;
     }
+
+    vec3_t tracedEntOrigin;
+
+    if (tracedEnt->r.bmodel)
+        VectorAverage(tracedEnt->r.mins, tracedEnt->r.maxs, tracedEntOrigin);
+    else
+        VectorCopy(tracedEnt->s.origin, tracedEntOrigin);
     
     if (newEntNum && ent->client->Lmd.crosshairText.debounceTime < level.time
-        && Distance(ent->client->ps.origin, tracedEnt->s.origin) <= tracedEnt->Lmd.crosshairTextRange)
+        && Distance(ent->client->ps.origin, tracedEntOrigin) <= tracedEnt->Lmd.crosshairTextRange)
     {
         trap_SendServerCommand(ent - g_entities, va("cp \"%s\n\"", tracedText));
         ent->client->Lmd.crosshairText.debounceTime = level.time + 1000;

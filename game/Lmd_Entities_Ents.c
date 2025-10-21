@@ -1847,8 +1847,9 @@ void lmd_menu_enter(gentity_t* player, gentity_t* menu)
     {
         player->client->ps.velocity[j] = 0.0f;
     }
-
-    G_SetAnim(player, SETANIM_BOTH, menu->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+    
+    if (menu->Lmd.customIndex < 2)
+        G_SetAnim(player, SETANIM_BOTH, menu->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
 }
 
 
@@ -1888,12 +1889,10 @@ void lmd_menu_update(gentity_t* player)
             if (menu->Lmd.choiceDelay == 0)
             {
                 player->client->Lmd.lmdMenu.choicesVisible = menu->count;
-                player->client->Lmd.lmdMenu.selection = 0;
             }
             else
             {
                 player->client->Lmd.lmdMenu.choicesVisible++;
-                if (player->client->Lmd.lmdMenu.choicesVisible == 1) player->client->Lmd.lmdMenu.selection = 0;
                 player->client->Lmd.lmdMenu.nextUpdateTime = level.time + menu->Lmd.choiceDelay;
                 return;
             }
@@ -1907,7 +1906,7 @@ void lmd_menu_update(gentity_t* player)
     }
 }
 
-
+void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator);
 void lmd_menu_key(gentity_t* player, usercmd_t* cmd)
 {
     if (!player || !player->client)
@@ -1928,8 +1927,7 @@ void lmd_menu_key(gentity_t* player, usercmd_t* cmd)
         {
             if (player->client->Lmd.lmdMenu.selection > 0)
                 player->client->Lmd.lmdMenu.selection--;
-            else
-                player->client->Lmd.lmdMenu.selection = menu->count;
+            
             G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             updateMenu = qtrue;
             player->client->Lmd.lmdMenu.stoppedPressingForward = qfalse;
@@ -1944,7 +1942,8 @@ void lmd_menu_key(gentity_t* player, usercmd_t* cmd)
     {
         if (player->client->Lmd.lmdMenu.stoppedPressingBackward)
         {
-            player->client->Lmd.lmdMenu.selection = (player->client->Lmd.lmdMenu.selection + 1) % (menu->count + 1);
+            if (player->client->Lmd.lmdMenu.selection < menu->count)
+                player->client->Lmd.lmdMenu.selection++;
             G_ClientSound(player, CHAN_AUTO, G_SoundIndex(menu->Lmd.navsnd));
             player->client->Lmd.lmdMenu.stoppedPressingBackward = qfalse;
             updateMenu = qtrue;
@@ -2015,6 +2014,12 @@ void lmd_menu_key(gentity_t* player, usercmd_t* cmd)
                         lmd_menu_enter(player, t);
                         break;
                     }
+
+                    if (!Q_stricmp(t->classname, "lmd_trainer"))
+                    {
+                        lmd_trainer_use(t, NULL, player);
+                        break;
+                    }
                 }
             }
         }
@@ -2045,6 +2050,10 @@ void lmd_terminal_use(gentity_t* self, gentity_t* other, gentity_t* activator)
 
     if (self->spawnflags & 4)
     {
+        if (activator->client->Lmd.lmdMenu.lastUsedEntityNum == self->s.number
+            && level.time - activator->client->Lmd.lmdMenu.lastUsedTime < 1000)
+            return;
+
         if (activator->client->Lmd.lmdMenu.entityNum == 0
             && activator->client->ps.groundEntityNum != ENTITYNUM_NONE)
         {
@@ -2159,7 +2168,7 @@ const entityInfoData_t lmd_terminal_keys[] = {
     {"navsnd", "Sound played for navigation."},
     {"cancelsnd", "Sound played for cancel."},
     {"targetname", "Activate the lmd_terminal when targetted."},
-    {"anim", "Animation to use (0 = console, 1 = console)."},
+    {"anim", "Animation to use (0 = console, 1 = talk, 2 = none)."},
     NULL
 };
 
@@ -3434,7 +3443,7 @@ const entityInfoData_t lmd_trainer_keys[] = {
     {"targetname", "Activate the lmd_trainer when targetted."},
     {"prof", "Professions this trainer handles (0 = all, 1 = Jedi, 2 = Merc)"},
     {"subprof", "Force sides this trainer handles (0 = all, 1 = light, 2 = dark). Only matters if prof = 1."},
-    {"anim", "Animation to use (0 = console, 1 = talking)."},
+{"anim", "Animation to use (0 = console, 1 = talk, 2 = none)."},
     {"selectsnd", "Sound played for confirmation."},
     {"navsnd", "Sound played for navigation."},
     {"cancelsnd", "Sound played for cancel."},
@@ -3473,6 +3482,10 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
         || activator->client->Lmd.lmdMenu.entityNum != 0
         || activator->client->ps.groundEntityNum == ENTITYNUM_NONE) return;
 
+    if (activator->client->Lmd.lmdMenu.lastUsedEntityNum == self->s.number
+    && level.time - activator->client->Lmd.lmdMenu.lastUsedTime < 1000)
+        return;
+
     // Check if player has chosen a profession
     int playerProf = PlayerAcc_Prof_GetProfession(activator);
     if (playerProf == PROF_NONE) {
@@ -3489,8 +3502,9 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
         for (int j = 0; j < 2; j++) {
             activator->client->ps.velocity[j] = 0.0f;
         }
-        
-        G_SetAnim(activator, SETANIM_BOTH, self->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
+
+        if (self->Lmd.customIndex < 2)
+            G_SetAnim(activator, SETANIM_BOTH, self->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
         return;
     }
     
@@ -3544,7 +3558,8 @@ void lmd_trainer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
     {
         activator->client->ps.velocity[j] = 0.0f;
     }
-
+    
+    if (self->Lmd.customIndex < 2)
         G_SetAnim(activator, SETANIM_BOTH, self->Lmd.customIndex == 0 ? BOTH_CONSOLE1 : BOTH_TALK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 0);
 }
 

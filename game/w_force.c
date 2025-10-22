@@ -983,7 +983,7 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 		//Ufo:
 		if(other->flags & FL_GODMODE) 
 			return 0;
-		if(other && other->NPC && other->spawnflags & 512)
+		if(other && other->NPC && other->NPC->scriptFlags & SCF_NO_FORCE)
 			return 0;
 		if(other->client->pers.Lmd.persistantFlags & SPF_IONLYDUEL)
 			return 0;

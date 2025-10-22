@@ -5730,35 +5730,6 @@ ContinueThink:
 
 				// lumaya: MediLevitate
 				lmd_meditate_levitate_update(ent);
-
-				gentity_t* pcn = &g_entities[ent->client->Lmd.crosshairEntNum];
-				if (ent->client->pers.cmd.buttons & BUTTON_USE
-					&& pcn && pcn->NPC
-					&& pcn->GenericStrings[7] && pcn->GenericStrings[7][0])
-				{
-					
-					float dist = Distance(ent->client->ps.origin, pcn->r.currentOrigin);
-					if (dist > 50)
-						return;
-
-					if (ent->client->ps.torsoAnim != BOTH_BUTTON_HOLD)
-					{
-						G_SetAnim( ent, SETANIM_TORSO, BOTH_BUTTON_HOLD,
-							SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, 0 );
-					}
-					else
-					{
-						ent->client->ps.torsoTimer = 500;
-					}
-					
-					ent->client->ps.weaponTime = ent->client->ps.torsoTimer;
-					
-					if (level.time - ent->client->Lmd.lmdMenu.lastUsedTime < 1000)
-						return;
-					
-					G_UseTargets2(pcn, ent, pcn->GenericStrings[7]);
-					
-				}
 				
 				if (ent->client->Lmd.lmdMenu.entityNum != 0)
 				{

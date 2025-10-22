@@ -124,7 +124,7 @@ qboolean G_CanBeEnemy(gentity_t *self, gentity_t *enemy)
 		return qfalse;
 	}
 
-	if (enemy && enemy->NPC && enemy->spawnflags & 1024)
+	if (enemy && enemy->NPC && enemy->NPC->scriptFlags & SCF_NO_HURT)
 		return qfalse;
 	
 	//end Lugormod
@@ -5579,7 +5579,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vec3_t pHitloc
 void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime );
 void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd  )
 {
-	if (self && self->NPC && self->spawnflags & 1024)
+	if (self && self->NPC && self->NPC->scriptFlags & SCF_NO_HURT)
 		return;
 		
 	float		dist;
@@ -8118,7 +8118,7 @@ static void G_GrabSomeMofos(gentity_t *self)
 			//&& (!Auths_Inferior(self,grabbed) 
 			//    || (duelInProgress(&self->client->ps) && (self->client->ps.duelIndex == grabbed->s.number)))
 			&& !(grabbed->flags & FL_GODMODE)
-			&& !(grabbed->NPC && grabbed->spawnflags & 1024))
+			&& !(grabbed->NPC && grabbed->NPC->scriptFlags & SCF_NO_HURT))
 		{ //grabbed an active player/npc
 			int tortureAnim = -1;
 			int correspondingAnim = -1;

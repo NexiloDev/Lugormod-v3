@@ -3189,7 +3189,7 @@ void G_ApplyKnockback( gentity_t *targ, vec3_t newDir, float knockback )
 		//return;
 	}
 
-	if (targ && targ->NPC && targ->spawnflags & 1024)
+	if (targ && targ->NPC && targ->NPC->scriptFlags & SCF_NO_HURT)
 		mass = 999999;
 	
 	if ( targ->physicsBounce > 0 )	//overide the mass
@@ -4733,7 +4733,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if (targ && targ->NPC && targ->spawnflags & 1024)
+	if (targ && targ->NPC && targ->NPC->scriptFlags & SCF_NO_HURT)
 		return;
 
 	//RoboPhred:

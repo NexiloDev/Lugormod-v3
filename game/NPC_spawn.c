@@ -1716,6 +1716,14 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 	newent->GenericStrings[7] = ent->GenericStrings[7];
 	newent->Lmd.crosshairText = ent->Lmd.crosshairText;
 	newent->Lmd.crosshairTextRange = ent->Lmd.crosshairTextRange;
+	newent->genericValue8 = ent->genericValue8;
+
+	if (newent->GenericStrings[7] && newent->GenericStrings[7][0])
+	{
+		// we have a usetarg
+		newent->use = NPC_Use;
+		newent->r.svFlags |= SVF_PLAYER_USABLE;
+	}
 
 	if(ent->paintarget)
 	{	//safe to point at owner's string since memory is never freed during game
@@ -1763,7 +1771,15 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 
 	newent->think = NPC_Begin;
 	newent->nextthink = level.time + FRAMETIME;
-	NPC_DefaultScriptFlags( newent );
+	if (newent->genericValue8)
+	{
+		newent->NPC->scriptFlags = newent->genericValue8;
+	}
+	else
+	{
+		NPC_DefaultScriptFlags( newent );
+	}
+	
 
 	//copy over team variables, too
 	newent->s.shouldtarget = ent->s.shouldtarget;
@@ -2142,6 +2158,16 @@ void NPC_Spawn_Tjo(gentity_t *ent){
 	trap_LinkEntity(newent);
 	newent->spawnflags = ent->spawnflags;
 	newent->GenericStrings[7] = ent->GenericStrings[7];
+	newent->Lmd.crosshairText = ent->Lmd.crosshairText;
+	newent->Lmd.crosshairTextRange = ent->Lmd.crosshairTextRange;
+	newent->genericValue8 = ent->genericValue8;
+
+	if (newent->GenericStrings[7] && newent->GenericStrings[7][0])
+	{
+		// we have a usetarg
+		newent->use = NPC_Use;
+		newent->r.svFlags |= SVF_PLAYER_USABLE;
+	}
 	
 	if(ent->paintarget)
 	{	//safe to point at owner's string since memory is never freed during game
@@ -2193,7 +2219,14 @@ void NPC_Spawn_Tjo(gentity_t *ent){
 
 	newent->think = NPC_Begin;
 	newent->nextthink = level.time + FRAMETIME;
-	NPC_DefaultScriptFlags( newent );
+	if (newent->genericValue8)
+	{
+		newent->NPC->scriptFlags = newent->genericValue8;
+	}
+	else
+	{
+		NPC_DefaultScriptFlags( newent );
+	}
 
 	//copy over team variables, too
 	newent->s.shouldtarget = ent->s.shouldtarget;
@@ -2456,8 +2489,6 @@ const entityInfoData_t NPC_spawner_spawnflags[] = {
 	{"16", "NPC can be in air, but will spawn on the closest floor surface below it"},
 	{"32", "Will spawn with no default AI (BS_CINEMATIC), or the blinking that happens when it spawns"},
 	{"256", "Spawner is shy (wont spawn if a player is looking at it)"},
-	{"512", "Unaffected by force powers"},
-	{"1024", "Unaffected by weapons"},
 	{NULL, NULL}
 };
 const entityInfoData_t NPC_spawner_keys[] = {
@@ -2529,6 +2560,7 @@ void SP_NPC_spawner( gentity_t *self){
 	G_SpawnString("usetarget", "", &self->GenericStrings[7]);
 	G_SpawnString("crosshairText", "", &self->Lmd.crosshairText);
 	G_SpawnInt("crosshairTextRange", "9999", &self->Lmd.crosshairTextRange);
+	G_SpawnInt("scriptflags", "", &self->genericValue8);
 
 	if ( self->targetname )
 		self->use = NPC_Spawn;

@@ -1,5 +1,13 @@
 # Lugormod v3 Changelog
 
+### Lugormod v3.3.1 - *Released 22 October 2025*
+- New `target_fp` entity that allows forcing powers and power levels onto players inside an area. For example, setting all players to have lighting at level 3 inside a certain area on the map.
+- Add `CrosshairText` and `CrosshairTextRange` keys to `func_` entities.
+- Enable targeting a `lmd_trainer` from a `lmd_terminal` so that they can be chained together.
+- Bug Fixes
+  - Fixed a crash when a `lmd_door` was grabbed with `grabx` `graby` `grabz`.
+  - Fixed a bug where `target2` was not firing on `func_door` entities.
+
 ### Lugormod v3.3.0 - *Released 6 October 2025*
 - RGB Saber Support (**Note:** You will need the latest TaystJK client as of this date, to use it).
 - New & Updated Commands & Features

@@ -12,7 +12,7 @@
 
 - So if an entity has **(L) by it that means that it was created for Lugormod, or was edited, and has to be targeted to work.
 
-# Lugormod Entities
+# lmd_ Entities
 
 ## lmd_chance * (L)
 When used, gets a random number between 1 and "count", and will go from "chance" to "chance6" checking if its number is less than or equal to it.

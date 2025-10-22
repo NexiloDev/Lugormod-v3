@@ -36,9 +36,23 @@ void lmd_crosshairEntText(const gentity_t* ent)
     vec3_t tracedEntOrigin;
 
     if (tracedEnt->r.bmodel)
-        VectorAverage(tracedEnt->r.mins, tracedEnt->r.maxs, tracedEntOrigin);
+    {
+        vec3_t temp;
+        vec3_t center;
+        VectorAverage(tracedEnt->r.mins, tracedEnt->r.maxs, center);
+        VectorCopy(center, temp);
+
+        RotatePointAroundVector(temp, axisDefault[0], temp, tracedEnt->r.currentAngles[2]);
+        RotatePointAroundVector(temp, axisDefault[1], temp, tracedEnt->r.currentAngles[0]);
+        RotatePointAroundVector(temp, axisDefault[2], temp, tracedEnt->r.currentAngles[1]);
+        
+        VectorAdd(temp, tracedEnt->r.currentOrigin, tracedEntOrigin);
+    }
     else
-        VectorCopy(tracedEnt->s.origin, tracedEntOrigin);
+    {
+        VectorCopy(tracedEnt->r.currentOrigin, tracedEntOrigin);
+    }
+        
     
     if (newEntNum && ent->client->Lmd.crosshairText.debounceTime < level.time
         && Distance(ent->client->ps.origin, tracedEntOrigin) <= tracedEnt->Lmd.crosshairTextRange)

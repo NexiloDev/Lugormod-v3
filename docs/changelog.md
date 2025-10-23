@@ -1,5 +1,11 @@
 # Lugormod v3 Changelog
 
+### Lugormod v3.3.2 - *Released 23 October 2025*
+- Bug Fixes
+  - Fixed `crosshairText` command not displaying on `func_` entities as expected.
+  - Fixed "print print" console spam for admins caused by an issue with the Auths_CommandUsed function.
+- New Building Sub-Command: `\mapents snapshot` to display the amount of entities in your current snapshot (max: 256)
+
 ### Lugormod v3.3.1 - *Released 22 October 2025*
 - New `target_fp` entity that allows forcing powers and power levels onto players inside an area. For example, setting all players to have lighting at level 3 inside a certain area on the map.
 - Add `CrosshairText` and `CrosshairTextRange` keys to `func_` entities.

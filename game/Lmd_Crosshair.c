@@ -36,9 +36,23 @@ void lmd_crosshairEntText(const gentity_t* ent)
     vec3_t tracedEntOrigin;
 
     if (tracedEnt->r.bmodel)
-        VectorAverage(tracedEnt->r.mins, tracedEnt->r.maxs, tracedEntOrigin);
+    {
+        vec3_t temp;
+        vec3_t center;
+        VectorAverage(tracedEnt->r.mins, tracedEnt->r.maxs, center);
+        VectorCopy(center, temp);
+
+        RotatePointAroundVector(temp, axisDefault[0], center, tracedEnt->r.currentAngles[2]);
+        RotatePointAroundVector(temp, axisDefault[1], center, tracedEnt->r.currentAngles[0]);
+        RotatePointAroundVector(temp, axisDefault[2], center, tracedEnt->r.currentAngles[1]);
+        
+        VectorAdd(temp, tracedEnt->r.currentOrigin, tracedEntOrigin);
+    }
     else
-        VectorCopy(tracedEnt->s.origin, tracedEntOrigin);
+    {
+        VectorCopy(tracedEnt->r.currentOrigin, tracedEntOrigin);
+    }
+        
     
     if (newEntNum && ent->client->Lmd.crosshairText.debounceTime < level.time
         && Distance(ent->client->ps.origin, tracedEntOrigin) <= tracedEnt->Lmd.crosshairTextRange)
@@ -49,22 +63,13 @@ void lmd_crosshairEntText(const gentity_t* ent)
 }
 
 
+extern gentity_t* AimAnyTarget (const gentity_t *ent, int length);
 void lmd_crosshairEntTrace(const gentity_t* ent)
 {
     if (!ent->client)
         return;
 
-    trace_t tr;
-    vec3_t tfrom, tto, fwd;
-
-    VectorCopy(ent->client->ps.origin, tfrom);
-    tfrom[2] += ent->client->ps.viewheight;
-    AngleVectors(ent->client->ps.viewangles, fwd, NULL, NULL);
-
-    tto[0] = tfrom[0] + fwd[0] * 9999;
-    tto[1] = tfrom[1] + fwd[1] * 9999;
-    tto[2] = tfrom[2] + fwd[2] * 9999;
-
-    trap_Trace(&tr, tfrom, NULL, NULL, tto, ent->s.number, MASK_ALL);
-    ent->client->Lmd.crosshairEntNum = tr.entityNum;
+    gentity_t *tracedEntity = AimAnyTarget(ent, 9999);
+    if (tracedEntity)
+        ent->client->Lmd.crosshairEntNum = tracedEntity - g_entities;
 }

@@ -79,7 +79,7 @@ void lmd_crosshairEntTrace(const gentity_t* ent)
     fPos[1] = ent->client->renderInfo.eyePoint[1] + fPos[1]*9999;
     fPos[2] = ent->client->renderInfo.eyePoint[2] + fPos[2]*9999;
 
-    trap_Trace(&tr,ent->client->renderInfo.eyePoint, mins, maxs, fPos, ent->s.number, ent->clipmask);
+    trap_Trace(&tr,ent->client->renderInfo.eyePoint, mins, maxs, fPos, ent->s.number, MASK_ALL);
 
     ent->client->Lmd.crosshairEntNum = tr.entityNum;
 }

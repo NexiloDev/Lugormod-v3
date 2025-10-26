@@ -56,6 +56,7 @@ Restricts the person inside of it by whatever spawnflags are set. Use maxs/mins 
 4     - No jetpack
 8     - No duels, existing duels break if a player enters this.
 16    - No firing weapons
+32    - Players in this area will not be able to use force jump.
 128   - Start inactive, must be hit by a target_activate entity to become active.
 256   - Alow Desann Stance
 512   - Allow Tavion Stance

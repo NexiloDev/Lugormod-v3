@@ -3221,6 +3221,7 @@ const entityInfoData_t lmd_restrict_spawnflags[] = {
     {"128", "Start disabled.  Must be used by a target_activate to have any effect."},
     {"256", "Allow Desann Stance."},
     {"512", "Allow Tavion Stance."},
+    {"1024", "Disallow special saber moves."},
     {NULL, NULL}
 };
 const entityInfoData_t lmd_restrict_keys[] = {

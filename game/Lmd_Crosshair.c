@@ -63,13 +63,23 @@ void lmd_crosshairEntText(const gentity_t* ent)
 }
 
 
-extern gentity_t* AimAnyTarget (const gentity_t *ent, int length);
 void lmd_crosshairEntTrace(const gentity_t* ent)
 {
     if (!ent->client)
         return;
+    
+    trace_t tr;
+    vec3_t fPos,maxs,mins;
 
-    gentity_t *tracedEntity = AimAnyTarget(ent, 9999);
-    if (tracedEntity)
-        ent->client->Lmd.crosshairEntNum = tracedEntity - g_entities;
+    AngleVectors(ent->client->ps.viewangles, fPos, 0, 0);
+    VectorSet( mins, -8, -8, -8 );
+    VectorSet( maxs, 8, 8, 8 );
+
+    fPos[0] = ent->client->renderInfo.eyePoint[0] + fPos[0]*9999;
+    fPos[1] = ent->client->renderInfo.eyePoint[1] + fPos[1]*9999;
+    fPos[2] = ent->client->renderInfo.eyePoint[2] + fPos[2]*9999;
+
+    trap_Trace(&tr,ent->client->renderInfo.eyePoint, mins, maxs, fPos, ent->s.number, MASK_ALL);
+
+    ent->client->Lmd.crosshairEntNum = tr.entityNum;
 }

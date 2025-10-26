@@ -538,7 +538,7 @@ void SP_target_fp( gentity_t *ent )
 	G_SpawnString("ModifyPowers", "", &ent->target2);
 	G_SpawnFloat("ForceRegenSpeedMultiplier", "0.0", &ent->modelScale[0]);
 
-	if (Q_stricmp(ent->target2, "") && ent->modelScale[0] == 0.0)
+	if (!Q_stricmp(ent->target2, "") && ent->modelScale[0] == 0.0)
 	{
 		EntitySpawnError("Both ModifyPowers and ForceRegenSpeedMultiplier are invalid.");
 		G_FreeEntity(ent);

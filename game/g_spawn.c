@@ -1427,8 +1427,6 @@ void Cmd_Entityinfo_t(gentity_t *ent, int iArg) {
 				color = qfalse;
 				header = qfalse;
 				for(data = spawn->info->spawnflags; data->key != NULL; data++) {
-					if(!data->key == 0)
-						break;
 					if(!header) {
 						Disp(ent, "^2Spawnflags ===============================================");
 						header = qtrue;

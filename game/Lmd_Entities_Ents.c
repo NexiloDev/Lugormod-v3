@@ -2732,6 +2732,9 @@ void jailPlayer(gentity_t* targ, int time);
 
 void lmd_playereffect_use(gentity_t* ent, gentity_t* other, gentity_t* activator)
 {
+    if (!activator || !activator->client)
+        return;
+    
     switch (ent->genericValue1)
     {
     case 1:
@@ -5293,7 +5296,7 @@ const entityInfoData_t lmd_event_keys[] = {
 
 entityInfo_t lmd_event_info = {
     "Trigger targetnames on various player events.",
-    lmd_event_spawnflags,
+    lmd_event_spawnflags,   
     lmd_event_keys
 };
 

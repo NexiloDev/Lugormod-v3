@@ -13,13 +13,23 @@ void GiveCredits(gentity_t *ent, int cr, char *reason) {
 		cr = 0;
 
 	else if(cr > 0) {
-		char *msg = va("^3You received ^2CR %i^3 %s.", cr, (reason != NULL) ? reason : "");
+		char msg[MAX_STRING_CHARS];
+		Q_strncpyz(
+			msg,
+			va("^3You received ^2CR %i^3 %s.", cr, (reason != NULL) ? reason : ""),
+			sizeof(msg)
+		);
 		Disp(ent, msg);
 		trap_SendServerCommand(ent->s.number, va("cp \"%s\"", msg));
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.wav"));
 	}
 	else if(cr < 0){
-		char *msg = va("^3You lost ^1CR %i^3 %s.", cr, (reason != NULL) ? reason : "");
+		char msg[MAX_STRING_CHARS];
+		Q_strncpyz(
+			msg,
+			va("^3You lost ^1CR %i^3 %s.", cr, (reason != NULL) ? reason : ""),
+			sizeof(msg)
+		);
 		Disp(ent, msg);
 		trap_SendServerCommand(ent->s.number, va("cp \"%s\"", msg));
 	}

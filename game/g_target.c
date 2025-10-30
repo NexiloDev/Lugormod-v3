@@ -503,10 +503,13 @@ int lmd_get_forcePowerMapIndex(const char *token) {
 	}
 	return -1;
 }
-
+qboolean PlayerUseableCheck(gentity_t *self, gentity_t *activator);
 void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 {
 	if (!activator || !activator->client)
+		return;
+		
+	if (PlayerUseableCheck(ent, other) == qfalse)
 		return;
 
 	activator->client->Lmd.customForceRegenSpeedMultiplier = ent->modelScale[0];

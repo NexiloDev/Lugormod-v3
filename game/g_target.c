@@ -452,6 +452,7 @@ void SP_target_print( gentity_t *ent ) {
 
 const entityInfoData_t target_fp_keys[] = {
 	{"targetname", "make the trigger target this value for the entity to be used"},
+	{"ResetPowers", "Resets the users original force powers. 0-1 (Default 0)"},
 	{"ModifyPowers", "E.g. ModifyPowers,heal2.rage2 -> would set force heal and rage to level 2. Available keys are: jump, push, pull, speed, seeing, heal, protect, absorb"
 				  "mindtrick, theal, grip, lightning, rage, drain, tforce, sattack, sdefend, sthrow."},
 	{"ForceRegenSpeedMultiplier", "Multiply the existing force regen speed by the given amount. E.g: 1.25. Must be greater than 0."},
@@ -509,6 +510,12 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 		return;
 
 	activator->client->Lmd.customForceRegenSpeedMultiplier = ent->modelScale[0];
+
+	if (ent->Lmd.customIndex == 1)
+	{
+		WP_InitForcePowers(activator);
+		return;
+	}
 	
 	char *token = strtok(ent->target2, ".");
 	while (token)
@@ -537,6 +544,7 @@ void SP_target_fp( gentity_t *ent )
 {
 	G_SpawnString("ModifyPowers", "", &ent->target2);
 	G_SpawnFloat("ForceRegenSpeedMultiplier", "0.0", &ent->modelScale[0]);
+	G_SpawnInt("ResetPowers", "0", &ent->Lmd.customIndex);
 
 	if (!Q_stricmp(ent->target2, "") && ent->modelScale[0] == 0.0)
 	{

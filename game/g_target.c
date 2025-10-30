@@ -509,7 +509,7 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 	if (!activator || !activator->client)
 		return;
 		
-	if (PlayerUseableCheck(ent, other) == qfalse)
+	if (PlayerUseableCheck(ent, activator) == qfalse)
 		return;
 
 	activator->client->Lmd.customForceRegenSpeedMultiplier = ent->modelScale[0];
@@ -548,13 +548,6 @@ void SP_target_fp( gentity_t *ent )
 	G_SpawnString("ModifyPowers", "", &ent->target2);
 	G_SpawnFloat("ForceRegenSpeedMultiplier", "0.0", &ent->modelScale[0]);
 	G_SpawnInt("ResetPowers", "0", &ent->Lmd.customIndex);
-
-	if (!Q_stricmp(ent->target2, "") && ent->modelScale[0] == 0.0)
-	{
-		EntitySpawnError("Both ModifyPowers and ForceRegenSpeedMultiplier are invalid.");
-		G_FreeEntity(ent);
-		return;
-	}
 	
 	ent->use = Use_Target_Fp;
 }

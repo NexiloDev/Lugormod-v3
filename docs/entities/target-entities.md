@@ -109,6 +109,16 @@ Applies custom Force power levels and/or a Force regeneration multiplier to whoe
 ### Keys:
 
 ```
+customskill                 - The name of the skill to check. (see lmd_customskill for details)
+customskillcompare          - Comparison type. -1 for direct compare (use this for text), 0 for greater or equal to, 1 for less than. 
+                              (default 0)
+customskillvalue            - The value to compare to.
+property                    - The property to check to fire this entity.
+profession                  - A bitmask of professions. Values: 1 - Jedi, 2 - Merc, 4 - Tech.
+level                       - Minimum player level.
+maxlevel                    - Maximum player level.
+adminlevel                  - Minimum admin level.
+playerflags                 - A bitmask of flags set by the lmd_playerflag entity.
 targetname                  - make the trigger target this value for the entity to be used.
 ModifyPowers                - Dot (`.`) separated list of Force power assignments in the format powernamelevel.
                               For example `push3.lightning1` will set Force Push to level 3 and Lightning to level 1.
@@ -118,9 +128,6 @@ ResetPowers                 - If set to 1 the user's Force powers are reset to t
                               `ModifyPowers`. (Default 0)
 ForceRegenSpeedMultiplier   - Multiplier applied to the player's Force regeneration speed. Must be greater than 0 to have an effect.
 ```
-
-At least one of `ModifyPowers` or `ForceRegenSpeedMultiplier` must be set.
-
 ### Example code:
 
 ```

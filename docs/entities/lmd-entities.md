@@ -50,15 +50,16 @@ Restricts the person inside of it by whatever spawnflags are set. Use maxs/mins 
 ### Spawnflags:
 
 ```
-1     - Damage restrict, the people inside cannot be inflicted with damage
-2     - Restrict forcepowers
-        (includes non-offensive force heal/protect etc...)
-4     - No jetpack
-8     - No duels, existing duels break if a player enters this.
-16    - No firing weapons
-128   - Start inactive, must be hit by a target_activate entity to become active.
-256   - Alow Desann Stance
-512   - Allow Tavion Stance
+1    - Players in this area will not take damage.
+2    - Players in this area will not be able to use forcepowers.
+4    - Players in this area will not be able to use their jetpack.
+8    - Players in this area will not be able to duel.  Existing duels will be broken if a player enters it.
+16   - Players in this area will not be able to fire weapons.  Players may still see the weapon fire animation.
+32   - Players in this area will not be able to use force jump.
+128  - Start disabled.  Must be used by a target_activate to have any effect.
+256  - Allow Desann Stance.
+512  - Allow Tavion Stance.
+1024 - Disallow special saber moves.
 ```
 
 ### Keys:

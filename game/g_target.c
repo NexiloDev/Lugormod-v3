@@ -516,9 +516,12 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 
 	if (ent->Lmd.customIndex == 1)
 	{
+		activator->client->Lmd.targetFpUsed = qfalse;
 		WP_InitForcePowers(activator);
 		return;
 	}
+
+	activator->client->Lmd.targetFpUsed = qtrue;
 	
 	char *token = strtok(ent->target2, ".");
 	while (token)

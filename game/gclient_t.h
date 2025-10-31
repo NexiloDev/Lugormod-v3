@@ -609,6 +609,7 @@ struct gclient_s {
 		int crosshairEntNum;
 		unsigned int grabbing;
 		float customForceRegenSpeedMultiplier;
+		qboolean targetFpUsed;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

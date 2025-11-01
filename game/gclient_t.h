@@ -608,6 +608,8 @@ struct gclient_s {
 
 		int crosshairEntNum;
 		unsigned int grabbing;
+		qboolean lockSaber;
+		int canPickUpWeapons;
 		float customForceRegenSpeedMultiplier;
 	}Lmd;
 	unsigned int lastTargetUse;

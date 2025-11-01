@@ -2455,7 +2455,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	if ( ps )
 	{
-		if ( ps->trueJedi )
+		if ( ps->trueJedi && &g_entities[ps->clientNum] && g_entities[ps->clientNum].client && g_entities[ps->clientNum].client->Lmd.canPickUpWeapons == 0 )
 		{//force powers and saber only
 			if ( item->giType != IT_TEAM //not a flag
 				//Ufo: allow medpaks

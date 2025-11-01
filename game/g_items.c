@@ -2650,15 +2650,16 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	//Lugormod anti jedimaster pickup
 	if (g_gametype.integer == GT_JEDIMASTER 
 		&& other->client
-		&& other->client->ps.isJediMaster
+		&& (other->client->ps.isJediMaster && other->client->Lmd.canPickUpWeapons != 0)
 		&& g_jmkillhealth.integer){
 			return;
 
 	}
 	//Lugormod no picking up weapons for the king
-	if (IsKing(other) && ent->item && ent->item->giType == IT_WEAPON){
-			return;
-	}
+	//if (IsKing(other) && ent->item && ent->item->giType == IT_WEAPON){
+	//		return;
+	//}
+	
 	//Lugormod only pick up our own weapons
 	if (g_gametype.integer == GT_GHOST && 
 		ent->item &&
@@ -2782,11 +2783,17 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 			//updateGhost(other);
 		}
 
+		if (other->client->Lmd.canPickUpWeapons != 0 && !(other->client->Lmd.canPickUpWeapons & (1<<ent->item->giTag)))
+			return;
+
 		respawn = Pickup_Weapon(ent, other);
 		//		predict = qfalse;
 		predict = qtrue;
 		break;
 	case IT_AMMO:
+		if (other->client->Lmd.canPickUpWeapons != 0 && other->client->ps.ammo[(other->client->Lmd.canPickUpWeapons & (1<<ent->item->giTag))] == ent->item->giTag)
+			return;
+		
 		respawn = Pickup_Ammo(ent, other);
 		if (ent->item->giTag == AMMO_THERMAL || ent->item->giTag == AMMO_TRIPMINE || ent->item->giTag == AMMO_DETPACK)
 		{

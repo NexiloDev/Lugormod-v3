@@ -391,7 +391,7 @@ static void TargetWeapons_ParseAndGive(gentity_t* activator, const char* input, 
         }
         else
         {
-            ammoAmount = 999; // default full ammo
+            ammoAmount = SHRT_MAX;
         }
 
         int weaponID = TargetWeapons_FindID(weaponName);
@@ -418,7 +418,13 @@ static void TargetWeapons_ParseAndGive(gentity_t* activator, const char* input, 
             }
 
             if (weaponID != WP_SABER && weaponID != WP_BRYAR_PISTOL)
+            {
                 activator->client->ps.ammo[weaponData[weaponID].ammoIndex] = addAmmo ? activator->client->ps.ammo[weaponData[weaponID].ammoIndex] + ammoAmount : ammoAmount;
+                if (activator->client->ps.ammo[weaponData[weaponID].ammoIndex] > SHRT_MAX)
+                {
+                    activator->client->ps.ammo[weaponData[weaponID].ammoIndex] = SHRT_MAX;
+                }
+            }
 
             if (weaponID == WP_SABER && !justAllow)
             {
@@ -517,7 +523,7 @@ void Use_Target_Weapons(gentity_t* ent, gentity_t* other, gentity_t* activator)
 
     if (ent->target2 && ent->target2[0])
     {
-        TargetWeapons_ParseAndGive(activator, ent->target2, (ent->spawnflags & 1), ent->spawnflags & 2, ent->spawnflags & 4);
+        TargetWeapons_ParseAndGive(activator, ent->target2, !(ent->spawnflags & 1), ent->spawnflags & 2, ent->spawnflags & 4);
     }
 }
 

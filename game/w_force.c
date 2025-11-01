@@ -6575,6 +6575,9 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd ){
 			else 
 				regenTime = g_forceRegenTime.integer;
 
+			if (self->client->Lmd.customForceRegenSpeedMultiplier > 0.0)
+				regenTime /= self->client->Lmd.customForceRegenSpeedMultiplier;
+		
 			if(regenTime <= 0)
 				regenTime = 1;
 

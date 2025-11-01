@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10...3.24)
 
 set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE STRING INTERNAL FORCE)
 
 # Option Defaults
 option(FORCE_32 "Enable 32 bit compile" ON)
-option(CUSTOM_OUTPUT_DIR "Customize Output Directory" OFF)
 
 if(UNIX)
 	# Prevent breaking the proxy patcher with over optimization, it doesn't like something in level 3...
@@ -17,11 +16,7 @@ endif()
 
 project(Lugormod-v3)
 
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
-
-if(FORCE_32)
-	message("Forcing 32bit compilation")
-endif()
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
 
 set(GAME_SRC
 	game/tri_coll_test.c 
@@ -111,7 +106,8 @@ set(GAME_SRC
 	game/Lmd_Crafting.c 
 	game/Lmd_CrashReport.c 
 	game/Lmd_Credits.c 
-	game/Lmd_Creditshunt.c 
+	game/Lmd_Creditshunt.c
+	game/Lmd_Crosshair.c  
 	game/Lmd_Data.c 
 	game/Lmd_Entities_Commands.c 
 	game/Lmd_Entities_Core.c 
@@ -133,7 +129,8 @@ set(GAME_SRC
 	game/Lmd_KeyPairs.c 
 	game/Lmd_King.c 
 	game/Lmd_Locations.c 
-	game/Lmd_Main.c 
+	game/Lmd_Main.c
+	game/Lmd_Medilevitate.c 
 	game/Lmd_mem.c 
 	game/Lmd_Misc.c 
 	game/Lmd_Missile.c 
@@ -153,6 +150,7 @@ set(GAME_SRC
 	game/Lmd_RandomChat.c 
 	game/Lmd_RandomSpot.c 
 	game/Lmd_Script.c 
+	game/Lmd_SetSaber.c
 	game/Lmd_StashZone.c 
 	game/Lmd_Time.c 
 	game/lmd_turret.c 
@@ -226,19 +224,28 @@ set(DEFINITIONS
 	$<$<CONFIG:Debug>:_DEBUG> $<$<CONFIG:Debug>:DEBUG> 
 	$<$<CONFIG:Release>:FINAL_BUILD>)
 
-
 if(WIN32)
 	set(TARGET_SUFFIX x86${CMAKE_SHARED_LIBRARY_SUFFIX})
-    #set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2")
+	#set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2")
 	#set(CMAKE_CXX_FLAGS_DEBUG "/MT /Od")
+	set(RESOURCEFILES
+			"win32/AutoVersion.h"
+			"win32/resource.h"
+			"win32/JK2game.rc"
+	)
+	set(GAME_SRC ${GAME_SRC} ${GAME_HEADER} ${RESOURCEFILES})
+	set(STATIC_LIBRARIES
+			dbghelp.lib
+			winmm.lib
+			psapi.lib
+	)
 else()
 	if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
 		set(TARGET_SUFFIX arm${CMAKE_SHARED_LIBRARY_SUFFIX})
 	elseif(FORCE_32 OR CMAKE_SYSTEM_PROCESSOR MATCHES "^i.86$")
 		if(APPLE)
 			set(TARGET_SUFFIX x86${CMAKE_SHARED_LIBRARY_SUFFIX})
-		else()
-			# e.g. Linux
+		else() # e.g. Linux
 			set(TARGET_SUFFIX i386${CMAKE_SHARED_LIBRARY_SUFFIX})
 		endif()
 	elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^x86.64$")
@@ -250,34 +257,12 @@ else()
 	else()
 		set(TARGET_SUFFIX ${CMAKE_SYSTEM_PROCESSOR}${CMAKE_SHARED_LIBRARY_SUFFIX})
 	endif()
+	set(GAME_SRC ${GAME_SRC} ${GAME_HEADER})
 endif()
-
-if (WIN32)
-    set(RESOURCEFILES
-        "win32/AutoVersion.h"
-        "win32/resource.h"
-        "win32/JK2game.rc"
-    )
-endif()
-
-if(WIN32)
-set(GAME_SRC ${GAME_SRC} ${GAME_HEADER} ${RESOURCEFILES})
-else()
-set(GAME_SRC ${GAME_SRC} ${GAME_HEADER})
-endif()
-
-
-if(WIN32)
-		set(STATIC_LIBRARIES
-			dbghelp.lib
-			winmm.lib
-			psapi.lib
-			)
-endif()
-
 
 add_library(GameLibrary SHARED ${GAME_SRC})
-if (FORCE_32)
+if (FORCE_32 AND NOT MSVC)
+	message("Forcing 32bit compilation")
 	set_target_properties(GameLibrary PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif()
 set_target_properties(GameLibrary PROPERTIES PREFIX "")
@@ -290,25 +275,15 @@ if(WIN32)
 	target_link_libraries(GameLibrary ${STATIC_LIBRARIES} )
 endif()
 
+if(MINGW) # necessary linking libraries to cross-compile on linux
+	target_link_libraries(GameLibrary ws2_32 wsock32)
+endif ()
+
 target_compile_definitions(GameLibrary PUBLIC "_GAME" "QAGAME" "GAME" "LMD_NEW_FORCEPOWERS" "LMD_NEW_WEAPONS" "MISSIONPACK" "_JK2" "JK2AWARDS" ${DEFINITIONS})
 
-# Cmake Output
-if (CUSTOM_OUTPUT_DIR)
-if (WIN32)
-set(ModDirDebug "${PROJECT_SOURCE_DIR}/ftp/GameData/lugormod")
-set(ModDirRelease "${PROJECT_SOURCE_DIR}/ftp/GameData/lugormod")
-else()
-set(ModDirDebug "${PROJECT_SOURCE_DIR}/ftp/GameData/lugormod")
-set(ModDirRelease "${PROJECT_SOURCE_DIR}/ftp/GameData/lugormod")
-endif()
-
-if(WIN32)
-set_target_properties(GameLibrary PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ModDirDebug}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${ModDirRelease}")
-else()
-set_target_properties(GameLibrary PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY_DEBUG "${ModDirDebug}"
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${ModDirRelease}")
-endif()
-endif()
+install(TARGETS GameLibrary
+		RUNTIME
+			DESTINATION lugormod
+		LIBRARY
+			DESTINATION lugormod
+)

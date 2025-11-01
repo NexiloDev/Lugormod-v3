@@ -515,13 +515,16 @@ qboolean Professions_ChooseProf(gentity_t *ent, int prof){
 		return qfalse;
 	}
 
+	// lumaya: we dont take crs on prof swapping
+	/*
 	if(flags & ACCFLAGS_NOPROFCRLOSS){
 		PlayerAcc_AddFlags(ent, -ACCFLAGS_NOPROFCRLOSS);
 		Disp(ent, "^3Your free profession change has been used up.");
 	}
 	else
 		PlayerAcc_SetCredits(ent, PlayerAcc_GetCredits(ent) / 2);
-
+*/
+	
 	PlayerAcc_Prof_SetProfession(ent, prof);
 	PlayerAcc_Prof_SetLevel(ent, 1);
 
@@ -709,8 +712,6 @@ void Cmd_SkillSelect_Level(gentity_t *ent, int prof, profSkill_t *skill, qboolea
 		}
 		level++;
 
-		Disp(ent, va("^3The ^2%s^3 skill is now at level ^2%i^3.", skill->name, level));
-
 		int points = Professions_AvailableSkillPoints(acc, prof, skill, NULL);
 		if(points < level) {
 			Disp(ent, va("^3It takes ^2%i^3 points to level up this skill.", level));
@@ -722,6 +723,8 @@ void Cmd_SkillSelect_Level(gentity_t *ent, int prof, profSkill_t *skill, qboolea
 			Disp(ent, va("^3This skill cannot be leveled up at this time."));
 			return;
 		}
+
+		Disp(ent, va("^3The ^2%s^3 skill is now at level ^2%i^3.", skill->name, level));
 
 		if(level >= skill->levels.max) {
 			Disp(ent, "^3This skill is now at its highest level.");
@@ -880,13 +883,13 @@ void Cmd_SkillSelect_f(gentity_t *ent, int iArg){
 	Disp(ent, "^4===========================================");
 }
 
-void Cmd_ResetSkills_f (gentity_t *ent, int iArg){
+void Cmd_ResetSkills_f (gentity_t *ent, int iArg) {
 	Account_t *acc = ent->client->pers.Lmd.account;
-	int credits = 0;
-	int myCredits = PlayerAcc_GetCredits(ent);
+	// int credits = 0;
+	// int myCredits = PlayerAcc_GetCredits(ent);
 	int prof = PlayerAcc_Prof_GetProfession(ent);
 	int used;
-	
+    
 	if (!acc) {
 		return;
 	}
@@ -898,26 +901,35 @@ void Cmd_ResetSkills_f (gentity_t *ent, int iArg){
 		return;
 	}
 
+	// Credit cost system has been disabled, since we can downrank skills for free
+	/*
 	if (trap_Argc() > 1) {
-		credits = atoi(ConcatArgs(1));
+	   credits = atoi(ConcatArgs(1));
 	}
 	if (myCredits < credits) {
-		credits = myCredits;
+	   credits = myCredits;
 	}
 
 	if(used == 0) {
-		Disp(ent, "^3All your skills are already at their lowest level.");
-		return;
+	   Disp(ent, "^3All your skills are already at their lowest level.");
+	   return;
 	}
 
 	int cost = used * 200;
 
 	if (credits < cost) {
-		Disp(ent,va("^3The cost to reset your skills is ^2CR %i^3.", cost));
-		return;
+	   Disp(ent,va("^3The cost to reset your skills is ^2CR %i^3.", cost));
+	   return;
 	}
 
 	PlayerAcc_SetCredits(ent, myCredits - cost);
+	*/
+	
+	if(used == 0) {
+		Disp(ent, "^3All your skills are already at their lowest level.");
+		return;
+	}
+	
 	Accounts_Prof_ClearData(ent->client->pers.Lmd.account);
 	Professions_SetDefaultSkills(ent->client->pers.Lmd.account, prof);
 	Profession_UpdateSkillEffects(ent, prof);
@@ -1050,6 +1062,55 @@ void Cmd_Profession_f (gentity_t *ent, int iArg){
 	Profession_DisplayProfs(ent);
 }
 
+void Cmd_MediLevitate_f(gentity_t* ent, int iArg)
+{
+	if (ent->client->sess.spectatorState != SPECTATOR_NOT)
+	{
+		Disp(ent, "^3You cannot do this while spectating.");
+		return;
+	}
+	
+	if (ent->client->Lmd.mediLevitate.state == 3)
+	{
+		Disp(ent, "^4Descending...");
+		ent->client->Lmd.mediLevitate.state = 4;
+		return;
+	}
+
+	if (ent->client->Lmd.mediLevitate.state == 4)
+	{
+		Disp(ent, "^3Press any action button to abort descending.");
+		return;
+	}
+
+	if (duelInProgress(&ent->client->ps))
+	{
+		Disp(ent, "^3You cannot do this while in a duel.");
+		return;
+	}
+
+	if (ent->client->Lmd.mediLevitate.enabled)
+	{
+		Disp(ent, "^3You are already doing this.");
+		return;
+	}
+
+	if (ent->client->ps.groundEntityNum == ENTITYNUM_NONE)
+	{
+		Disp(ent, "^3You cannot do this mid air.");
+		return;
+	}
+	
+	if (ent->client->ps.weaponTime > 0
+		|| ent->client->ps.forceHandExtendTime > level.time)
+	{
+		Disp(ent, "^3You cannot do this while attacking.");
+		return;
+	}
+	
+	ent->client->Lmd.mediLevitate.enabled = qtrue;
+}
+
 void Cmd_Cortosis_f(gentity_t *ent, int iArg);
 void Cmd_Flame_f(gentity_t *ent, int iArg);
 void Cmd_Ionlysaber_f(gentity_t *ent, int iArg);
@@ -1061,10 +1122,12 @@ cmdEntry_t professionCommandEntries[] = {
 	{"cortosis", "Equips an armor that turns off hostile lightsabers and lowers incoming splash damage. Prevents usability of heavy splash weapons.", Cmd_Cortosis_f, 0, qfalse, 0, 64, ~(1 << GT_FFA), PROF_MERC},
 	{"flame", "Shoots out a spew of flames.", Cmd_Flame_f, 0, qfalse, 1, 257, 0, PROF_MERC},
 	{"ionlysaber", "You can't use forcepowers other than heal or drain - but you're also immune to them. Greatly reduces received splash damage.", Cmd_Ionlysaber_f, 0, qfalse, 0, 64, ~(1 << GT_FFA), PROF_JEDI},
+	{"levitate", "Enter deep meditation, levitating gently above the ground. You become immune to most Force attacks except Heal and Drain, and significantly resist splash damage. A state of serene invulnerability, but with limited aggression.", Cmd_MediLevitate_f, 0, qfalse, 0, 64, 0, PROF_JEDI},
 	{"profession", "Choose a profession. ^1You will start from level one and lose your score and half your money if you choose a new profession.", Cmd_Profession_f, 0, qfalse, 1, 256, 0, 0},
 	{"resetskills", "Reset your skills. This costs money; if no argument is provided the cost will be displayed.", Cmd_ResetSkills_f, 0, qfalse, 2, 257, 0, 0},
 	{"skills", "View and raise your profession skills. You can only raise skill levels if you have unallocated skill points.\nIf no argument is provided, your current skill levels will be listed.", Cmd_SkillSelect_f, 0, qfalse, 1, 257,0, 0},
 	{"weapons", "Select or unselect a weapon.", Cmd_MercWeapon_f, 0, qfalse, 1, 257, 0, PROF_MERC},
+	
 #ifndef LMD_EXPERIMENTAL
 	{"ysalamiri","Use your Ysalamiri.  You can use the 'challenge to duel' button instead of this command.", Cmd_Ysalamiri_f, 0, qfalse, 0, 257,0, PROF_MERC},
 #endif

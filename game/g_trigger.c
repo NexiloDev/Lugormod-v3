@@ -792,6 +792,40 @@ multiple classes with the use of |, e.g.:
 */
 
 //        extern vmCvar_t g_dontLoadNPC;
+const entityInfoData_t trigger_once_spawnflags[] = {
+  {"1", "only a player can trigger this by touch. makes it so an NPC cannot fire"},
+  {"2", "won\'t fire unless trigger ent\'s view angles are within 45 degrees of trigger\'s angles"},
+  {"4", "won\'t fire unless player is in it and is pressing the use button"},
+  {"8", "won\'t fire unless player/NPC is in it and pressing the fire button"},
+  {"16", "only non-player NPCs can trigger this by touch"},
+  {"32", "?"},
+  {"64", "?"},
+  {"128", "Starts deactivated"},
+  {"256", "multiple entities can touch this trigger in a single frame and if needed, the trigger can have a wait of > 0"},
+  {NULL, NULL}
+};
+const entityInfoData_t trigger_once_keys[] = {
+  {"target", "what to fire at, if there is a bounding box it will fire when the player/npc is in the box"},
+  {"targetname", "make something target this value for the entity to be used"},
+  {"random", "the wait variance (default 0)"},
+//  {"wait", "unsure if this works, might be wait time between when the trigger fires to check if an entity is inside"},
+  {"delay", "how many seconds to wait to fire its targets after tripped"},
+  {"noise", "sound to play when the trigger fires (plays at activator\'s origin)"},
+  {"NPC_targetname", "only the NPC with this NPC_targetname fires this trigger"},
+  {"team", "if set, only this team can trip the trigger (0 - any, 1 - red, 2 - blue)"},
+  {"soundSet", "ambient sound set to play when this trigger is activated"},
+  {"usetime", "require a client to hold the use key for x amount of milliseconds, along with spawnflags 4"},
+  {"teamuser", "(siege only) if 1, team 2 can\'t use this. if 2, team 1 can\'t use this"},
+  {"siegetrig", "(siege only) if non-0, can only be activated by players carrying a misc_siege_item which is associated with this trigger by the item\'s goaltarget value"},
+  {"idealclass", "(siege only) can only be used by this class/these classes. specify multiple using \'|\' e.g. \'Imperial Medic|Imperial Assassin| ImperialDemolitionist\'"},
+  {NULL, NULL}
+};
+const entityInfo_t trigger_once_info = {
+  "Works exactly like a trigger_multiple but fires only once. Then it doesn\'t fire again.",
+  trigger_once_spawnflags,
+  trigger_once_keys
+};
+
 
 void SP_trigger_once( gentity_t *ent )
 {
@@ -1057,6 +1091,20 @@ void trigger_always_think( gentity_t *ent ) {
 /*QUAKED trigger_always (.5 .5 .5) (-8 -8 -8) (8 8 8)
 This trigger will always fire.  It is activated by the world.
 */
+const entityInfoData_t trigger_always_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_always_keys[] = {
+	{"target", "target to fire"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_always_info = {
+	"This trigger will always fire.  It is activated by the world.",
+	trigger_always_spawnflags,
+	trigger_always_keys
+};
 void SP_trigger_always (gentity_t *ent) {
 	// we must have some delay to make sure our use targets are present
 	// needs to be very long it seems
@@ -1137,6 +1185,19 @@ trigger_visible_use ( gentity_t *self, gentity_t *other, gentity_t *activator )
 	self->use = NULL;
 }
 
+const entityInfoData_t trigger_visible_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_visible_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_visible_info = {
+	"No documentation provided but used in spots where a ent is expected.",
+	trigger_visible_spawnflags,
+	trigger_visible_keys
+};
 void SP_trigger_visible (gentity_t *ent)
 {
 	if (ent->targetname) {
@@ -1541,6 +1602,23 @@ Pushes the activator in the direction.of angle, or towards a target apex.
 "speed"		defaults to 1000
 if "bouncepad", play bounce noise instead of none
 */
+
+const entityInfoData_t target_push_spawnflags[] = {
+	{"1", "play bounce noise"},
+	{"2", "will push activator at constant speed, speed does need to be set for this to work"},
+	{NULL, NULL}
+};
+const entityInfoData_t target_push_keys[] = {
+	{"speed", "speed to push activator (default 1000)"},
+	{"target", "a target_position to aim at"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_push_info = {
+	"will push activator in direction of \'target\' at constant \'speed\'. Should target a target_position.",
+	target_push_spawnflags,
+	target_push_keys
+};
 void SP_target_push( gentity_t *self ) {
 	if (!self->speed) {
 		self->speed = 1000;
@@ -1616,6 +1694,20 @@ If spectator is set, only spectators can use this teleport
 Spectator teleporters are not normally placed in the editor, but are created
 automatically near doors to allow spectators to move through them
 */
+const entityInfoData_t trigger_teleport_spawnflags[] = {
+	{"1", "only spectators can use this teleport"},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_teleport_keys[] = {
+	{"maxs/mins", "bounding box for trigger size"},
+	{"target", "the location to teleport to"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_teleport_info = {
+	"Allows client side prediction of teleportation events. Must point at a target_position, which will be the teleport destination",
+	trigger_teleport_spawnflags,
+	trigger_teleport_keys
+};
 void SP_trigger_teleport( gentity_t *self ) {
 	InitTrigger (self);
 
@@ -1657,9 +1749,26 @@ NO_PROTECTION	*nothing* stops the damage
 "team"			team (1 or 2) to allow hurting (if none then hurt anyone) only applicable for siege
 "dmg"			default 5 (whole numbers only)
 If dmg is set to -1 this brush will use the fade-kill method
-
 */
-
+const entityInfoData_t trigger_hurt_spawnflags[] = {
+	{"1", "The entity will start in its off state"},
+	{"2", "if you target it, it will toggle on and off"},
+	{"4", "supresses playing the sound"},
+	{"8", "*nothing* stops the damage"},
+	{"16", "changes the damage rate to once per second"},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_hurt_keys[] = {
+	{"maxs/mins", "define trigger size"},
+	{"team", "team (1 or 2) to allow hurting (if none then hurt anyone) only applicable for siege"},
+	{"dmg", "default 5 (whole numbers only). -1 is fade-kill method"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_hurt_info = {
+	"Any entity that touches this will be hurt. It does dmg points of damage each server frame. Targeting the trigger will toggle its on / off state",
+	trigger_hurt_spawnflags,
+	trigger_hurt_keys
+};
 void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	int		dflags = DAMAGE_NO_DISMEMBER;
 	//RoboPhred: the hell?
@@ -2014,6 +2123,20 @@ causes vehicle to turn toward target and travel in that direction for a set time
 "traveltime"	time to travel in this direction
 
 */
+const entityInfoData_t trigger_shipboundary_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_shipboundary_keys[] = {
+	{"target", "name of entity to turn toward (can be info_notnull, or whatever)"},
+	{"traveltime", "time to travel in this direction"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_shipboundary_info = {
+	"causes vehicle to turn toward target and travel in that direction for a set time when hit",
+	trigger_shipboundary_spawnflags,
+	trigger_shipboundary_keys
+};
 void SP_trigger_shipboundary(gentity_t *self)
 {
 	InitTrigger(self);
@@ -2151,6 +2274,20 @@ Ship will turn to face the angles of the first target_position then fly forward,
 "target"		whatever position the ship teleports from in relation to the target_position specified here, that's the relative position the ship will spawn at around the target2 target_position
 "target2"		name of target_position to teleport the ship to (will be relative to it's origin)
 */
+const entityInfoData_t trigger_hyperspace_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_hyperspace_keys[] = {
+	{"target", "whatever position the ship teleports from in relation to the target_position specified here, that's the relative position the ship will spawn at around the target2 target_position"},
+	{"target2", "name of target_position to teleport the ship to (will be relative to it's origin)"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_hyperspace_info = {
+	"Ship will turn to face the angles of the first target_position then fly forward, playing the hyperspace effect, then pop out at a relative point around the target",
+	trigger_hyperspace_spawnflags,
+	trigger_hyperspace_keys
+};
 void SP_trigger_hyperspace(gentity_t *self)
 {
 	//register the hyperspace end sound (start sounds are customized)
@@ -2196,6 +2333,22 @@ so, the basic time between firing is a random time between
 (wait - random) and (wait + random)
 
 */
+const entityInfoData_t func_timer_spawnflags[] = {
+	{"1", "start on"},
+	{NULL, NULL}
+};
+const entityInfoData_t func_timer_keys[] = {
+	{"wait", "base time between triggering all targets, default is 1"},
+	{"random", "wait variance (+/- each direction), default is 0"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{"target", "targets to fire"},
+	{NULL, NULL}
+};
+const entityInfo_t func_timer_info = {
+	"This should be renamed trigger_timer... Repeatedly fires its targets. Can be turned on or off by using.",
+	func_timer_spawnflags,
+	func_timer_keys
+};
 void func_timer_think( gentity_t *self ) {
 	G_UseTargets (self, self->activator);
 	// set time before next firing
@@ -2406,6 +2559,21 @@ speed - how fast, on average, the asteroid moves
 count - how many asteroids, max, to have at one time
 target - target this at func_rotating asteroids
 */
+const entityInfoData_t trigger_asteroid_field_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t trigger_asteroid_field_keys[] = {
+	{"speed", "how fast, on average, the asteroid moves"},
+	{"count", "how many asteroids, max, to have at one time"},
+	{"target", "target this at func_rotating asteroids"},
+	{NULL, NULL}
+};
+const entityInfo_t trigger_asteroid_field_info = {
+	"Something like t3_byss asteroid field",
+	trigger_asteroid_field_spawnflags,
+	trigger_asteroid_field_keys
+};
 void SP_trigger_asteroid_field(gentity_t *self)
 {
 	trap_SetBrushModel( self, self->model );

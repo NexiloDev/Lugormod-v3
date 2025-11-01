@@ -33,6 +33,7 @@ struct Account_s{
 	int time;
 	int score;
 	int credits;
+	int bounty;
 	int flags;
 
 	struct {
@@ -220,6 +221,7 @@ DataWriteResult_t Accounts_Write_Modules(void *target, char key[], int keySize, 
 	_m##_AUTO(time, ACCOUNTOFS(time), F_INT) \
 	_m##_AUTO(score, ACCOUNTOFS(score), F_INT) \
 	_m##_AUTO(credits, ACCOUNTOFS(credits), F_INT) \
+	_m##_AUTO(bounty, ACCOUNTOFS(bounty), F_INT) \
 	_m##_AUTO(flags, ACCOUNTOFS(flags), F_INT) \
 	_m##_DEFL(Accounts_Parse_Modules, Accounts_Write_Modules, NULL)
 
@@ -570,6 +572,39 @@ char* Accounts_NewSeccode(Account_t *acc) {
 	return acc->secCode;
 }
 
+int Accounts_GetBounty(Account_t *acc)
+{
+	if(!acc) return 0;
+	return acc->bounty;
+}
+
+void Accounts_SetBounty(Account_t *acc, int value)
+{
+	if(!acc) return;
+	acc->bounty = value;
+}
+
+void Accounts_PrintBountyList(gentity_t* ent)
+{
+	qboolean found = qfalse;
+	int bounty;
+
+	for(int i = 0; i < AccList.count; i++)
+	{
+		bounty = Accounts_GetBounty(AccList.accounts[i]);
+		if (bounty > 0)
+		{
+			Disp(ent, va("^7%s ^5- ^6%d ^5CR", Accounts_GetName(AccList.accounts[i]), bounty));
+			found = qtrue;
+		}
+	}
+	
+	if (!found)
+	{
+		Disp(ent, "^5No bounties currently placed.");
+	}
+}
+
 int Accounts_GetCredits(Account_t *acc) {
 	if(!acc)
 		return 0;
@@ -609,6 +644,144 @@ void Accounts_SetTime(Account_t *acc, int value) {
 		return;
 	acc->time = value;
 	Lmd_Accounts_Modify(acc);
+}
+
+// lumaya Titles:
+#define TITLES_FILE "prof_titles.txt"
+#define MAX_TITLE_LENGTH 32
+#define DEFAULT_TITLE "Unknown"
+
+typedef struct {
+	char jedi_titles[5][MAX_TITLE_LENGTH];
+	char sith_titles[5][MAX_TITLE_LENGTH];
+	char merc_titles[5][MAX_TITLE_LENGTH];
+} LmdTitleData_t;
+
+static LmdTitleData_t lmd_titleData;
+static int lmd_titlesLoaded = 0;
+
+void Accounts_CreateDefaultTitlesFile(void) {
+	fileHandle_t f;
+	const char *defaults =
+		"# Jedi Titles (Level 1-9, 10-19, 20-29, 30-39, 40)\n"
+		"JEDI,Youngling,Jedi Padawan,Jedi Knight,Jedi Master,Grand Master\n"
+		"# Sith Titles\n"
+		"SITH,Initiate,Sith Acolyte,Sith Apprentice,Sith Warrior,Sith Lord\n"
+		"# Merc Titles\n"
+		"MERC,Rookie,Hired Gun,Outlaw,Bounty Hunter,Elite Enforcer\n";
+
+	f = Lmd_Data_OpenDataFile(NULL, TITLES_FILE, FS_WRITE);
+	if (!f) {
+		G_Printf("Failed to create default titles file\n");
+		return;
+	}
+	trap_FS_Write(defaults, strlen(defaults), f);
+	trap_FS_FCloseFile(f);
+	G_Printf("Created default titles file\n");
+}
+
+
+
+int Accounts_LoadTitles(void) {
+	char *file = Lmd_Data_AllocFileContents(TITLES_FILE);
+	if (!file) {
+		G_Printf("Titles file not found, creating default...\n");
+		Accounts_CreateDefaultTitlesFile();
+		file = Lmd_Data_AllocFileContents(TITLES_FILE);
+		if (!file) {
+			G_Printf("Failed to open titles file\n");
+			return 0;
+		}
+	}
+
+	for (int i = 0; i < 5; i++) {
+		Q_strncpyz(lmd_titleData.jedi_titles[i], DEFAULT_TITLE, MAX_TITLE_LENGTH);
+		Q_strncpyz(lmd_titleData.sith_titles[i], DEFAULT_TITLE, MAX_TITLE_LENGTH);
+		Q_strncpyz(lmd_titleData.merc_titles[i], DEFAULT_TITLE, MAX_TITLE_LENGTH);
+	}
+
+	char *line = strtok(file, "\n");
+	while (line != NULL) {
+		if (line[0] == '#' || line[0] == '\0') {
+			line = strtok(NULL, "\n");
+			continue;
+		}
+
+		char *rest = NULL;
+		char *type = strtok_s(line, ",", &rest);
+		if (!type) {
+			line = strtok(NULL, "\n");
+			continue;
+		}
+
+		char *titles[6] = {0};
+		for (int i = 0; i < 6 && rest; i++) {
+			titles[i] = strtok_s(NULL, ",", &rest);
+		}
+
+		if (!titles[0] || !titles[4]) {
+			line = strtok(NULL, "\n");
+			continue; // invalid line
+		}
+
+		char (*dest)[MAX_TITLE_LENGTH] = NULL;
+
+		if (!Q_stricmp(type, "JEDI")) dest = lmd_titleData.jedi_titles;
+		else if (!Q_stricmp(type, "SITH")) dest = lmd_titleData.sith_titles;
+		else if (!Q_stricmp(type, "MERC")) dest = lmd_titleData.merc_titles;
+		else {
+			line = strtok(NULL, "\n");
+			continue;
+		}
+
+		for (int i = 0; i < 5; i++) {
+			if (titles[i]) {
+				Q_strncpyz(dest[i], titles[i], MAX_TITLE_LENGTH);
+			}
+		}
+
+		line = strtok(NULL, "\n");
+	}
+
+	G_Free(file);
+	lmd_titlesLoaded = 1;
+	G_Printf("Titles loaded successfully\n");
+	return 1;
+}
+
+static int GetTitleIndex(int levelp)
+{
+	if (levelp <= 9) return 0;
+	if (levelp <= 19) return 1;
+	if (levelp <= 29) return 2;
+	if (levelp <= 39) return 3;
+	return 4;
+}
+
+extern int Jedi_GetAccSide(Account_t *acc);
+char* Accounts_GetTitle(Account_t *acc)
+{
+	if (!acc) return DEFAULT_TITLE;
+	if (!lmd_titlesLoaded && !Accounts_LoadTitles()) return DEFAULT_TITLE;
+
+	int level = Accounts_Prof_GetLevel(acc);
+	if (level < 1) level = 1;
+	if (level > 40) level = 40;
+
+	int index = GetTitleIndex(level);
+	int prof = Accounts_Prof_GetProfession(acc);
+
+	if (prof == PROF_JEDI) {
+		int side = Jedi_GetAccSide(acc);
+		if (side == FORCE_LIGHTSIDE) return lmd_titleData.jedi_titles[index];
+		if (side == FORCE_DARKSIDE) return lmd_titleData.sith_titles[index];
+		return "None";
+	}
+
+	if (prof == PROF_MERC)
+		return lmd_titleData.merc_titles[index];
+
+	return DEFAULT_TITLE;
 }
 
 int Accounts_GetFlags(Account_t *acc) {

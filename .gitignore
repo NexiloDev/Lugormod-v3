@@ -6,6 +6,7 @@
 *.user
 *.sln.docstates
 .vs/
+.vscode/
 
 # Build results
 [Dd]ebug/
@@ -19,6 +20,14 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+
+# Build-generated runtime libraries and shared objects
+**.dll
+**.so
+**.lib
+
+# Intelij IDEs
+.idea
 
 # Roslyn cache directories
 *.ide/
@@ -131,8 +140,6 @@ publish/
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
-# TODO: Comment the next line if you want to checkin your web deploy settings 
-# but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
 *.publishproj
 
@@ -241,3 +248,9 @@ $RECYCLE.BIN/
 
 # We can ignore *.txt files alright, but not CMakeLists.txt
 !CMakeLists.txt
+
+# Linux builds
+# =========================
+CMakeFiles
+cmake_install.cmake
+Makefile

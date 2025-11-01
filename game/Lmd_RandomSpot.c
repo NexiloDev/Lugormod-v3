@@ -1,6 +1,7 @@
 
 
 #include "g_local.h"
+#include "Lmd_Entities_Public.h" // for entityInfo_t
 
 int count_random_spots (void){
 	int c = 0;
@@ -54,6 +55,22 @@ void random_spot_think(gentity_t *ent) {
 		ent->enemy = NULL;
 	ent->nextthink = level.time + FRAMETIME;
 }
+
+
+const entityInfoData_t random_spot_spawnflags[] = {
+  {NULL, NULL}
+};
+
+const entityInfoData_t random_spot_keys[] = {
+  {"origin", "Where the random spot is located (x y z)"},
+  {NULL, NULL}
+};
+
+const entityInfo_t random_spot_info = {
+  "A location for a stash to randomly spawn. Only works in FFA, Team, Holocron gametypes. Once a stash has spawned it won't use the same spot for another 10 minutes.",
+  random_spot_spawnflags,
+  random_spot_keys
+};
 
 void SP_random_spot (gentity_t *ent) {
 	assert(ent && ent->inuse);

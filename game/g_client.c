@@ -373,6 +373,20 @@ INITIAL - The first time a player enters the game, they will be at an 'initial' 
 "nobots" will prevent bots from using this spot.
 "nohumans" will prevent non-bots from using this spot.
 */
+const entityInfoData_t info_player_start_red_spawnflags[] = {
+	// {"1", "The first time a player enters the game, they will be at an \'initial\' spot."}, // pretty sure INITIAL is a spawnflag and it's not used?
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_start_red_keys[] = {
+	{"nobots", "will prevent bots from using this spot"},
+	{"nohumans", "will prevent non-bots from using this spot"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_start_red_info = {
+	"For Red Team DM starts, equivalent to info_player_deathmatch. Targets will be fired when someone spawns in on them",
+	info_player_start_red_spawnflags,
+	info_player_start_red_keys
+};
 void SP_info_player_start_red(gentity_t *ent) {
 	//RoboPhred
 	if(g_gametype.integer == GT_FFA){
@@ -407,6 +421,20 @@ INITIAL - The first time a player enters the game, they will be at an 'initial' 
 "nobots" will prevent bots from using this spot.
 "nohumans" will prevent non-bots from using this spot.
 */
+const entityInfoData_t info_player_start_blue_spawnflags[] = {
+	// {"1", "The first time a player enters the game, they will be at an \'initial\' spot."}, // pretty sure INITIAL is a spawnflag and it's not used?
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_start_blue_keys[] = {
+	{"nobots", "will prevent bots from using this spot"},
+	{"nohumans", "will prevent non-bots from using this spot"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_start_blue_info = {
+	"For Blue Team DM starts, equivalent to info_player_deathmatch. Targets will be fired when someone spawns in on them",
+	info_player_start_blue_spawnflags,
+	info_player_start_blue_keys
+};
 void SP_info_player_start_blue(gentity_t *ent) {
 	if(g_gametype.integer == GT_FFA){
 		if (disablesenabled && thereIsAPlayerSpawn()) { //Lugormod
@@ -453,6 +481,23 @@ idealclass - if specified, this spawn point will be considered
 entry in the .scl (siege class) file.
 Targets will be fired when someone spawns in on them.
 */
+const entityInfoData_t info_player_siegeteam1_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_siegeteam1_keys[] = {
+	{"startoff", "if non-0 spawn point will be disabled until used"},
+	{"idealclass", "if specified, this spawn point will be considered \'ideal\' for players of this class. Corresponds to the name entry in the .scl (siege class) file"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_siegeteam1_info = {
+	"Siege team start point for team1. Name and behavior of team1 depends on what is defined in the .siege file for the level. If gametype is not siege this becomes a info_player_deathmatch.",
+	info_player_siegeteam1_spawnflags,
+	info_player_siegeteam1_keys
+};
+
 void SP_info_player_siegeteam1(gentity_t *ent) {
 	int soff = 0;
 
@@ -513,6 +558,22 @@ idealclass - if specified, this spawn point will be considered
 entry in the .scl (siege class) file.
 Targets will be fired when someone spawns in on them.
 */
+const entityInfoData_t info_player_siegeteam2_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_siegeteam2_keys[] = {
+	{"startoff", "if non-0 spawn point will be disabled until used"},
+	{"idealclass", "if specified, this spawn point will be considered \'ideal\' for players of this class. Corresponds to the name entry in the .scl (siege class) file"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_siegeteam2_info = {
+	"Siege team start point for team2. Name and behavior of team2 depends on what is defined in the .siege file for the level. If gametype is not siege this becomes a info_player_deathmatch.",
+	info_player_siegeteam2_spawnflags,
+	info_player_siegeteam2_keys
+};
 void SP_info_player_siegeteam2(gentity_t *ent) {
 	int soff = 0;
 
@@ -564,6 +625,19 @@ The intermission will be viewed from this point.  Target an info_notnull for the
 RED - In a Siege game, the intermission will happen here if the Red (attacking) team wins
 BLUE - In a Siege game, the intermission will happen here if the Blue (defending) team wins
 */
+const entityInfoData_t info_player_intermission_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_intermission_keys[] = {
+	{"target", "target an info_notnull for the view direction"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_intermission_info = {
+	"The intermission will be viewed from this point. Might be removed.",
+	info_player_intermission_spawnflags,
+	info_player_intermission_keys
+};
 void SP_info_player_intermission( gentity_t *ent ) {
 
 }
@@ -575,6 +649,20 @@ In a Siege game, the intermission will happen here if the Red (attacking) team w
 target - ent to look at
 target2 - ents to use when this intermission point is chosen
 */
+const entityInfoData_t info_player_intermission_red_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_intermission_red_keys[] = {
+	{"target", "target an info_notnull for the view direction"},
+	{"target2", "ents to use when this intermission point is chosen"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_intermission_red_info = {
+	"The intermission will be viewed from this point if red wins. Might be removed.",
+	info_player_intermission_red_spawnflags,
+	info_player_intermission_red_keys
+};
 void SP_info_player_intermission_red( gentity_t *ent ) {
 
 }
@@ -586,6 +674,20 @@ In a Siege game, the intermission will happen here if the Blue (defending) team 
 target - ent to look at
 target2 - ents to use when this intermission point is chosen
 */
+const entityInfoData_t info_player_intermission_blue_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_player_intermission_blue_keys[] = {
+	{"target", "target an info_notnull for the view direction"},
+	{"target2", "ents to use when this intermission point is chosen"},
+	{NULL, NULL}
+};
+const entityInfo_t info_player_intermission_blue_info = {
+	"The intermission will be viewed from this point if blue wins. Might be removed.",
+	info_player_intermission_blue_spawnflags,
+	info_player_intermission_blue_keys
+};
 void SP_info_player_intermission_blue( gentity_t *ent ) {
 
 }
@@ -831,6 +933,19 @@ gentity_t *gJMSaberEnt = NULL;
 /*QUAKED info_jedimaster_start (1 0 0) (-16 -16 -24) (16 16 32)
 "jedi master" saber spawn point
 */
+const entityInfoData_t info_jedimaster_start_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t info_jedimaster_start_keys[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t info_jedimaster_start_info = {
+	"Saber spawn point for \'Jedi Master\' gametype. If the gametype is something else the ent is removed.",
+	info_jedimaster_start_spawnflags,
+	info_jedimaster_start_keys
+};
 void SP_info_jedimaster_start(gentity_t *ent)
 {
 	if (g_gametype.integer != GT_JEDIMASTER)
@@ -2603,6 +2718,7 @@ void ClientUserinfoChanged_Do( int clientNum ) {
 	char	className[MAX_QPATH]; //name of class type to use in siege
 	char	saberName[MAX_QPATH];
 	char	saber2Name[MAX_QPATH];
+	char cp_sbRGB1[MAX_QPATH]={0}, cp_sbRGB2[MAX_QPATH]={0};
 	//char	*value;
 	qboolean modelChanged;
 	char model[MAX_QPATH];
@@ -2782,26 +2898,28 @@ void ClientUserinfoChanged_Do( int clientNum ) {
 	// colors
 	strcpy(c1, Info_ValueForKey( userinfo, "color1" ));
 	strcpy(c2, Info_ValueForKey( userinfo, "color2" ));
+	Q_strncpyz( cp_sbRGB1, Info_ValueForKey( userinfo, "cp_sbRGB1" ), sizeof(cp_sbRGB1) );//rgbsabers
+	Q_strncpyz( cp_sbRGB2, Info_ValueForKey( userinfo, "cp_sbRGB2" ), sizeof(cp_sbRGB2) );//rgbsabers
 
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
 	if ( ent->r.svFlags & SVF_BOT ) {
-		s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
-			client->pers.netname, team, model,  c1, c2, 
+		s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\c3\\%s\\c4\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
+			client->pers.netname, team, model,  c1, c2, cp_sbRGB1, cp_sbRGB2,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
 			Info_ValueForKey( userinfo, "skill" ), teamTask, teamLeader, className, saberName, saber2Name, client->sess.duelTeam, client->sess.siegeDesiredTeam );
 	} else {
 		if (g_gametype.integer == GT_SIEGE 
 			|| g_gametype.integer == GT_BATTLE_GROUND) //Lugormod
 		{ //more crap to send
-			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
-				client->pers.netname, client->sess.sessionTeam, model, c1, c2, 
+			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\c3\\%s\\c4\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\siegeclass\\%s\\st\\%s\\st2\\%s\\dt\\%i\\sdt\\%i",
+				client->pers.netname, client->sess.sessionTeam, model, c1, c2, cp_sbRGB1, cp_sbRGB2,
 				client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader, className, saberName, saber2Name, client->sess.duelTeam, client->sess.siegeDesiredTeam);
 		}
 		else
 		{
-			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\st\\%s\\st2\\%s\\dt\\%i",
-				client->pers.netname, client->sess.sessionTeam, model, c1, c2, 
+			s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\c3\\%s\\c4\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\st\\%s\\st2\\%s\\dt\\%i",
+				client->pers.netname, client->sess.sessionTeam, model, c1, c2, cp_sbRGB1, cp_sbRGB2,
 				client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader, saberName, saber2Name, client->sess.duelTeam);
 		}
 	}

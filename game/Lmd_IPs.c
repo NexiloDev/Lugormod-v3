@@ -355,47 +355,6 @@ void Lmd_IPs_SetPlayerIP(gclient_t *client, IP_t ip) {
 	Lmd_IPs_IdentifyHostname(ip);
 }
 
-
-void Cmd_PlayerIPs_f(gentity_t *ent, int iArg) {
-	int i;
-	qboolean shade = qfalse;
-	char name[MAX_NAME_LENGTH];
-	char dstr[MAX_TOKEN_CHARS] = "";
-	gentity_t *pEnt;
-	Disp(ent,	"^3--------------------------------------------------------------\n"
-				"   ^2Player                       ^1IP              ^5Hostname");
-
-	for (i = 0; i < MAX_CLIENTS; i++) {
-		pEnt = &g_entities[i];
-		if(!pEnt->inuse || !pEnt->client)
-			continue;
-		if(pEnt->r.svFlags & SVF_BOT)
-			continue;
-
-		dstr[0] = 0;
-
-		Q_strcat(dstr, sizeof(dstr), va("%-2i ", i));
-
-		if(shade)
-			Q_strcat(dstr, sizeof(dstr),"^3");
-		else
-			Q_strcat(dstr, sizeof(dstr),"^7");
-		shade = !shade;
-		
-		Q_strncpyz(name, pEnt->client->pers.netname, sizeof(name));
-		Q_CleanStr(name);
-		Q_strcat(dstr, sizeof(dstr), va("%-28s ", name));
-
-		//xxx.xxx.xxx.xxx
-		Q_strcat(dstr, sizeof(dstr), va("%-15s ", Lmd_IPs_IPToString(pEnt->client->sess.Lmd.ip)));
-		//Max legal hostname is 255, and illegal hostnames are not accepted, so this wont overflow.
-		Q_strcat(dstr, sizeof(dstr), Lmd_IPs_GetHostname(pEnt->client->sess.Lmd.ip));
-
-		DispContiguous(ent, dstr);
-	}
-	DispContiguous(ent, NULL);
-}
-
 void Cmd_FindIP_ListNames(gentity_t *ent, IP_t ip) {
 	int i;
 	char *host;
@@ -502,7 +461,6 @@ void Cmd_ListIPs_f(gentity_t *ent, int iArg) {
 }
 
 cmdEntry_t IPCommandEntries[] = {
-	{"PlayerIPs", "^3View all players and their ips.", Cmd_PlayerIPs_f, 0, qtrue, 1, 0, 0},
 	{"ListIPs", "^3View all IPs that have connected since the last restart.", Cmd_ListIPs_f, 0, qtrue, 1, 0, 0},
 	{"FindIP", "^3Find players who have used an IP, or search players by ip names.\nOnly works for the last 10 names on IPs that have connected since the last restart.", Cmd_FindIP_f, 0, qtrue, 1, 0, 0},
 	{NULL},

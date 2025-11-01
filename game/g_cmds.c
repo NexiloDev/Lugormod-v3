@@ -9,6 +9,7 @@
 
 #include "Lmd_Commands_Auths.h"
 #include "Lmd_Data.h"
+#include "Lmd_Medilevitate.h"
 
 #include "../ui/menudef.h"			// for the voice chats
 
@@ -2494,7 +2495,7 @@ void CallVote (gentity_t *ent, char *arg1, char *arg2)
 		ent->client->pers.voteCount++;
 	}
 
-	botsVoteNotification(arg1);
+	//botsVoteNotification(arg1); // Bot "random voting"
 	level.votingGametype = qfalse;
 
 	// special case for g_gametype, check for bad values
@@ -3522,6 +3523,9 @@ void Cmd_EngageDuel_f(gentity_t *ent){
 		if(ent->client->ps.weapon != challenged->client->ps.weapon)
 			return;
 
+		if (challenged && challenged->client && challenged->client->Lmd.lmdMenu.entityNum != 0)
+			return;
+
 		//Lugormod: cannot engage if too close
 		float dist = Distance(ent->client->ps.origin, challenged->client->ps.origin);
 		if(dist < 80){
@@ -3609,6 +3613,16 @@ void Cmd_EngageDuel_f(gentity_t *ent){
 			ent->client->ps.duelInProgress = qtrue;
 			challenged->client->ps.duelInProgress = qtrue;
 			//}
+
+			if (ent->client->Lmd.mediLevitate.enabled)
+			{
+				lmd_meditate_levitate_end(ent);
+			}
+
+			if (challenged->client->Lmd.mediLevitate.enabled)
+			{
+				lmd_meditate_levitate_end(challenged);
+			}
 
 			ent->client->ps.duelTime = level.time + 2000;
 			challenged->client->ps.duelTime = level.time + 2000;

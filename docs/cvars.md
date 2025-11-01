@@ -4,6 +4,16 @@
 ```
 Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new connections from the ip will be ignored.  Usefull for stopping fake player attacks.
 ```
+## lmd_melee_lightning_multiplier
+### Default value: 2
+```
+Set the multiplier for melee force lightning damage.
+```
+## lmd_min_bounty_amount
+### Default value: 1000
+```
+The minimum amount required to do a /bounty.
+```
 ## lmd_autoBanSameIp
 ### Default value: 0
 ```
@@ -14,6 +24,11 @@ If lmd_maxsameip is set, then this cvar controls whether to ban ips that go over
 ### Restart required
 ```
 The data path that lugormod will use for its accounts, entity sets, and other files.
+```
+## lmd_drainBelowLevel3Range
+### Default value: 512
+```
+Set the range for force drain below level 3.
 ```
 ## lmd_startingCr
 ### Default value: 0
@@ -50,6 +65,21 @@ The minimum admin level required to be able to use cheats.  Set this to 0 to dis
 ### Default value: 0
 ```
 Allow all entities created with the place command to save.  This is for those of you who got too used to the bug which caused this to happen in the first place.  By default, only entities created by admins with the "save placed" auth flag or the level 1 auto authfile will save
+```
+## lmd_set_saber_delay
+### Default value: 750
+```
+Set the delay for instant saber switch for when to be able to use saber again after swapping.
+```
+## lmd_set_saber_duels
+### Default value: 1
+```
+Enable/Disable instant saber switch in duels.
+```
+## lmd_allow_set_saber
+### Default value: 1
+```
+Enable/Disable instant saber switch.
 ```
 ## lmd_enforceEntWait
 ### Default value: 600
@@ -156,6 +186,94 @@ Set to 0 for no maximum limit.
 ### Default value: 70
 ```
 Maximum number of days to keep an account between user logins.
+```
+## lmd_levitateInitialUpVelocity
+### Default value: 50
+```
+Set the initial upwards velocity for Levitate.
+```
+## lmd_levitateInitialBounceMultiplier
+### Default value: 0.35
+```
+Set the bounce multiplier for Levitate. 0 - 1.0!
+```
+## lmd_levitateHealAmount
+### Default value: 2
+```
+How much we heal per tick of lmd_levitateHealInterval while levitating.
+```
+## lmd_levitateHealInterval
+### Default value: 2000
+```
+The interval (in milliseconds) at which lmd_levitateHealAmount is applied during Levitate.
+```
+## lmd_levitateBreathSway
+### Default value: 10.0
+```
+Set the breath sway (visual/positional wobble) for Levitate.
+```
+## lmd_levitateJediFx
+### Default value: 0
+```
+If set to 1, Levitate plays an effect when used by Jedi.
+```
+## lmd_levitateSithFx
+### Default value: 0
+```
+If set to 1, Levitate plays an effect when used by Sith.
+```
+
+## lmd_levitateAscentSound
+### Default value: 1
+```
+1 to enable a sound effect during the ascending phase of /levitate (starting animation), 0 to disable.
+```
+
+## lmd_levitateDescentSound
+### Default value: 1
+```
+1 to enable a sound effect during the descending phase of /levitate (ending animation), 0 to disable.
+```
+
+## lmd_levitateJediSound
+### Default value: 0
+```
+If set to 1, Levitate plays a continuous sound when used by Jedi.
+```
+
+## lmd_levitateSithSound
+### Default value: 0
+```
+If set to 1, Levitate plays a continuous sound when used by Sith.
+```
+
+## lmd_levitateFinish
+### Default value: 0
+```
+If set to 1, Levitate will stop once lmd_levitateMaxHealth (Jedi) or lmd_levitateMaxForcePoints (Sith) is reached.
+```
+
+## lmd_levitateMaxHealth
+### Default value: 100
+```
+Maximum health a Jedi can reach while levitating.
+```
+## lmd_levitateMaxForcePoints
+### Default value: 100
+```
+Maximum force points a Sith can reach while levitating.
+```
+
+## lmd_levitateRegen
+### Default value: 1
+```
+1 to enable health regeneration (for Jedi) and force regeneration (for Sith), 0 to disable it.
+```
+
+## lmd_lightningBelowLevel3Range
+### Default value: 600
+```
+Set the range for force lightning below level 3.
 ```
 ## lmd_logArchive
 ### Default value: 1

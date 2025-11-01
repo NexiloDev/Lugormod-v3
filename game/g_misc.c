@@ -12,12 +12,30 @@
 #include "Lmd_EntityCore.h"
 #include "Lmd_EntityUtil.h"
 
+#include "Lmd_Entities_Public.h"
+
 #define HOLOCRON_RESPAWN_TIME 30000
 #define MAX_AMMO_GIVE 2
 #define STATION_RECHARGE_TIME 100
 
 void HolocronThink(gentity_t *ent);
 extern vmCvar_t g_MaxHolocronCarry;
+
+/*LMD Placeholder entityInfo objects
+const entityInfoData_t placeholder_spawnflags[] = {
+	{"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t placeholder_keys[] = {
+	{"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t placeholder_info = {
+	"",
+	placeholder_spawnflags,
+	placeholder_keys
+};
+*/
 
 /*QUAKED func_group (0 0 0) ?
 Used to group brushes together just for editor convenience.  They are turned into normal brushes by the utilities.
@@ -26,6 +44,20 @@ Used to group brushes together just for editor convenience.  They are turned int
 /*QUAKED info_camp (0 0.5 0) (-4 -4 -4) (4 4 4)
 Used as a positional target for calculations in the utilities (spotlights, etc), but removed during gameplay.
 */
+
+const entityInfoData_t SP_info_camp_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t SP_info_camp_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t SP_info_camp_info = {
+	"Used as a positional target for calculations in the utilities (spotlights, etc), but removed during gameplay",
+	SP_info_camp_spawnflags,
+	SP_info_camp_keys
+};
 void SP_info_camp( gentity_t *self ) {
 	G_SetOrigin( self, self->s.origin );
 }
@@ -33,6 +65,20 @@ void SP_info_camp( gentity_t *self ) {
 /*QUAKED info_null (0 0.5 0) (-4 -4 -4) (4 4 4)
 Used as a positional target for calculations in the utilities (spotlights, etc), but removed during gameplay.
 */
+
+const entityInfoData_t SP_info_null_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t SP_info_null_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t SP_info_null_info = {
+	"Used as a positional target for calculations in the utilities (spotlights, etc), but removed during gameplay",
+	SP_info_null_spawnflags,
+	SP_info_null_keys
+};
 void SP_info_null( gentity_t *self ) {
 	G_FreeEntity( self );
 }
@@ -41,6 +87,20 @@ void SP_info_null( gentity_t *self ) {
 Used as a positional target for in-game calculation, like jumppad targets.
 target_position does the same thing
 */
+
+const entityInfoData_t SP_info_notnull_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t SP_info_notnull_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t SP_info_notnull_info = {
+	"Used as a positional target for in-game calculation, like jumppad targets. target_position does the same thing",
+	SP_info_notnull_spawnflags,
+	SP_info_notnull_keys
+};
 void SP_info_notnull( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
@@ -84,6 +144,30 @@ greater than 1 is brighter, between 0 and 1 is dimmer.
 12 FAST PULSE FOR JEREMY
 13 Test Blending
 */
+const entityInfoData_t SP_light_spawnflags[] = {
+	{"linear", ""},
+	{"noIncidence", ""},
+	{"START_OFF", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t SP_light_keys[] = {
+	{"light", "overrides the default 300 intensity - affects size a negative \'light\' will subtract the light\'s color"},
+	{"linear", "checkbox gives linear falloff instead of inverse square"},
+	{"noIncidence", "checkbox makes lighting smoother - lights pointed at a target will be spotlights"},
+	{"radius", "overrides the default 64 unit radius of a spotlight at the target point"},
+	{"scale", "multiplier for the light intensity - does not affect size (default 1) - greater than 1 is brighter, between 0 and 1 is dimmer"},
+	{"color", "sets the light\'s color (R G B)"},
+	{"targetname", "to indicate a switchable light - NOTE that all lights with the same targetname will be grouped together and act as one light (ie: don't mix colors, styles or start_off flag)"},
+	{"style", "to specify a specify light style, even for switchable lights"},
+	{"style_off", "light style to use when switched off (Only for switchable lights)"},
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t SP_light_info = {
+	"Non-displayed light",
+	SP_light_spawnflags,
+	SP_light_keys
+};
 static void misc_lightstyle_set ( gentity_t *ent)
 {
 	const int mLightStyle = ent->count;
@@ -245,6 +329,20 @@ Point teleporters at these.
 Now that we don't have teleport destination pads, this is just
 an info_notnull
 */
+
+const entityInfoData_t misc_teleporter_dest_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_teleporter_dest_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_teleporter_dest_info = {
+	"Point teleporters at these like misc_teleporter_dest. Now that we don't have teleport destination pads, this is just an info_notnull",
+	misc_teleporter_dest_spawnflags,
+	misc_teleporter_dest_keys
+};
 void SP_misc_teleporter_dest( gentity_t *ent ) {
 }
 
@@ -254,6 +352,20 @@ void SP_misc_teleporter_dest( gentity_t *ent ) {
 "model"		arbitrary .md3 or .ase file to display
 turns into map triangles - not solid
 */
+
+const entityInfoData_t misc_model_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_model_keys[] = {
+	{"model", "arbitrary .md3 or .ase file to display"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_model_info = {
+	"not used, turns into map triangles - not solid",
+	misc_model_spawnflags,
+	misc_model_keys
+};
 void SP_misc_model( gentity_t *ent ) {
 #if 0
 	ent->s.modelindex = G_ModelIndex( ent->model );
@@ -474,6 +586,25 @@ void misc_camera_use(gentity_t *self, gentity_t *other, gentity_t *activator){
 	return;
 }
 
+const entityInfoData_t misc_camera_spawnflags[] = {
+	{NULL, NULL}
+};
+
+const entityInfoData_t misc_camera_keys[] = {
+	{"wait", "time between the user being able to fire its targets by attacking.  (defaults to 1 second)"},
+	{"target2", "when the user attacks"},
+	{"target3", "fire when the user alt-attacks"},
+	{"model", "a .md3 to draw instead of the default camera model"},
+	{"targetname", "make the trigger target this value for the entity to be used."},
+	{NULL, NULL}
+};
+
+const entityInfo_t misc_camera_info = {
+	"A working camera that is similar to the single player camera system. the player is noclipped and teleported and frozen at the camera location, and a fake model is left behind where he was. Any damage given to the fake model is passed onto the player. The entity spawns a camera model by default at the origin/angle of the entity. You can turn off the model by setting model,null,",
+	misc_camera_spawnflags,
+	misc_camera_keys
+};
+
 void SP_misc_camera (gentity_t *ent){
 	//G_FreeEntity(ent);
 	//return;
@@ -521,6 +652,19 @@ void misc_security_panel_use (gentity_t *self, gentity_t *other, gentity_t *acti
 	G_UseTargets(self, activator);
 }
 
+const entityInfoData_t misc_security_panel_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_security_panel_keys[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t misc_security_panel_info = {
+	"no info given but appears to be solid kejim/sec_panel.md3 that accepts player usable keys",
+	misc_security_panel_spawnflags,
+	misc_security_panel_keys
+};
 void SP_misc_security_panel (gentity_t *ent) {
 	VectorSet(ent->r.maxs, 8, 8, 8);
 	VectorSet(ent->r.mins, -8, -8, -8);
@@ -558,6 +702,8 @@ void misc_model_breakable_touch (gentity_t *self, gentity_t *other, trace_t *tra
 	G_UseTargets(self, other);
 }
 
+extern char* lmd_processMessagePlaceholders(gentity_t* entity, char* message, char* target2);
+
 void misc_model_breakable_use (gentity_t *self, gentity_t *other, gentity_t *activator){
 	if (self->genericValue10 > level.time) {
 		return;
@@ -583,8 +729,13 @@ void misc_model_breakable_use (gentity_t *self, gentity_t *other, gentity_t *act
 
 	//RoboPhred
 	if(self->message && !(self->spawnflags & 8192))
-		trap_SendServerCommand(activator->s.number, va("cp \"%s\"", self->message));
+	{
+		char msg[MAX_STRING_CHARS];
+		strncpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL), MAX_STRING_CHARS);
+		trap_SendServerCommand(activator->s.number, va("cp \"%s\"", msg));
+	}
 }
+
 
 void misc_model_breakable_pay (gentity_t *self, gentity_t *other, gentity_t *activator){
 	if (self->genericValue10 > level.time) {
@@ -604,8 +755,10 @@ void misc_model_breakable_pay (gentity_t *self, gentity_t *other, gentity_t *act
 
 	if (other->client->pers.cmd.buttons & BUTTON_USE ) {
 		if (self->message) {
+			char msg[MAX_STRING_CHARS];
+			strncpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL), MAX_STRING_CHARS);
 			trap_SendServerCommand(other-g_entities,
-				va("cp \"%s\nUse the command \\pay on this.\nThe cost is CR %i.\"", self->message,self->count));
+				va("cp \"%s\nUse the command \\pay on this.\nThe cost is CR %i.\"", msg,self->count));
 		} else {
 			trap_SendServerCommand(other-g_entities,
 				va("cp \"Use the command \\pay on this.\nThe cost is CR %i.\"", self->count));
@@ -635,9 +788,10 @@ void animate_model (gentity_t *self);
 
 void FixBox(vec3_t mins,vec3_t maxs, vec3_t angles);
 
-/*
-misc_model_breakable
-spawnflags:
+/*QUAKED misc_model_breakable
+This will spawn a model in game that can either have no purpose and sit there, or it can fire a target, or it can even accept money to fire at its target.
+
+SPAWNFLAGS
 SOLID           1
 AUTOANIMATE     2
 DEAD SOLID      4
@@ -650,8 +804,107 @@ NO_EXPLOSION  256
 START_OFF     512
 ??           1024
 ??           2048
+??			 4096
+??			 8192
+
+1     - Makes the model solid. If maxs/mins are defined it will follow those.
+        Otherwise it will follow default maxs/mins, which go to the full extent size of the model
+2     - Will cycle its animation
+4     - Bounding Box will be there even when destroyed
+8     - Doesn't display damage model when destroyed
+16    - No smoke when used
+32    - When used, will toggle to it's usemodel (model + "_u1.md3")... this does nothing if spawnflags 64 is not checked.
+64    - When used it will not break
+128   - Player can use it will use button
+256   - No Explosion
+512   - Starts deactivated
+8192  - Payable button, use count and message keys
+
+Keys:
+customSkill        - The name of the skill to check. (see lmd_customskill for details).  
+customSkillCompare - Comparison type. -1 for direct compare (use this for text), 0 for greater or equal to, 1 for less than. 
+                     (default 0)  
+customSkillValue   - The value to compare to.  
+property    - this entity will only work for people with access to the property set here  
+playerFlags - gives access to this entity for players who have this set ammount of flags, see lmd_flagplayer for more information  
+useScript   - the script to use  
+parm1       - the movement distance for a movable model to move to, if spawnflags 2 is set it loops its movement.  
+              If not it only moves when something targets the entities targetname this only works if you have the usescript key set to something like:         
+              "usescript,common/switch_on".  
+parm2       - the delay to wait in milliseconds before moving again when the movement reaches its closed position or opened position  
+profession  - Sets it so only a person with a certain profession can use a button.   
+              Note that you can add these together: profession,3, = jedi and merc but tech can't access this button.
+              -1     - no profession  
+               1     - Jedi Profession  
+               2     - Mercenary Profession  
+               4     - Tech Profession  
+  
+level       - People with this level and above can use this, must be set to 1-40. So if you set it to 5, people level 5 and up can use it while people   
+              below level 5 cannot use it. However now if you set it to -5 people level's 5 and below will only be able to use this.  
+adminLevel  - People with this admin level and above can use this, must be set for 1-4, So if you set it to 2, admins level 2 and up can use it,   
+              while people with level 3 and below cannot.  
+count       - Only works when spawnflags are set to 8192, the amount of credits the person must pay for the entity to fire its target.  
+message     - The message that people will see when they press 'use' on the button.  
+gravity     - Add this key with the number one after it and make the z-axis to something above the ground and the model will be pushable and pullable.  
+target      - What to fire at when used  
+model       - the md3 model to draw  
+modelScale  - how much to scale the model, 1-10 for larger model, 0-1 for smaller, ex .5 for half the size.  
+targetName  - make the trigger target this value for the entity to be used  
+
+Example code:
+
+/place misc_model_breakable 0 model,models/map_objects/factory/f_con1,spawnflags,8193,message,Pay Up Yo,count,20,target,spawn_desann,
+
+    This will make a button that charges 20 Credits to fire its target
+
+/place misc_model_breakable 0 model,models/map_objects/roof_top/mech1,angle,90,usescript,common/switch_on,spawnflags,65,parm1,7,parm2,2000,
+
+    This will spawn a movable model that moves up and down with a 2 second delay between movements.
+
 */
 
+const entityInfoData_t misc_model_breakable_spawnflags[] = {
+	{"1", "Makes the model solid. if maxs/mins are defined it will follow those"},
+	{"2", "Will cycle its animation"},
+	{"4", "Bounding Box will be there even when destroyed"},
+	{"8", "Doesn't display damage model when destroyed"},
+	{"16", "No smoke when used"},
+	{"32", "When used, will toggle to it's usemodel (model + \'_u1.md3\')... this does nothing if spawnflags 64 is not checked."},
+	{"64", "When used it will not break"},
+	{"128", "Player can use it will use button"},
+	{"256", "No Explosion"},
+	{"512", "Starts deactivated"},
+	{"1024", "??"},
+	{"2048", "??"},
+	{"4096", "??"},
+	{"8192", "Payable button, use count and message keys"},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_model_breakable_keys[] = {
+	{"model", "the .md3 model to draw"},
+	{"modelscale", "how much to scale the model, 1-10 for larger model, 0-1 for smaller, ex .5 for half the size"},
+	{"target", "What to fire at when used"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{"parm1", "the movement distance for a movable model to move to, if spawnflags 2 is set it loops its movement. If not it only moves when something targets the entities targetname this only works if you have the usescript key set to something like: \'usescript,common/switch_on\'"},
+	{"parm2", "the delay to wait in milliseconds before moving again when the movement reaches its closed position or opened position"},
+	{"useScript", "the script to use"},
+	{"profession", "Sets it so only a person with a certain profession can use a button. you can add these together: \'profession,3,\' = jedi and merc (-1: no profession, 1: jedi, 2: merc, 4: tech)"},
+	{"count", "Only works when spawnflags are set to 8192, the amount of credits the person must pay for the entity to fire its target"},
+	{"message", "The message that people will see when they press \'use\' on the button"},
+	{"level", "People with this level and above/below only. range of 1-40. Set to 5, people level 5 and up. Set to -5, people level 5 and below."},
+	{"adminLevel", "People with this admin level and above can use this same as \'level\' usage"},
+	{"", ""},
+	{"", ""},
+	{"", ""},
+	{"", ""},
+	{"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t misc_model_breakable_info = {
+	"This will spawn a model in game that can either have no purpose and sit there, or it can fire a target, or it can even accept money to fire at its target.",
+	misc_model_breakable_spawnflags,
+	misc_model_breakable_keys
+};
 void SP_misc_model_breakable( gentity_t *ent ) {
 	qboolean gravity;
 	int t;
@@ -766,6 +1019,27 @@ void SP_misc_model_breakable( gentity_t *ent ) {
 	trap_LinkEntity(ent);
 }
 
+/*QUAKED misc_slotmachine *(L)
+An in game slot machine, 1 entity thats all it takes. Accepts /pay command with numbers from 10 - 200 all numbers have to be by 10, ex /pay 50.
+Keys
+
+count - the starting credit the machine comes with, once the total credit hits 0 the machine will say its out of credits when used.
+
+Example code: /place misc_slotmachine 0 count,5000,
+*/
+const entityInfoData_t misc_slotmachine_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_slotmachine_keys[] = {
+	{"count", "the starting credit the machine comes with, once the total credit hits 0 the machine will say its out of credits when used."},
+	{NULL, NULL}
+};
+const entityInfo_t misc_slotmachine_info = {
+	"An in game slot machine, 1 entity thats all it takes. Accepts /pay command with numbers from 10 - 200 all numbers have to be by 10, ex /pay 50.",
+	misc_slotmachine_spawnflags,
+	misc_slotmachine_keys
+};
 void misc_slotmachine_use (gentity_t *ent, gentity_t *other, gentity_t *activator){
 	vec3_t dir;
 	int diff;
@@ -865,6 +1139,37 @@ void SP_misc_slotmachine(gentity_t *ent){
 	trap_LinkEntity(ent);
 }
 
+/*QUAKED misc_exploding_crate (1 0 0) (-16 -16 0) (16 16 16)
+
+Spawns a crate that when hit by an attack will explode. You can change its default model by the model key, although its hitbox is hard coded.
+Keys
+
+dmg           - sets the damage that the entity will give
+model         - model
+splashRadius  - sets the damage radius around the origin of the entity
+splashDamage  - sets the splash damage (if you are inside the splash radius you will receive this damage amount)
+
+Example code:
+
+/place misc_exploding_crate 0
+    will spawn an exploding crate that loads every time the entities are loaded for that map. After being destroyed, it doesn't respawn.
+*/
+const entityInfoData_t misc_exploding_crate_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_exploding_crate_keys[] = {
+	{"model", "model"},
+	{"dmg", "sets the damage that the entity will give"},
+	{"splashRadius", "sets the damage radius around the origin of the entity"},
+	{"splashDamage", "sets the splash damage (if you are inside the splash radius you will receive this damage amount)"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_exploding_crate_info = {
+	"Spawns a crate that when hit by an attack will explode. You can change its default model by the model key, although its hitbox is hard coded",
+	misc_exploding_crate_spawnflags,
+	misc_exploding_crate_keys
+};
 void SP_misc_exploding_crate (gentity_t *ent){
 	//ent->model = "models/map_objects/imperial/crate_xplode.md3";
 	G_SpawnString("model","map_objects/imperial/crate_xplode",&ent->model);
@@ -894,6 +1199,23 @@ ground and whatnot.
 loaded as a model in the renderer - does not take up precious
 bsp space!
 */
+
+const entityInfoData_t misc_model_static_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_model_static_keys[] = {
+	{"model", "arbitrary .md3 file to display"},
+	{"zoffset", "units to offset vertical culling position by, can be negative or positive. This does not affect the actual position of the model, only the culling position. Use it for models with stupid origins that go below the ground and whatnot."},
+	{"modelscale", "scale on all axis"},
+	{"modelscale_vec", "scale difference axis"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_model_static_info = {
+	"Unused in LMD. Loaded as a model in the renderer - does not take up precious bsp space!",
+	misc_model_static_spawnflags,
+	misc_model_static_keys
+};
 void SP_misc_model_static(gentity_t *ent)
 {
 	G_FreeEntity( ent );
@@ -902,6 +1224,20 @@ void SP_misc_model_static(gentity_t *ent)
 /*QUAKED misc_G2model (1 0 0) (-16 -16 -16) (16 16 16)
 "model"		arbitrary .glm file to display
 */
+
+const entityInfoData_t misc_G2model_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_G2model_keys[] = {
+	{"model", "arbitrary .glm file to display"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_G2model_info = {
+	"Display a .glm model file. Removed in Lugormod.",
+	misc_G2model_spawnflags,
+	misc_G2model_keys
+};
 void SP_misc_G2model( gentity_t *ent ) {
 #if 0
 	char name1[200] = "models/players/kyle/modelmp.glm";
@@ -971,6 +1307,20 @@ void locateCamera( gentity_t *ent ) {
 The portal surface nearest this entity will show a view from the targeted misc_portal_camera, or a mirror view if untargeted.
 This must be within 64 world units of the surface!
 */
+
+const entityInfoData_t misc_portal_surface_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_portal_surface_keys[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t misc_portal_surface_info = {
+	"The portal surface nearest this entity will show a view from the targeted misc_portal_camera, or a mirror view if untargeted. This must be within 64 world units of the surface!",
+	misc_portal_surface_spawnflags,
+	misc_portal_surface_keys
+};
 void SP_misc_portal_surface(gentity_t *ent) {
 	VectorClear( ent->r.mins );
 	VectorClear( ent->r.maxs );
@@ -991,6 +1341,22 @@ void SP_misc_portal_surface(gentity_t *ent) {
 The target for a misc_portal_director.  You can set either angles or target another entity to determine the direction of view.
 "roll" an angle modifier to orient the camera around the target vector;
 */
+
+const entityInfoData_t misc_portal_camera_spawnflags[] = {
+	{"slowrotate", "unknown"},
+	{"fastrotate", "unknown"},
+	{"noswing", "unknown"},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_portal_camera_keys[] = {
+	{"roll", "an angle modifier to orient the camera around the target vector"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_portal_camera_info = {
+	"The target for a misc_portal_director. You can set either angles or target another entity to determine the direction of view. Might be unusable in LMD.",
+	misc_portal_camera_spawnflags,
+	misc_portal_camera_keys
+};
 void SP_misc_portal_camera(gentity_t *ent) {
 	float	roll;
 
@@ -1008,6 +1374,15 @@ void SP_misc_portal_camera(gentity_t *ent) {
 /*QUAKED misc_bsp (1 0 0) (-16 -16 -16) (16 16 16)
 "bspmodel"		arbitrary .bsp file to display
 */
+const entityInfoData_t misc_bsp_keys[] = {
+	{"bspmodel", "arbitrary .bsp file to display"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_bsp_info = {
+	"put a map inside a map. the misc_bsp brush models start at the last brush model number of the original map. so if you expect to use *55 from one map, guess randomly or find the last brush model and do the math",
+	NULL,
+	misc_bsp_keys
+};
 //RoboPhred
 void G_SubBSP_SpawnEntitiesFromString(void);
 extern qboolean disablesenabled;
@@ -1112,6 +1487,28 @@ miscentDef - defines which client models spawn on the terrain (file is base/ext_
 densityMap - how dense the client models are packed
 
 */
+
+const entityInfoData_t terrain_spawnflags[] = {
+	{"NOVEHDMG", "don\'t damage vehicles upon impact with this terrain"},
+	{NULL, NULL}
+};
+const entityInfoData_t terrain_keys[] = {
+	{"numPatches", "integer number of patches to split the terrain brush into (default 200)"},
+	{"terxels", "integer number of terxels on a patch side (default 4) (2 <= count <= 8)"},
+	{"seed", "integer seed for random terrain generation (default 0)"},
+	{"textureScale", "float scale of texture (default 0.005)"},
+	{"heightmap", "name of heightmap data image to use, located in heightmaps/*.png. (must be PNG format)"},
+	{"terrainDef", "defines how the game textures the terrain (file is base/ext_data/rmg/*.terrain - default is grassyhills)"},
+	{"instanceDef", "defines which bsp instances appear"},
+	{"miscentDef", "defines which client models spawn on the terrain (file is base/ext_data/rmg/*.miscents)"},
+	{"densityMap", "how dense the client models are packed"},
+	{NULL, NULL}
+};
+const entityInfo_t terrain_info = {
+	"(untested) Terrain entity - It will stretch to the full height of the brush",
+	terrain_spawnflags,
+	terrain_keys
+};
 void AddSpawnField(char *field, char *value);
 #define MAX_INSTANCE_TYPES		16
 void SP_terrain(gentity_t *ent)
@@ -1309,6 +1706,15 @@ to the regular view position.
 
 "modelscale"			the scale at which to scale positions
 */
+const entityInfoData_t misc_skyportal_orient_keys[] = {
+	{"modelscale", "the scale at which to scale positions"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_skyportal_orient_info = {
+	"removed per RoboPhred. originally: point from which to orient the sky portal cam in relation to the regular view position",
+	NULL,
+	misc_skyportal_orient_keys
+};
 void SP_misc_skyportal_orient (gentity_t *ent)
 {
 	//RoboPhred: not anymore, we want to save
@@ -1328,6 +1734,23 @@ is in the same PVS as them (only once otherwise, but still once no matter
 where the client is). In other words, don't go overboard with it or everything
 will explode.
 */
+const entityInfoData_t misc_skyportal_keys[] = {
+	{"fov", "for the skybox default is 80"},
+	{"onlyfoghere", "if non-0 allows you to set a global fog, but will only use that fog within this sky portal."},
+	{NULL, NULL}
+};
+const entityInfo_t misc_skyportal_info = {
+	"Will take a snapshot of wherever you place one of these and put it in the sky. The snapshot is a whole 360 around the origin of this entity, place on on the map and look at the sky"
+	"\nNote that entities in the same PVS and visible (via point trace) from this"
+	"\nobject will be flagged as portal entities. This means they will be sent and"
+	"\nupdated from the server for every client every update regardless of where"
+	"\nthey are, and they will essentially be added to the scene twice if the client"
+	"\nis in the same PVS as them (only once otherwise, but still once no matter"
+	"\nwhere the client is). In other words, don't go overboard with it or everything will explode"
+	,
+	NULL,
+	misc_skyportal_keys
+};
 void SP_misc_skyportal (gentity_t *ent)
 {
 	char	*fov = NULL;
@@ -1372,6 +1795,22 @@ SABERATTACK = 15
 SABERDEFEND = 16
 SABERTHROW = 17
 */
+const entityInfoData_t misc_holocron_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_holocron_keys[] = {
+	{"count", "set to type of holocron (based on force power value)"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_holocron_info = {
+	"HEAL = 0, JUMP = 1, SPEED = 2, PUSH = 3, PULL = 4, TELEPATHY = 5"
+	"\nGRIP = 6, LIGHTNING = 7, RAGE = 8, PROTECT = 9, ABSORB = 10"
+	"\nTEAM HEAL = 11, TEAM FORCE = 12, DRAIN = 13, SEE = 14"
+	"\nSABERATTACK = 15, SABERDEFEND = 16, SABERTHROW = 17",
+	misc_holocron_spawnflags,
+	misc_holocron_keys
+};
 
 char *holocronTypeModels[] = {
 	"models/map_objects/mp/lt_heal.md3",//FP_HEAL,
@@ -1836,6 +2275,19 @@ void InitShooter( gentity_t *ent, int weapon ) {
 Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
+const entityInfoData_t shooter_blaster_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t shooter_blaster_keys[] = {
+	{"random", "the number of degrees of deviance from the taget. (1.0 default)"},
+	{NULL, NULL}
+};
+const entityInfo_t shooter_blaster_info = {
+	"Fires at either the target or the current direction",
+	shooter_blaster_spawnflags,
+	shooter_blaster_keys
+};
 void SP_shooter_blaster( gentity_t *ent ) {
 	InitShooter( ent, WP_BLASTER);
 }
@@ -2201,6 +2653,17 @@ Gives generic ammo when used
 "chargerate" - rechage 1 point every this many milliseconds (default 2000)
 "nodrain" - don't drain power from station if 1
 */
+const entityInfoData_t misc_ammo_floor_unit_keys[] = {
+	{"count", "max charge value (default 200)"},
+	{"chargerate", "recharge 1 point every this many milliseconds (default 2000)"},
+	{"nodrain", "don\'t drain power from station if 1"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_ammo_floor_unit_info = {
+	"Gives generic ammo when used",
+	NULL,
+	misc_ammo_floor_unit_keys
+};
 void SP_misc_ammo_floor_unit(gentity_t *ent)
 {
 	vec3_t dest;
@@ -2295,6 +2758,17 @@ Gives shield energy when used.
 "chargerate" - rechage 1 point every this many milliseconds (default 3000)
 "nodrain" - don't drain power from me
 */
+const entityInfoData_t misc_shield_floor_unit_keys[] = {
+	{"count", "max charge value (default 50)"},
+	{"chargerate", "rechage 1 point every this many milliseconds (default 3000)"},
+	{"nodrain", "don\'t drain power from me"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_shield_floor_unit_info = {
+	"Gives shield energy when used.",
+	NULL,
+	misc_shield_floor_unit_keys
+};
 void SP_misc_shield_floor_unit( gentity_t *ent )
 {
 	/* Lugormod no, why ??
@@ -2392,6 +2866,15 @@ Gives shield energy when used.
 "count" - the amount of ammo given when used (default 200)
 */
 //------------------------------------------------------------
+const entityInfoData_t misc_model_shield_power_converter_keys[] = {
+	{"count", "the amount of shield given when used (default unknown)"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_model_shield_power_converter_info = {
+	"Gives shield energy when used",
+	NULL,
+	misc_model_shield_power_converter_keys
+};
 void SP_misc_model_shield_power_converter( gentity_t *ent )
 {
 	if (!ent->health)
@@ -2558,6 +3041,16 @@ Gives ammo energy when used.
 "nodrain" - don't drain power from me
 */
 //------------------------------------------------------------
+const entityInfoData_t misc_model_ammo_power_converter_keys[] = {
+	{"count", "the amount of ammo given when used (default 200)"},
+	{"nodrain", "don\'t drain power from me"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_model_ammo_power_converter_info = {
+	"Gives ammo energy when used",
+	NULL,
+	misc_model_ammo_power_converter_keys
+};
 void SP_misc_model_ammo_power_converter( gentity_t *ent )
 {
 	if (!ent->health)
@@ -2678,6 +3171,15 @@ Gives ammo energy when used.
 "count" - the amount of ammo given when used (default 200)
 */
 //------------------------------------------------------------
+const entityInfoData_t misc_model_health_power_converter_keys[] = {
+	{"count", "the amount of health given when used (default 200)"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_model_health_power_converter_info = {
+	"Gives health energy when used",
+	NULL,
+	misc_model_health_power_converter_keys
+};
 void SP_misc_model_health_power_converter( gentity_t *ent )
 {
 	if (!ent->health)
@@ -2959,6 +3461,27 @@ DAMAGE - does radius damage around effect every "delay" milliseonds
 "splashDamage" - only works when damage is checked ( default 5 )
 "soundset"	- bmodel set to use, plays start sound when toggled on, loop sound while on ( doesn't play on a oneshot), and a stop sound when turned off
 */
+const entityInfoData_t fx_runner_spawnflags[] = {
+	{"1", "effect will start in the off state"},
+	{"2", "effect fires once and that's when it\'s used"},
+	{"4", "does radius damage around effect"},
+	{NULL, NULL}
+};
+const entityInfoData_t fx_runner_keys[] = {
+	{"fxFile", "name of the effect file to play"},
+	{"target", "direction to aim the effect in (default to up)"},
+	{"target2", "uses its target2 when the fx gets triggered"},
+	{"splashRadius", "the radius around the origin that the fx is located (default 16)"},
+	{"splashDamage", "the damage to give everything in the splash radius (default is 5)"},
+	{"soundSet", "plays start sound when toggled on, loop sound while on, and a stop sound when turned off"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t fx_runner_info = {
+	"Runs the specified effect. If used it will toggle on/off",
+	fx_runner_spawnflags,
+	fx_runner_keys
+};
 #define FX_RUNNER_RESERVED 0x800000
 #define FX_ENT_RADIUS 32
 extern int	BMS_START;
@@ -3207,6 +3730,15 @@ This world effect will spawn space dust globally into the level.
 "count" the number of snow particles (default of 1000)
 */
 //----------------------------------------------------------
+const entityInfoData_t fx_spacedust_keys[] = {
+	{"count", "the number of space dust particles (default of 1000)"},
+	{NULL, NULL}
+};
+const entityInfo_t fx_spacedust_info = {
+	"This world effect will spawn space dust globally into the level",
+	NULL,
+	fx_spacedust_keys
+};
 void SP_CreateSpaceDust( gentity_t *ent )
 {
 	G_EffectIndex(va("*spacedust %i", ent->count));
@@ -3219,6 +3751,15 @@ This world effect will spawn snow globally into the level.
 "count" the number of snow particles (default of 1000)
 */
 //----------------------------------------------------------
+const entityInfoData_t fx_snow_keys[] = {
+	{"count", "the number of snow particles (default of 1000)"},
+	{NULL, NULL}
+};
+const entityInfo_t fx_snow_info = {
+	"This world effect will spawn snow globally into the level",
+	NULL,
+	fx_snow_keys
+};
 void SP_CreateSnow( gentity_t *ent )
 {
 	G_EffectIndex("*snow");
@@ -3232,6 +3773,15 @@ This world effect will spawn rain globally into the level.
 "count" the number of rain particles (default of 500)
 */
 //----------------------------------------------------------
+const entityInfoData_t fx_rain_keys[] = {
+	{"count", "the number of rain particles (default of 500)"},
+	{NULL, NULL}
+};
+const entityInfo_t fx_rain_info = {
+	"This world effect will spawn rain globally into the level",
+	NULL,
+	fx_rain_keys
+};
 void SP_CreateRain( gentity_t *ent )
 {
 	if (g_dontLoadNPC.integer) {
@@ -3248,6 +3798,19 @@ void SP_CreateRain( gentity_t *ent )
 	G_EffectIndex(va("*rain init %i", ent->count));
 }
 
+const entityInfoData_t fx_wind_spawnflags[] = {
+	{"2", "make a camera shake effect"},
+	{NULL, NULL}
+};
+const entityInfoData_t fx_wind_keys[] = {
+	{"speed", "speed at which wind is blowing (default 100)"},
+	{NULL, NULL}
+};
+const entityInfo_t fx_wind_info = {
+	"This world effect will spawn wind globally into the level",
+	fx_wind_spawnflags,
+	fx_wind_keys
+};
 void SP_CreateWind( gentity_t *ent )
 {
 	if (!ent->speed) { //Lugormod (where else would it be done???)
@@ -3263,6 +3826,28 @@ void SP_CreateWind( gentity_t *ent )
 	G_EffectIndex(va("*constantwind %s", vtos(dir)));
 }
 
+/*QUAKED target_screenshake
+anyone near this entity has their screen shake around, in Lugormod T2 it is bugged and always does global
+
+"intensity"     intensity of the shake
+"duration"      how long the shake lasts
+"globalshake"   if set to anything > 0, then everyone in the server will have this effect them.
+                (default 0)
+"targetname"    make the trigger target this value for the entity to be used
+*/
+//----------------------------------------------------------
+const entityInfoData_t target_screenshake_keys[] = {
+	{"intensity", "intensity of the shake"},
+	{"duration", "how long the shake lasts"},
+	{"globalshake", "if set to anything greater than 0, everyone in the server will experience the shake (default 0)"},
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{NULL, NULL}
+};
+const entityInfo_t target_screenshake_info = {
+	"anyone near this entity has their screen shake around, in Lugormod T2 it is bugged and always does global",
+	NULL,
+	target_screenshake_keys
+};
 void Use_Target_Screenshake( gentity_t *ent, gentity_t *other, gentity_t *activator )
 {
 	qboolean bGlobal = qfalse;
@@ -3274,6 +3859,7 @@ void Use_Target_Screenshake( gentity_t *ent, gentity_t *other, gentity_t *activa
 
 	G_ScreenShake(ent->s.origin, NULL, ent->speed, ent->genericValue5, bGlobal);
 }
+
 
 void SP_target_screenshake(gentity_t *ent)
 {
@@ -3287,6 +3873,11 @@ void SP_target_screenshake(gentity_t *ent)
 	ent->use = Use_Target_Screenshake;
 }
 
+/*QUAKED target_escapetrig
+SP only per phred
+
+*/
+//----------------------------------------------------------
 void LogExit( const char *string );
 qboolean gEscaping = qfalse;
 int gEscapeTime = 0;
@@ -3350,6 +3941,16 @@ NOTE: place these half-way in the door to make it flush with the door's surface.
 "target"	thing to use when destoryed (not doors - it automatically unlocks the door it was angled at)
 "health"	default is 10
 */
+const entityInfoData_t misc_maglock_keys[] = {
+	{"target", "thing to use when destoryed (not doors - it automatically unlocks the door it was angled at)"},
+	{"health", "default is 10"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_maglock_info = {
+	"Place facing a door (using the angle, not a targetname) and it will lock that door. Can only be destroyed by lightsaber and will automatically unlock the door it\'s attached to. NOTE: place these half-way in the door to make it flush with the door surface",
+	NULL,
+	misc_maglock_keys
+};
 void maglock_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
 {
 	//unlock our door if we're the last lock pointed at the door
@@ -3571,6 +4172,21 @@ targetname	- if specified, will only spawn when used
 interval	- spawn every so often (milliseconds)
 fudgefactor	- milliseconds between 0 and this number randomly added to interval
 */
+const entityInfoData_t misc_faller_spawnflags[] = {
+	{NULL, NULL}
+};
+const entityInfoData_t misc_faller_keys[] = {
+	{"targetname", "if specified, will only spawn when used"},
+	{"interval", "spawn every so often (milliseconds)"},
+	{"fudgefactor", "milliseconds between 0 and this number randomly added to interval"},
+	{NULL, NULL}
+};
+const entityInfo_t misc_faller_info = {
+	"Raining Stormtroopers?? spawned every interval+random fudgefactor, or if specified, when used. This takes up a lot of temp ents if you let them rain freely.",
+	misc_faller_spawnflags,
+	misc_faller_keys
+};
+
 void SP_misc_faller(gentity_t *ent)
 {
 	G_ModelIndex("models/players/stormtrooper/model.glm");
@@ -3994,6 +4610,30 @@ ownername	- the owner of this tag
 target		- use to point the tag at something for angles
 */
 
+const entityInfoData_t ref_tag_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t ref_tag_keys[] = {
+	{"targetname", "the name of this tag"},
+	{"ownername", "the owner of this tag"},
+	{"target", "use to point the tag at something for angles"},
+	{NULL, NULL}
+};
+const entityInfo_t ref_tag_info = {
+	"Reference tags which can be positioned throughout the level. These tags can later be refered to by the scripting system so that their origins and angles can be referred to"
+	"\nIf you set angles on the tag, these will be retained"
+	"\nIf you target a ref_tag at an entity, that will set the ref_tag\'s angles toward that entity."
+	"\nIf you set the ref_tag's ownername to the ownername of an entity, it makes that entity is the owner of the ref_tag. This means"
+    "that the owner, and only the owner, may refer to that tag"
+	"\nTags may not have the same name as another tag with the same owner. However, tags with different owners may have the same"
+	"name as one another.  In this way, scripts can generically"
+	"refer to tags by name, and their owners will automatically"
+	"specifiy which tag is being referred to."
+	,
+	ref_tag_spawnflags,
+	ref_tag_keys
+};
 void ref_link ( gentity_t *ent )
 {
 	reference_tag_t	*tag;
@@ -4073,6 +4713,28 @@ WP_TIE_FIGHTER
 WP_RAPID_FIRE_CONC
 WP_BLASTER_PISTOL
 */
+
+const entityInfoData_t misc_weapon_shooter_spawnflags[] = {
+	{"1", "fire the alt-fire of the chosen weapon"},
+	{"2", "keep firing until used again (fires at intervals of \'wait\')"},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_weapon_shooter_keys[] = {
+	{"wait", "debounce time between refires (defaults to 500)"},
+	{"target", "what to aim at (will update aim every frame if it\'s a moving target. if you target a door it will always shoot the door, even if the door moves)"},
+	{"weapon", "specify the weapon to use. Some of these are unstable, or will shut down the server when used, careful with them (default is WP_BLASTER)"},
+	{"targetname", "make the trigger target this value for the entity to be used."},
+	{"", ""},
+	{"", ""},
+	{"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t misc_weapon_shooter_info = {
+	"fires weapon projectiles when used",
+	misc_weapon_shooter_spawnflags,
+	misc_weapon_shooter_keys
+};
+
 //kind of hacky, but we have to do this with no dynamic allocation
 /*
 #define MAX_SHOOTERS		16
@@ -4248,6 +4910,20 @@ void SP_misc_weapon_shooter( gentity_t *self )
 /*QUAKED misc_weather_zone (0 .5 .8) ?
 Determines a region to check for weather contents - will significantly reduce load time
 */
+
+const entityInfoData_t misc_weather_zone_spawnflags[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfoData_t misc_weather_zone_keys[] = {
+	// {"", ""},
+	{NULL, NULL}
+};
+const entityInfo_t misc_weather_zone_info = {
+	"(removed) Determines a region to check for weather contents - will significantly reduce load time",
+	misc_weather_zone_spawnflags,
+	misc_weather_zone_keys
+};
 void SP_misc_weather_zone( gentity_t *ent )
 {
 	G_FreeEntity(ent);

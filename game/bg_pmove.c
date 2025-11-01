@@ -1234,7 +1234,7 @@ static void PM_Friction( void ) {
 		drop += speed*pm_waterfriction*pm->waterlevel*pml.frametime;
 	}
 	// If on a client then there is no friction
-	else if ( lmd_noPlayerBounce->integer == 0 && pm->ps->groundEntityNum < MAX_CLIENTS )
+	else if ( lmd_noPlayerBounce.integer == 0 && pm->ps->groundEntityNum < MAX_CLIENTS )
 	{
 		drop = 0;
 	}

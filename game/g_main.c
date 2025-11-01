@@ -424,6 +424,8 @@ vmCvar_t lmd_melee_lightning_multiplier;
 
 vmCvar_t lmd_min_bounty_amount;
 
+vmCvar_t lmd_noPlayerBounce;
+
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
 
@@ -436,6 +438,9 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &lmd_maxsameip, "lmd_maxSameIp", "3", CVAR_ARCHIVE, 0, qfalse, qfalse,
 		"Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new "
 		"connections from the ip will be ignored.  Usefull for stopping fake player attacks."
+	},
+	{ &lmd_noPlayerBounce, "lmd_noPlayerBounce", "0", CVAR_ARCHIVE, 0, qtrue, qfalse,
+	"<0-1> If 1, you won't slide off of a Players head. Default 0."
 	},
 	{ &lmd_autobansameip, "lmd_autoBanSameIp", "0", CVAR_ARCHIVE, 0, qfalse, qfalse,
 		"If lmd_maxsameip is set, then this cvar controls whether to ban ips that go over the given limit."

@@ -761,7 +761,6 @@ void Auths_CommandUsed(gentity_t *ent, cmdEntry_t *cmd){
 
 	if(entry->report != 0){
 
-		char *msg = va(CT_B"Player "CT_N"%s"CT_B" ("CT_SV"%s"CT_B") used command \'"CT_SV"%s"CT_B"\'", ent->client->pers.netname, PlayerAcc_GetUsername(ent), ConcatArgs(0));
 		int i;
 		for(i = 0; i < MAX_CLIENTS; i++){
 			if(!g_entities[i].inuse || !g_entities[i].client || g_entities[i].client->pers.connected != CON_CONNECTED)
@@ -769,7 +768,13 @@ void Auths_CommandUsed(gentity_t *ent, cmdEntry_t *cmd){
 
 			int plRank = Auths_GetPlayerRank(&g_entities[i]);
 			if (plRank != 0 && (entry->report == -1 || plRank <= entry->report)) {
-				Disp(&g_entities[i], msg);
+				Disp(
+					&g_entities[i],
+					CT_B"Player "CT_N"%s"CT_B" ("CT_SV"%s"CT_B") used command \'"CT_SV"%s"CT_B"\'",
+					ent->client->pers.netname,
+					PlayerAcc_GetUsername(ent),
+					ConcatArgs(0)
+				);
 			}
 		}
 	}

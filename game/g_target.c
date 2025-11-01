@@ -742,6 +742,106 @@ void SP_target_print(gentity_t* ent)
         G_SpawnString("arg", "", &ent->target2);
 }
 
+const entityInfoData_t target_fp_keys[] = {
+	{"targetname", "make the trigger target this value for the entity to be used"},
+	{"ModifyPowers", "E.g. ModifyPowers,heal2.rage2 -> would set force heal and rage to level 2. Available keys are: jump, push, pull, speed, seeing, heal, protect, absorb"
+				  "mindtrick, theal, grip, lightning, rage, drain, tforce, sattack, sdefend, sthrow."},
+	{"ForceRegenSpeedMultiplier", "Multiply the existing force regen speed by the given amount. E.g: 1.25. Must be greater than 0."},
+	{NULL, NULL}
+};
+
+const entityInfo_t target_fp_info = {
+	"The activator is given the forcepower + levels given in the ModifyPowers key. ForcePowers not given in ModifyPowers key will remain unchanged. Only death can reset this.",
+	NULL,
+	target_fp_keys
+};
+
+typedef struct {
+	const char *name;
+	int id;
+} forcePowerMap_t;
+
+static const forcePowerMap_t forcePowerMap[] = {
+	{"jump", FP_LEVITATION},
+	{"push", FP_PUSH},
+	{"pull", FP_PULL},
+	{"speed", FP_SPEED},
+	{"seeing", FP_SEE},
+    
+	{"heal", FP_HEAL},
+	{"protect", FP_PROTECT},
+	{"absorb", FP_ABSORB},
+	{"mindtrick", FP_TELEPATHY},
+	{"theal", FP_TEAM_HEAL},
+    
+	{"grip", FP_GRIP},
+	{"lightning", FP_LIGHTNING},
+	{"rage", FP_RAGE},
+	{"drain", FP_DRAIN},
+	{"tforce", FP_TEAM_FORCE},
+    
+	{"sattack", FP_SABER_OFFENSE},
+	{"sdefend", FP_SABER_DEFENSE},
+	{"sthrow", FP_SABERTHROW},
+	{NULL, -1}
+};
+
+int lmd_get_forcePowerMapIndex(const char *token) {
+	for (int i = 0; forcePowerMap[i].name; i++) {
+		if (!Q_stricmp(forcePowerMap[i].name, token)) {
+			return forcePowerMap[i].id;
+		}
+	}
+	return -1;
+}
+
+void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
+{
+	if (!activator || !activator->client)
+		return;
+
+	activator->client->Lmd.customForceRegenSpeedMultiplier = ent->modelScale[0];
+	
+	char *token = strtok(ent->target2, ".");
+	while (token)
+	{
+		char powerName[32];
+		int level = -1;
+            
+		if (sscanf(token, "%31[a-zA-Z]%d", powerName, &level) == 2)
+		{
+			int fpIndex = lmd_get_forcePowerMapIndex(powerName);
+			if (fpIndex >= 0 && level >= 0 && level <= FORCE_LEVEL_5)
+			{
+				activator->client->ps.fd.forcePowerLevel[fpIndex] = level;
+				if (level > 0)
+					activator->client->ps.fd.forcePowersKnown |= (1 << fpIndex);
+				else
+					activator->client->ps.fd.forcePowersKnown &= ~(1 << fpIndex);
+			}
+		}
+
+		token = strtok(NULL, ".");
+	}
+}
+
+void SP_target_fp( gentity_t *ent )
+{
+	G_SpawnString("ModifyPowers", "", &ent->target2);
+	G_SpawnFloat("ForceRegenSpeedMultiplier", "0.0", &ent->modelScale[0]);
+
+	if (!Q_stricmp(ent->target2, "") && ent->modelScale[0] == 0.0)
+	{
+		EntitySpawnError("Both ModifyPowers and ForceRegenSpeedMultiplier are invalid.");
+		G_FreeEntity(ent);
+		return;
+	}
+	
+	ent->use = Use_Target_Fp;
+}
+
+
+
 
 //==========================================================
 

@@ -424,8 +424,11 @@ extern entityInfo_t target_speaker_info;
 
 void SP_target_print (gentity_t *ent);
 extern entityInfo_t target_print_info;
+
 void SP_target_weapons (gentity_t *ent);
 extern entityInfo_t target_weapons_info;
+void SP_target_fp(gentity_t *ent);
+extern entityInfo_t target_fp_info;
 void SP_target_laser (gentity_t *self);
 extern entityInfo_t target_laser_info;
 void SP_target_character (gentity_t *ent); // no doc
@@ -855,6 +858,7 @@ spawn_t	spawnInitValues[] = {
 	{"lmd_customskill", lmd_customskill, Logical_True, &lmd_customskill_info},
 
 	{"lmd_event", lmd_event, Logical_True, &lmd_event_info},
+	{"lmd_forcepower", lmd_event, Logical_True, &lmd_event_info},
 
 	{"lmd_interact", lmd_interact, Logical_True, &lmd_interact_info},
 	
@@ -933,6 +937,7 @@ spawn_t	spawnInitValues[] = {
 	{"target_speaker", SP_target_speaker, {qtrue, target_speaker_allowlogical}, &target_speaker_info},
 	{"target_print", SP_target_print, Logical_True, &target_print_info},
 	{"target_weapons", SP_target_weapons, Logical_True, &target_weapons_info},
+	{"target_fp", SP_target_fp, Logical_True, &target_fp_info},
 	{"target_laser", SP_target_laser, Logical_True, &target_laser_info},
 	{"target_score", SP_target_score, Logical_True, &target_score_info},
 	{"target_teleporter", SP_target_teleporter, Logical_True, &target_teleporter_info},
@@ -1426,8 +1431,6 @@ void Cmd_Entityinfo_t(gentity_t *ent, int iArg) {
 				color = qfalse;
 				header = qfalse;
 				for(data = spawn->info->spawnflags; data->key != NULL; data++) {
-					if(!data->key == 0)
-						break;
 					if(!header) {
 						Disp(ent, "^2Spawnflags ===============================================");
 						header = qtrue;
@@ -1446,18 +1449,24 @@ void Cmd_Entityinfo_t(gentity_t *ent, int iArg) {
 					}
 					if(Q_stricmp(data->key, "#UKEYS") == 0) {
 						const entityInfoData_t *d2;
-						for(d2 = usable_key_description; d2->key != NULL; d2++)
+						for(d2 = usable_key_description; d2->key != NULL; d2++) {
 							Disp(ent, va("%s%s: %s", (color)?"^3":"", d2->key, d2->value));
+							color = !color;
+						}
 					}
 					else if(Q_stricmp(data->key, "#MODEL") == 0) {
 						Disp(ent, va("%s%s: %s", (color)?"^3":"", model_key_description.key, model_key_description.value));
+						color = !color;
 					}
 					else if(Q_stricmp(data->key, "#HITBOX") == 0) {
 						Disp(ent, va("%s%s: %s", (color)?"^3":"", hitbox_key_description.key, hitbox_key_description.value));
+						color = !color;
 					}
 					else
+					{
 						Disp(ent, va("%s%s: %s", (color)?"^3":"", data->key, data->value));
-					color = !color;
+						color = !color;
+					}
 				}
 			}
 			if(spawn->info->description != NULL) {

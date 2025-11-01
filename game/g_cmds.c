@@ -2494,7 +2494,7 @@ void CallVote (gentity_t *ent, char *arg1, char *arg2)
 		ent->client->pers.voteCount++;
 	}
 
-	botsVoteNotification(arg1);
+	//botsVoteNotification(arg1); // Bot "random voting"
 	level.votingGametype = qfalse;
 
 	// special case for g_gametype, check for bad values

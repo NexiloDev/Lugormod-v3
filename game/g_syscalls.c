@@ -287,6 +287,9 @@ void trap_SetBrushModel( gentity_t *ent, const char *name ) {
 		ent->targetname = G_NewString2(va("bmodel_autotarget_%s", name+1));
 		ent->isAutoTargeted = qtrue;
 	}
+
+	G_SpawnString("crosshairText", "", &ent->Lmd.crosshairText);
+	G_SpawnInt("crosshairTextRange", "9999", &ent->Lmd.crosshairTextRange);
 }
 
 void trap_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask ) {

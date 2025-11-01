@@ -16,7 +16,7 @@ endif()
 
 project(Lugormod-v3)
 
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
 
 set(GAME_SRC
 	game/tri_coll_test.c 

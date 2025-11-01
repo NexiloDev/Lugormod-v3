@@ -576,6 +576,7 @@ struct gclient_s {
     struct 
 		{
 			int entityNum;
+    		int lastUsedEntityNum;
 			unsigned int selection;
 			qboolean stoppedPressingUsing;
 			qboolean stoppedPressingForward;
@@ -595,6 +596,7 @@ struct gclient_s {
 			unsigned int engageTime;
     		int trainerMenuMode;
     		int currentPage;
+    		unsigned int lastUsedTime;
 		} lmdMenu;
 
 		struct
@@ -608,7 +610,9 @@ struct gclient_s {
 		unsigned int grabbing;
 		qboolean lockSaber;
 		int canPickUpWeapons;
+		float customForceRegenSpeedMultiplier;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;
+	
 };

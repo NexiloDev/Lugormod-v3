@@ -1104,6 +1104,7 @@ extern vmCvar_t		g_blockspeedhack;
 
 //RoboPhred
 extern vmCvar_t lmd_enforceentwait;
+extern vmCvar_t lmd_mapEntitySuffix;
 
 
 #include "../namespace_begin.h"

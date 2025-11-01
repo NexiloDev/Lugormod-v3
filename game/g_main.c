@@ -62,6 +62,7 @@ const char *verMods =
 #include "Lmd_EntityCore.h"
 #include "Lmd_Commands_Auths.h"
 #include "Lmd_Bans.h"
+#include "Lmd_Data.h"
 #include "Lmd_EntityCore.h"
 #include "Lmd_Medilevitate.h"
 
@@ -151,6 +152,7 @@ vmCvar_t        g_jmsaberDamageScale;
 //vmCvar_t        g_jmsaberdistance;
 vmCvar_t        g_jmsaberreplace;
 vmCvar_t        g_jmhealthbar;
+vmCvar_t        lmd_mapEntitySuffix;
 //End Lugormod cvars.
 vmCvar_t	g_allowNPC;
 
@@ -443,6 +445,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &lmd_DataPath, "lmd_datapath", "default", CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse, qfalse,
 		"The data path that lugormod will use for its accounts, entity sets, and other files."
 	},
+	{ &lmd_mapEntitySuffix, "lmd_mapEntitySuffix", "", CVAR_TEMP, 0, qfalse, qfalse, NULL },
 	{ &lmd_startingcr, "lmd_startingCr", "0", CVAR_ARCHIVE, 0, qfalse, qfalse,
 		"The number of credits a newly registered player starts with",
 	},
@@ -1787,6 +1790,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
 	vmCvar_t	mapname;
 	vmCvar_t	ckSum;
+	char		entitySuffix[MAX_QPATH];
+	qboolean	loadedOverride = qfalse;
 
 #ifdef _XBOX
 	if(restart) {
@@ -1996,127 +2001,136 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_Printf("Loading custom entity data...\n");
 
-	switch (g_gametype.integer) {
-		case GT_JEDIMASTER:
-			LoadEntitiesData("jedimaster", qfalse);
-			break;
-		case GT_TEAM:
-		case GT_CTF:
-		case GT_CTY:
-		case GT_SABER_RUN:
-		case GT_REBORN:
-		case GT_GHOST:
-			LoadEntitiesData("team", qfalse);
-			break;
-		case GT_SIEGE:
-			LoadEntitiesData("siege", qfalse);
-			break; //Ufo: was missing
-		case GT_BATTLE_GROUND:
-			level.teamScores[TEAM_RED]  = 50;
-			level.teamScores[TEAM_BLUE] = 50;
-			LoadEntitiesData("battleground", qfalse);
+	trap_Cvar_VariableStringBuffer("lmd_mapEntitySuffix", entitySuffix, sizeof(entitySuffix));
+	if (entitySuffix[0] && Lmd_Data_IsCleanPath(entitySuffix)) {
+		LoadEntitiesData(entitySuffix, qfalse);
+		trap_Cvar_Set("lmd_mapEntitySuffix", "");
+		loadedOverride = qtrue;
+	}
 
-			//Load the player class types
-
-			//RoboPhred: this is done around 20 lines above here...
-			//vmCvar_t		mapname;
-			char			levelname[512];
-			char			goalreq[64];
-			char                    teams[2048];
-			char			gParseObjectives[2048];
-			char                    team1[512],team2[512];
-			int				len;
-			fileHandle_t	f;
-			len = 0;
-
-			//SiegeSetCompleteData(0);
-			//RoboPhred: this is done around 20 lines above here...
-			//trap_Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
-
-			//RoboPhred
-			Com_sprintf(levelname, sizeof(levelname), "maps/%s.bgd\0", level.rawmapname);
-			//Com_sprintf(levelname, sizeof(levelname), "maps/%s.bgd\0", mapname.string);
-
-			len = trap_FS_FOpenFile(levelname, &f, FS_READ);
-
-			if (f && len < MAX_SIEGE_INFO_SIZE)
-			{
-				trap_FS_Read(siege_info, len, f);
-
-				trap_FS_FCloseFile(f);
-
-				if (BG_SiegeGetValueGroup(siege_info, "Teams", teams))
+	if (!loadedOverride) {
+		switch (g_gametype.integer) {
+			case GT_JEDIMASTER:
+				LoadEntitiesData("jedimaster", qfalse);
+				break;
+			case GT_TEAM:
+			case GT_CTF:
+			case GT_CTY:
+			case GT_SABER_RUN:
+			case GT_REBORN:
+			case GT_GHOST:
+				LoadEntitiesData("team", qfalse);
+				break;
+			case GT_SIEGE:
+				LoadEntitiesData("siege", qfalse);
+				break; //Ufo: was missing
+			case GT_BATTLE_GROUND:
+				level.teamScores[TEAM_RED]  = 50;
+				level.teamScores[TEAM_BLUE] = 50;
+				LoadEntitiesData("battleground", qfalse);
+	
+				//Load the player class types
+	
+				//RoboPhred: this is done around 20 lines above here...
+				//vmCvar_t		mapname;
+				char			levelname[512];
+				char			goalreq[64];
+				char                    teams[2048];
+				char			gParseObjectives[2048];
+				char                    team1[512],team2[512];
+				int				len;
+				fileHandle_t	f;
+				len = 0;
+	
+				//SiegeSetCompleteData(0);
+				//RoboPhred: this is done around 20 lines above here...
+				//trap_Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
+	
+				//RoboPhred
+				Com_sprintf(levelname, sizeof(levelname), "maps/%s.bgd\0", level.rawmapname);
+				//Com_sprintf(levelname, sizeof(levelname), "maps/%s.bgd\0", mapname.string);
+	
+				len = trap_FS_FOpenFile(levelname, &f, FS_READ);
+	
+				if (f && len < MAX_SIEGE_INFO_SIZE)
 				{
-					if (g_siegeTeam1.string[0] && Q_stricmp(g_siegeTeam1.string, "none"))
-					{ //check for override
-						strcpy(team1, g_siegeTeam1.string);
-					}
-					else
-					{ //otherwise use level default
-						BG_SiegeGetPairedValue(teams, "team1", team1);
-					}
-
-					if (g_siegeTeam2.string[0] && Q_stricmp(g_siegeTeam2.string, "none"))
-					{ //check for override
-						strcpy(team2, g_siegeTeam2.string);
-					}
-					else
-					{ //otherwise use level default
-						BG_SiegeGetPairedValue(teams, "team2", team2);
+					trap_FS_Read(siege_info, len, f);
+	
+					trap_FS_FCloseFile(f);
+	
+					if (BG_SiegeGetValueGroup(siege_info, "Teams", teams))
+					{
+						if (g_siegeTeam1.string[0] && Q_stricmp(g_siegeTeam1.string, "none"))
+						{ //check for override
+							strcpy(team1, g_siegeTeam1.string);
+						}
+						else
+						{ //otherwise use level default
+							BG_SiegeGetPairedValue(teams, "team1", team1);
+						}
+	
+						if (g_siegeTeam2.string[0] && Q_stricmp(g_siegeTeam2.string, "none"))
+						{ //check for override
+							strcpy(team2, g_siegeTeam2.string);
+						}
+						else
+						{ //otherwise use level default
+							BG_SiegeGetPairedValue(teams, "team2", team2);
+						}
 					}
 				}
-			}
-
-			//Load the player class types
-			BG_SiegeLoadClasses(NULL);
-			if (!bgNumSiegeClasses)
-			{ //We didn't find any?!
-				G_Error("Couldn't find any player classes for Battle Ground");
-			}
-			//Now load the teams since we have class data.
-
-			BG_SiegeLoadTeams();
-			if (!bgNumSiegeTeams)
-			{ //React same as with classes.
-				G_Error("Couldn't find any player teams for Battle Ground");
-			}
-
-			//Get and set the team themes for each team. This will control which classes can be
-			//used on each team.
-			if (BG_SiegeGetValueGroup(siege_info, team1, gParseObjectives))
-			{
-				if (BG_SiegeGetPairedValue(gParseObjectives, "UseTeam", goalreq))
-				{
-					BG_SiegeSetTeamTheme(SIEGETEAM_TEAM1, goalreq);
+	
+				//Load the player class types
+				BG_SiegeLoadClasses(NULL);
+				if (!bgNumSiegeClasses)
+				{ //We didn't find any?!
+					G_Error("Couldn't find any player classes for Battle Ground");
 				}
-			} else {
-				BG_SiegeSetTeamTheme(SIEGETEAM_TEAM1, "Siege2_Mercs");
-			}
-
-			if (BG_SiegeGetValueGroup(siege_info, team2, gParseObjectives))
-			{
-				if (BG_SiegeGetPairedValue(gParseObjectives, "UseTeam", goalreq))
-				{
-					BG_SiegeSetTeamTheme(SIEGETEAM_TEAM2, goalreq);
+				//Now load the teams since we have class data.
+	
+				BG_SiegeLoadTeams();
+				if (!bgNumSiegeTeams)
+				{ //React same as with classes.
+					G_Error("Couldn't find any player teams for Battle Ground");
 				}
-			} else {
-				BG_SiegeSetTeamTheme(SIEGETEAM_TEAM2, "Siege2_Rebels");
-			}
-
-			//---------------------------------------------------------
-			//BG_PrecacheSabersForSiegeTeam(SIEGETEAM_TEAM1);
-			//BG_PrecacheSabersForSiegeTeam(SIEGETEAM_TEAM2);
-			//trap_Cvar_Set( "team1_icon", "gfx/2d/mp_imp_symbol_3");
-			//trap_Cvar_Set( "team2_icon", "gfx/2d/mp_rebel_symbol_3");
-
-			//G_SiegeRegisterWeaponsAndHoldables(SIEGETEAM_TEAM1);
-			//G_SiegeRegisterWeaponsAndHoldables(SIEGETEAM_TEAM2);
-
-			LinkBGSpawnPoints();
-			break;
-		default:
-			LoadEntitiesData("default", qfalse);
-			break;
+	
+				//Get and set the team themes for each team. This will control which classes can be
+				//used on each team.
+				if (BG_SiegeGetValueGroup(siege_info, team1, gParseObjectives))
+				{
+					if (BG_SiegeGetPairedValue(gParseObjectives, "UseTeam", goalreq))
+					{
+						BG_SiegeSetTeamTheme(SIEGETEAM_TEAM1, goalreq);
+					}
+				} else {
+					BG_SiegeSetTeamTheme(SIEGETEAM_TEAM1, "Siege2_Mercs");
+				}
+	
+				if (BG_SiegeGetValueGroup(siege_info, team2, gParseObjectives))
+				{
+					if (BG_SiegeGetPairedValue(gParseObjectives, "UseTeam", goalreq))
+					{
+						BG_SiegeSetTeamTheme(SIEGETEAM_TEAM2, goalreq);
+					}
+				} else {
+					BG_SiegeSetTeamTheme(SIEGETEAM_TEAM2, "Siege2_Rebels");
+				}
+	
+				//---------------------------------------------------------
+				//BG_PrecacheSabersForSiegeTeam(SIEGETEAM_TEAM1);
+				//BG_PrecacheSabersForSiegeTeam(SIEGETEAM_TEAM2);
+				//trap_Cvar_Set( "team1_icon", "gfx/2d/mp_imp_symbol_3");
+				//trap_Cvar_Set( "team2_icon", "gfx/2d/mp_rebel_symbol_3");
+	
+				//G_SiegeRegisterWeaponsAndHoldables(SIEGETEAM_TEAM1);
+				//G_SiegeRegisterWeaponsAndHoldables(SIEGETEAM_TEAM2);
+	
+				LinkBGSpawnPoints();
+				break;
+			default:
+				LoadEntitiesData("default", qfalse);
+				break;
+	}
 	}
 
 	//RoboPhred: done in LoadEntitiesData()

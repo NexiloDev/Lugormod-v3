@@ -1483,7 +1483,7 @@ void G_Sound( gentity_t *ent, int channel, int soundIndex ) {
 
 	assert(soundIndex);
 
-	if (!ent || !ent->client) //Ufo: sanity check
+	if (!ent) //Ufo: sanity check
 		return;
 	
 	te = G_SoundTempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND, channel );
@@ -1493,7 +1493,7 @@ void G_Sound( gentity_t *ent, int channel, int soundIndex ) {
 	te->s.eventParm = soundIndex;
 	te->s.saberEntityNum = channel;
 
-	if (channel > TRACK_CHANNEL_NONE)
+	if (ent->client && channel > TRACK_CHANNEL_NONE)
 	{ //let the client remember the index of the player entity so he can kill the most recent sound on request
 		//Ufo:
 		if (ent->client->ps.fd.killSoundEntIndex[channel-50] > MAX_CLIENTS &&

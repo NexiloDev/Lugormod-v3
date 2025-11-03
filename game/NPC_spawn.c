@@ -1717,6 +1717,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 	newent->Lmd.crosshairText = ent->Lmd.crosshairText;
 	newent->Lmd.crosshairTextRange = ent->Lmd.crosshairTextRange;
 	newent->genericValue8 = ent->genericValue8;
+	newent->genericValue9 = ent->genericValue9;
 
 	if (newent->GenericStrings[7] && newent->GenericStrings[7][0])
 	{
@@ -2161,6 +2162,7 @@ void NPC_Spawn_Tjo(gentity_t *ent){
 	newent->Lmd.crosshairText = ent->Lmd.crosshairText;
 	newent->Lmd.crosshairTextRange = ent->Lmd.crosshairTextRange;
 	newent->genericValue8 = ent->genericValue8;
+	newent->genericValue9 = ent->genericValue9;
 
 	if (newent->GenericStrings[7] && newent->GenericStrings[7][0])
 	{
@@ -2219,6 +2221,8 @@ void NPC_Spawn_Tjo(gentity_t *ent){
 
 	newent->think = NPC_Begin;
 	newent->nextthink = level.time + FRAMETIME;
+
+
 	if (newent->genericValue8)
 	{
 		newent->NPC->scriptFlags = newent->genericValue8;
@@ -2558,6 +2562,7 @@ void SP_NPC_spawner( gentity_t *self){
 	NPC_Precache(self);
 
 	G_SpawnString("usetarget", "", &self->GenericStrings[7]);
+	G_SpawnInt("forceResistLevel", "0", &self->genericValue9);
 	G_SpawnString("crosshairText", "", &self->Lmd.crosshairText);
 	G_SpawnInt("crosshairTextRange", "9999", &self->Lmd.crosshairTextRange);
 	G_SpawnInt("scriptflags", "", &self->genericValue8);
@@ -4671,6 +4676,12 @@ void SP_LMD_spawner (gentity_t *NPCspawner){
 		NPC_GalakMech_Precache();
 	else if ( !Q_stricmp( "wampa", NPCspawner->NPC_type ))
 		NPC_Wampa_Precache();
+
+	G_SpawnString("usetarget", "", &NPCspawner->GenericStrings[7]);
+	G_SpawnInt("forceResistLevel", "0", &NPCspawner->genericValue9);
+	G_SpawnString("crosshairText", "", &NPCspawner->Lmd.crosshairText);
+	G_SpawnInt("crosshairTextRange", "9999", &NPCspawner->Lmd.crosshairTextRange);
+	G_SpawnInt("scriptflags", "", &NPCspawner->genericValue8);
 
 	NPCspawner->damage = 60000;
 

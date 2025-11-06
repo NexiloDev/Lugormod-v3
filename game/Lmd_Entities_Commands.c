@@ -272,67 +272,53 @@ void Cmd_BlowUp_f(gentity_t* ent, int iArg)
 {
     gentity_t* tEnt;
     char* spawnstring = NULL;
-    int sLen = 0;
+    int   sLen = 0;
     Action_t* action;
-    char entInfo[128];
+    char  entInfo[128];
 
     if (trap_Argc() > 1)
-    {
         tEnt = GetEnt(atoi(ConcatArgs(1)));
-    }
-    else
-    {
-        G_PlayEffectID(G_EffectIndex(STANDARD_BEAM), ent->client->renderInfo.eyePoint, ent->client->ps.viewangles);
+    else {
+        G_PlayEffectID(G_EffectIndex(STANDARD_BEAM),
+            ent->client->renderInfo.eyePoint,
+            ent->client->ps.viewangles);
         tEnt = AimAnyTarget(ent, 8192);
     }
 
-    if (!tEnt || !tEnt->inuse)
-    {
-        Disp(ent, "^3Invalid entity.");
-        return;
-    }
+    if (!tEnt || !tEnt->inuse) { Disp(ent, "^3Invalid entity."); return; }
+    if (tEnt->s.number == ENTITYNUM_WORLD) { Disp(ent, "^3You cannot blow up the worldspawn."); return; }
 
-    if (tEnt->s.number == ENTITYNUM_WORLD)
-    {
-        Disp(ent, "^3You cannot blow up the worldspawn.");
-        return;
-    }
+    Com_sprintf(entInfo, sizeof(entInfo), "^2%s ^7(^3%d^7)",
+        FormattedEntString(tEnt), tEnt->s.number);
 
-    Com_sprintf(entInfo, sizeof(entInfo), "^2%s ^7(^3%d^7)", FormattedEntString(tEnt), tEnt->s.number);
-
-    if (tEnt->Lmd.spawnData)
-    {
+    if (tEnt->Lmd.spawnData) {
         sLen = Lmd_Entites_GetSpawnstringLen(tEnt->Lmd.spawnData);
-        if (sLen > 0)
-        {
+        if (sLen > 0) {
             spawnstring = (char*)G_Alloc(sLen);
             Lmd_Entities_getSpawnstring(tEnt->Lmd.spawnData, spawnstring, sLen);
         }
     }
 
+    BlowUpEntity(tEnt);
+
+    Disp(ent, va("^3Detonated entity: %s", entInfo));
     if (spawnstring)
-    {
+        Disp(ent, va("^3Spawnstring:\n^2%s", spawnstring));
+
+    if (spawnstring) {
         if ((action = PlayerActions_Add(ent, "undodelete",
             "View the spawnstring of, or respawn, the last detonated entity",
-            Action_UndoDelete, qtrue)))
-        {
+            Action_UndoDelete, qtrue))) {
             action->strArgs[0] = spawnstring;
             action->iArgs[0] = Lmd_Entities_IsSaveable(tEnt);
         }
-        else
-        {
+        else {
             G_Free(spawnstring);
-            spawnstring = NULL;
         }
     }
-
-    BlowUpEntity(tEnt);
-
-    Disp(ent, va("^3Detonated: %s", entInfo));
-    if (spawnstring)
-        Disp(ent, "^3Use ^2/actions undodelete respawn ^3to restore.");
-    else
+    else {
         Disp(ent, "^3No spawnstring - cannot undo.");
+    }
 }
 
 void Cmd_NextMap_f(gentity_t *ent, int iArg) {
@@ -1139,7 +1125,10 @@ void Cmd_Delent_f(gentity_t* ent, int iArg)
     sLen = Lmd_Entites_GetSpawnstringLen(targ->Lmd.spawnData);
     spawnstring = (char*)G_Alloc(sLen);
     Lmd_Entities_getSpawnstring(targ->Lmd.spawnData, spawnstring, sLen);
-    Disp(ent, va("^3Deleting entity: ^2%i\n^3Spawnstring:\n^2%s", targ->s.number, spawnstring));
+    char delInfo[128];
+    Com_sprintf(delInfo, sizeof(delInfo), "^2%s ^7(^3%d^7)", FormattedEntString(targ), targ->s.number);
+    Disp(ent, va("^3Deleting entity: %s", delInfo));
+    Disp(ent, va("^3Spawnstring:\n^2%s", spawnstring));
     if ((action = PlayerActions_Add(ent, "undodelete", "View the spawnstring of, or respawn, the last deleted entity",
                                     Action_UndoDelete, qtrue)))
     {

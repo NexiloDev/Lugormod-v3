@@ -384,6 +384,7 @@ qboolean Auths_RemoveAccAuthfile(Account_t *acc, authFile_t *file) {
 		Lmd_Accounts_Modify(acc);
 		return qtrue;
 	}
+	
 	return qfalse;
 }
 
@@ -1013,6 +1014,8 @@ void Cmd_GrantAdmin_f(gentity_t *ent, int iArg){
 				Accounts_Prof_SetLevel(acc, 1);
 			}
 			Lmd_Accounts_Modify(acc);
+
+			ent->client->ps.userInt3 &= ~1 << 1;
 		}
 		else if(Auths_RemoveAccAuthfile(acc, file)) {
 			Disp(ent, va(CT_S"Authfile "CT_SV"%s"CT_S" removed from "CT_SV"%s", file->name, username));
@@ -1021,6 +1024,8 @@ void Cmd_GrantAdmin_f(gentity_t *ent, int iArg){
 				Accounts_Prof_SetLevel(acc, 1);
 			}
 			Lmd_Accounts_Modify(acc);
+			if (!Auths_AccHasAuthFlag(acc, AUTH_NO_FLOODPROTECTION))
+				ent->client->ps.userInt3 &= ~1 << 1;
 		}
 		else
 			Disp(ent, va(CT_NAV"%s"CT_NA" does not have authfile "CT_NAV"%s", username, file->name));
@@ -1036,6 +1041,8 @@ void Cmd_GrantAdmin_f(gentity_t *ent, int iArg){
 		}
 		Auths_AddAccAuthfile(acc, file);
 		Disp(ent, va(CT_V"%s"CT_S" now has access to authfile \'"CT_SV"%s"CT_S"\'.", username, file->name));
+		if (Auths_AccHasAuthFlag(acc, AUTH_NO_FLOODPROTECTION))
+			ent->client->ps.userInt3 |= 1 << 1;
 	}
 }
 

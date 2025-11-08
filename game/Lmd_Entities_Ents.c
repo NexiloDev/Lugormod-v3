@@ -1416,6 +1416,7 @@ const entityInfoData_t lmd_door_keys[] = {
     {"OpenTarget", "Fired after reaching the \'open\' position."},
     {"Target2", "Fired when it starts moving from the open position to the closed position."},
     {"CloseTarget", "Fire after reaching the \'closed\' position."},
+    {"WantPosition", "Desired resting position for target_doorstate checks. Accepts 'open' or 'close'."},
     {
         "TargetName",
         "Trigger when an entity uses this.  If not specified, the door will open when someone gets close to it."
@@ -1459,6 +1460,11 @@ void lmd_door(gentity_t* ent)
     {
         ent->classname = "lmd_door";
         Lmd_Entities_setSpawnstringKey(ent->Lmd.spawnData, "classname", "lmd_door");
+    }
+    G_SpawnString("wantPosition", "", &ent->GenericStrings[15]);
+    if (ent->GenericStrings[15] && !ent->GenericStrings[15][0])
+    {
+        ent->GenericStrings[15] = NULL;
     }
     G_SpawnInt("vehopen", "0", &ent->genericValue14);
 

@@ -1507,6 +1507,139 @@ void SP_target_counter(gentity_t* self)
     self->use = target_counter_use;
 }
 
+#define TARGET_DOORSTATE_MAX_DOORS 6
+
+static qboolean target_doorstate_is_door(gentity_t* ent)
+{
+    return ent && ent->classname && (!Q_stricmp(ent->classname, "func_door") || !Q_stricmp(ent->classname, "lmd_door"));
+}
+
+static qboolean target_doorstate_matches(gentity_t* door)
+{
+    const char* want = door->GenericStrings[15];
+
+    if (!want || !want[0])
+    {
+        return qfalse;
+    }
+
+    if (!Q_stricmp(want, "open"))
+    {
+        return (door->moverState == MOVER_POS2);
+    }
+
+    if (!Q_stricmp(want, "close") || !Q_stricmp(want, "closed"))
+    {
+        return (door->moverState == MOVER_POS1);
+    }
+
+    return qfalse;
+}
+
+const entityInfoData_t target_doorstate_keys[] = {
+    {"target", "Fired when every referenced door matches its wantPosition."},
+    {"target2", "Fired when any referenced door is missing or does not match its wantPosition."},
+    {"door1", "Targetname of the first door to check."},
+    {"door2", "Targetname of the second door to check."},
+    {"door3", "Targetname of the third door to check."},
+    {"door4", "Targetname of the fourth door to check."},
+    {"door5", "Targetname of the fifth door to check."},
+    {"door6", "Targetname of the sixth door to check."},
+    {NULL, NULL},
+};
+
+const entityInfo_t target_doorstate_info = {
+    "Checks a list of doors to ensure each is in its configured wantPosition. Fires target when all match, otherwise fires target2.",
+    NULL,
+    target_doorstate_keys
+};
+
+static void target_doorstate_use(gentity_t* self, gentity_t* other, gentity_t* activator)
+{
+    qboolean allMatch = qtrue;
+    qboolean hasDoor = qfalse;
+    int i;
+
+    if (!activator)
+    {
+        activator = self;
+    }
+
+    for (i = 0; i < TARGET_DOORSTATE_MAX_DOORS && allMatch; ++i)
+    {
+        const char* doorTarget = self->GenericStrings[i];
+        gentity_t* door = NULL;
+        qboolean foundDoor = qfalse;
+
+        if (!doorTarget || !doorTarget[0])
+        {
+            continue;
+        }
+
+        hasDoor = qtrue;
+
+        while ((door = G_Find(door, FOFS(targetname), doorTarget)) != NULL)
+        {
+            if (!target_doorstate_is_door(door))
+            {
+                continue;
+            }
+
+            foundDoor = qtrue;
+
+            if (!target_doorstate_matches(door))
+            {
+                allMatch = qfalse;
+                break;
+            }
+        }
+
+        if (!allMatch)
+        {
+            break;
+        }
+
+        if (!foundDoor)
+        {
+            allMatch = qfalse;
+            break;
+        }
+    }
+
+    if (!hasDoor)
+    {
+        allMatch = qfalse;
+    }
+
+    if (allMatch)
+    {
+        G_UseTargets(self, activator);
+    }
+    else if (self->target2 && self->target2[0])
+    {
+        G_UseTargets2(self, activator, self->target2);
+    }
+}
+
+void SP_target_doorstate(gentity_t* self)
+{
+    int i;
+
+    for (i = 0; i < TARGET_DOORSTATE_MAX_DOORS; ++i)
+    {
+        char keyName[8];
+
+        Com_sprintf(keyName, sizeof(keyName), "door%d", i + 1);
+        G_SpawnString(keyName, "", &self->GenericStrings[i]);
+        if (self->GenericStrings[i] && !self->GenericStrings[i][0])
+        {
+            self->GenericStrings[i] = NULL;
+        }
+    }
+
+    self->use = target_doorstate_use;
+}
+
 /*QUAKED target_random (.5 .5 .5) (-4 -4 -4) (4 4 4) USEONCE
 Randomly fires off only one of it's targets each time used
 

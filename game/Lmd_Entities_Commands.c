@@ -14,6 +14,9 @@
 #define GRAB_Y 3
 #define GRAB_Z 4
 
+// Forward declaration for action handler
+qboolean Action_UndoDelete(gentity_t* ent, Action_t* action);
+
 gentity_t* AimAnyTarget(gentity_t* ent, int length);
 char* ConcatArgs(int start);
 #define STANDARD_BEAM "env/hevil_bolt"
@@ -37,7 +40,7 @@ void BlowUpEntity(gentity_t* ent)
     VectorSet(upVec, -90, 0, 0);
     G_PlayEffectID(G_EffectIndex("env/ion_cannon_explosion"), pos, upVec);
 
-    G_RadiusDamage(pos, NULL, 300, 512, ent, ent, MOD_TRIGGER_HURT);
+    G_RadiusDamage(pos, NULL, 150, 256, ent, ent, MOD_TRIGGER_HURT);
     if (ent->s.number >= MAX_CLIENTS)
     {
         G_FreeEntity(ent);
@@ -157,14 +160,14 @@ void Cmd_Bounds_f(gentity_t* ent, int iArg)
         if (!targ->Lmd.displayBounds)
         {
             // The entity isn't displaying its bounds (yet)
-            // Display the relevant information
+            // Show entity type + number, then current bounds and contents
+            Disp(ent, va("^3%s ^7(^2%d^7)", FormattedEntString(targ), targ->s.number));
             Disp(ent, va(
-                     CT_B"Mins: "CT_V"%s\n"
-                     CT_B"Maxs: "CT_V"%s",
-                     vtos2(targ->r.mins),
-                     vtos2(targ->r.maxs)));
-            Disp(ent, va("^3Contents: ^2%x ^3Clipmask: ^2%x", ent->r.contents, ent->clipmask));
-
+                CT_B"Mins: "CT_V"%s\n"
+                CT_B"Maxs: "CT_V"%s",
+                vtos2(targ->r.mins),
+                vtos2(targ->r.maxs)));
+            Disp(ent, va("^3Contents: ^2%x ^3Clipmask: ^2%x", targ->r.contents, targ->clipmask));
             // Toggle the bounding box ON
             targ->Lmd.displayBounds = qtrue;
             if (!targ->think)
@@ -173,29 +176,29 @@ void Cmd_Bounds_f(gentity_t* ent, int iArg)
                 targ->nextthink = level.time;
             }
             Disp(ent, "^3Bounding box ^2ON");
-            return;
-        }
-
-        // Otherwise, the entity is currently displaying its bounds => Restore entity "think"
-        // Toggle the bounding box OFF
-        targ->Lmd.displayBounds = qfalse;
-        if (targ->Lmd.oldThink)
-        {
-            targ->think = targ->Lmd.oldThink;
-            targ->nextthink = level.time + targ->Lmd.oldNextthink;
         }
         else
         {
-            targ->think = NULL;
-            targ->nextthink = 0;
+            // The entity is currently displaying its bounds => Restore entity "think"
+            // Toggle the bounding box OFF
+            targ->Lmd.displayBounds = qfalse;
+            if (targ->Lmd.oldThink)
+            {
+                targ->think = targ->Lmd.oldThink;
+                targ->nextthink = level.time + targ->Lmd.oldNextthink;
+            }
+            else
+            {
+                targ->think = NULL;
+                targ->nextthink = 0;
+            }
+            // Reset other fields
+            targ->Lmd.oldThink = 0;
+            targ->Lmd.oldNextthink = 0;
+            // Notify the user
+            Disp(ent, va("^3%s ^7(^2%d^7) - Bounding box ^1OFF", FormattedEntString(targ), targ->s.number));
         }
-
-        // Reset other fields
-        targ->Lmd.oldThink = 0;
-        targ->Lmd.oldNextthink = 0;
-
-        // Notify the user
-        Disp(ent, "^3Bounding box ^2OFF");
+        return;
     }
     else if (arg[0])
     {
@@ -267,24 +270,55 @@ void Cmd_Bounds_f(gentity_t* ent, int iArg)
 
 void Cmd_BlowUp_f(gentity_t* ent, int iArg)
 {
-      gentity_t* tEnt;
+    gentity_t* tEnt;
+    char* spawnstring = NULL;
+    int   sLen = 0;
+    Action_t* action;
+    char  entInfo[128];
 
     if (trap_Argc() > 1)
-    {
         tEnt = GetEnt(atoi(ConcatArgs(1)));
-    }
-    else
-    {
-        G_PlayEffectID(G_EffectIndex(STANDARD_BEAM), ent->client->renderInfo.eyePoint, ent->client->ps.viewangles);
+    else {
+        G_PlayEffectID(G_EffectIndex(STANDARD_BEAM),
+            ent->client->renderInfo.eyePoint,
+            ent->client->ps.viewangles);
         tEnt = AimAnyTarget(ent, 8192);
     }
-    if (tEnt && tEnt->inuse)
-    {
-        BlowUpEntity(tEnt);
-        Disp(ent, "^3Entity detonated.");
+
+    if (!tEnt || !tEnt->inuse) { Disp(ent, "^3Invalid entity."); return; }
+    if (tEnt->s.number == ENTITYNUM_WORLD) { Disp(ent, "^3You cannot blow up the worldspawn."); return; }
+
+    Com_sprintf(entInfo, sizeof(entInfo), "^2%s ^7(^3%d^7)",
+        FormattedEntString(tEnt), tEnt->s.number);
+
+    if (tEnt->Lmd.spawnData) {
+        sLen = Lmd_Entites_GetSpawnstringLen(tEnt->Lmd.spawnData);
+        if (sLen > 0) {
+            spawnstring = (char*)G_Alloc(sLen);
+            Lmd_Entities_getSpawnstring(tEnt->Lmd.spawnData, spawnstring, sLen);
+        }
     }
-    else
-        Disp(ent, "^3Invalid entity.");
+
+    BlowUpEntity(tEnt);
+
+    Disp(ent, va("^3Detonated entity: %s", entInfo));
+    if (spawnstring)
+        Disp(ent, va("^3Spawnstring:\n^2%s", spawnstring));
+
+    if (spawnstring) {
+        if ((action = PlayerActions_Add(ent, "undodelete",
+            "View the spawnstring of, or respawn, the last detonated entity",
+            Action_UndoDelete, qtrue))) {
+            action->strArgs[0] = spawnstring;
+            action->iArgs[0] = Lmd_Entities_IsSaveable(tEnt);
+        }
+        else {
+            G_Free(spawnstring);
+        }
+    }
+    else {
+        Disp(ent, "^3No spawnstring - cannot undo.");
+    }
 }
 
 void Cmd_NextMap_f(gentity_t *ent, int iArg) {
@@ -1091,7 +1125,10 @@ void Cmd_Delent_f(gentity_t* ent, int iArg)
     sLen = Lmd_Entites_GetSpawnstringLen(targ->Lmd.spawnData);
     spawnstring = (char*)G_Alloc(sLen);
     Lmd_Entities_getSpawnstring(targ->Lmd.spawnData, spawnstring, sLen);
-    Disp(ent, va("^3Deleting entity: ^2%i\n^3Spawnstring:\n^2%s", targ->s.number, spawnstring));
+    char delInfo[128];
+    Com_sprintf(delInfo, sizeof(delInfo), "^2%s ^7(^3%d^7)", FormattedEntString(targ), targ->s.number);
+    Disp(ent, va("^3Deleting entity: %s", delInfo));
+    Disp(ent, va("^3Spawnstring:\n^2%s", spawnstring));
     if ((action = PlayerActions_Add(ent, "undodelete", "View the spawnstring of, or respawn, the last deleted entity",
                                     Action_UndoDelete, qtrue)))
     {

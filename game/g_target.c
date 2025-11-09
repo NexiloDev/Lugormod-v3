@@ -374,6 +374,8 @@ static void TargetWeapons_ParseAndGive(gentity_t* activator, const char* input, 
     char buffer[1024];
     Q_strncpyz(buffer, input, sizeof(buffer));
 
+    int forcedWeapon = -1;
+
     char* token = strtok(buffer, ".");
     while (token)
     {
@@ -510,9 +512,22 @@ static void TargetWeapons_ParseAndGive(gentity_t* activator, const char* input, 
                         activator->client->ps.fd.saberAnimLevel;
                 }
             }
+
+            if (forceGive && !justAllow && ammoAmount != 0)
+            {
+                forcedWeapon = weaponID;
+            }
         }
 
         token = strtok(NULL, ".");
+    }
+
+    if (forcedWeapon != -1)
+    {
+        activator->client->ps.weapon = forcedWeapon;
+        activator->client->ps.weaponstate = WEAPON_READY;
+        activator->client->ps.weaponTime = 0;
+        activator->s.weapon = forcedWeapon;
     }
 }
 

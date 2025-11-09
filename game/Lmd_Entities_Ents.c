@@ -5683,6 +5683,155 @@ void lmd_cskill_compare(gentity_t* self)
     self->use = lmd_cskill_compare_use;
 }
 
+void lmd_equalcheck_use(gentity_t* self, gentity_t* other, gentity_t* activator)
+{
+    const char* keyName = self->GenericStrings[6];
+    if (!keyName || !keyName[0])
+    {
+        return;
+    }
+
+    char compareValue[MAX_STRING_CHARS];
+    qboolean haveCompareValue = qfalse;
+    qboolean mismatch = qfalse;
+    qboolean foundAny = qfalse;
+
+    if (self->GenericStrings[7] && self->GenericStrings[7][0])
+    {
+        Q_strncpyz(compareValue, self->GenericStrings[7], sizeof(compareValue));
+        haveCompareValue = qtrue;
+    }
+
+    for (int i = 0; i < 6 && !mismatch; i++)
+    {
+        const char* targetName = self->GenericStrings[i];
+        if (!targetName || !targetName[0])
+        {
+            continue;
+        }
+
+        gentity_t* ent = NULL;
+        qboolean foundForTarget = qfalse;
+
+        while ((ent = G_Find(ent, FOFS(targetname), targetName)) != NULL)
+        {
+            foundForTarget = qtrue;
+            foundAny = qtrue;
+
+            if (!ent->Lmd.spawnData)
+            {
+                mismatch = qtrue;
+                break;
+            }
+
+            char value[MAX_STRING_CHARS];
+            if (!Lmd_Entities_getSpawnstringKey(ent->Lmd.spawnData, (char*)keyName, value, sizeof(value)))
+            {
+                mismatch = qtrue;
+                break;
+            }
+
+            if (!haveCompareValue)
+            {
+                Q_strncpyz(compareValue, value, sizeof(compareValue));
+                haveCompareValue = qtrue;
+                continue;
+            }
+
+            if (Q_stricmp(compareValue, value) != 0)
+            {
+                mismatch = qtrue;
+                break;
+            }
+        }
+
+        if (mismatch)
+        {
+            break;
+        }
+
+        if (!foundForTarget)
+        {
+            mismatch = qtrue;
+        }
+    }
+
+    if (!haveCompareValue || !foundAny)
+    {
+        mismatch = qtrue;
+    }
+
+    if (!mismatch)
+    {
+        G_UseTargets2(self, activator, self->GenericStrings[8]);
+    }
+    else
+    {
+        G_UseTargets2(self, activator, self->GenericStrings[9]);
+    }
+}
+
+const entityInfoData_t lmd_equalcheck_keys[] = {
+    {"Target1", "First targetname to evaluate."},
+    {"Target2", "Second targetname to evaluate."},
+    {"Target3", "Third targetname to evaluate."},
+    {"Target4", "Fourth targetname to evaluate."},
+    {"Target5", "Fifth targetname to evaluate."},
+    {"Target6", "Sixth targetname to evaluate."},
+    {"Key", "Spawn key to compare across all referenced entities."},
+    {"Value", "Optional expected value; if omitted the first entity's value is used."},
+    {"EqualTarget", "Target to fire when all values match."},
+    {"UnequalTarget", "Target to fire when a mismatch is detected."},
+    {NULL, NULL},
+};
+
+entityInfo_t lmd_equalcheck_info = {
+    "Compares a spawn key across up to six targetnames, firing EqualTarget when all values match and UnequalTarget otherwise.",
+    NULL,
+    lmd_equalcheck_keys
+};
+
+void lmd_equalcheck(gentity_t* self)
+{
+    for (int i = 0; i < 6; i++)
+    {
+        char keyName[16];
+        Com_sprintf(keyName, sizeof(keyName), "target%d", i + 1);
+        G_SpawnString(keyName, "", &self->GenericStrings[i]);
+        if (!self->GenericStrings[i] || !self->GenericStrings[i][0])
+        {
+            self->GenericStrings[i] = NULL;
+        }
+    }
+
+    G_SpawnString("key", "", &self->GenericStrings[6]);
+    if (!self->GenericStrings[6] || !self->GenericStrings[6][0])
+    {
+        G_FreeEntity(self);
+        return;
+    }
+
+    G_SpawnString("value", "", &self->GenericStrings[7]);
+    if (!self->GenericStrings[7] || !self->GenericStrings[7][0])
+    {
+        self->GenericStrings[7] = NULL;
+    }
+
+    G_SpawnString("equaltarget", "", &self->GenericStrings[8]);
+    if (!self->GenericStrings[8] || !self->GenericStrings[8][0])
+    {
+        self->GenericStrings[8] = NULL;
+    }
+
+    G_SpawnString("unequaltarget", "", &self->GenericStrings[9]);
+    if (!self->GenericStrings[9] || !self->GenericStrings[9][0])
+    {
+        self->GenericStrings[9] = NULL;
+    }
+
+    self->use = lmd_equalcheck_use;
+}
+
 void lmd_countcheck_use(gentity_t* self, gentity_t* other, gentity_t* activator)
 {
     int count;

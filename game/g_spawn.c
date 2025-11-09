@@ -753,6 +753,9 @@ extern entityInfo_t target_modify_info;
 void lmd_cskill_compare(gentity_t* self);
 extern entityInfo_t lmd_cskill_compare_info;
 
+void lmd_equalcheck(gentity_t* self);
+extern entityInfo_t lmd_equalcheck_info;
+
 void lmd_countcheck(gentity_t* self);
 extern entityInfo_t lmd_countcheck_info;
 
@@ -1146,6 +1149,9 @@ spawn_t	spawnInitValues[] = {
 	{"target_heal", sp_target_heal, Logical_True, &target_heal_info},
 	{"lmd_actor_modify", lmd_actor_modify, Logical_True, &lmd_actor_modify_info},
 	{"target_animate", sp_target_animate, Logical_True, &target_animate_info},
+
+	// lumaya:
+		{"lmd_equalcheck", lmd_equalcheck, Logical_True, &lmd_equalcheck_info},
 
 	{NULL, 0, Logical_False}
 };

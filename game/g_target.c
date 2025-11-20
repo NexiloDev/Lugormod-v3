@@ -618,7 +618,7 @@ void Send_Target_Print(gentity_t* ent, int targ)
     }
 
     char* processedMsg = lmd_processMessagePlaceholders(activator, buf, ent->target2);
-    strncpy_s(buf, sizeof(buf), processedMsg, MAX_STRING_CHARS);
+    strncpy(buf, processedMsg, MAX_STRING_CHARS);
 
     if (buf[0] == '@' && buf[1] != '@')
     {

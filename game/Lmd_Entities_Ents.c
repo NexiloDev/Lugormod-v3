@@ -1798,7 +1798,7 @@ void lmd_menu_show(gentity_t* player, gentity_t* menu)
         Q_strcat(msg, sizeof(msg), va("  %sCancel\n", menu->Lmd.color2));
     }
     
-    strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(player, msg, NULL));
+    strcpy(msg, lmd_processMessagePlaceholders(player, msg, NULL));
 
 
     trap_SendServerCommand(player->s.number, va("cp \"%s\"", msg));
@@ -2078,7 +2078,7 @@ void lmd_terminal_use(gentity_t* self, gentity_t* other, gentity_t* activator)
     int i;
     if (self->message)
     {
-        strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL));
+        strcpy(msg, lmd_processMessagePlaceholders(activator, self->message, NULL));
         Q_strcat(msg, sizeof(msg), va("\n^5==============================\n", msg));
     }
 
@@ -2399,7 +2399,7 @@ void lmd_rentterminal_examine(gentity_t* self, gentity_t* activator)
     if (self->message)
     {
         char msgt[MAX_STRING_CHARS] = "";
-        strcpy_s(msgt, sizeof(msgt), lmd_processMessagePlaceholders(activator, self->message, NULL));
+        strcpy(msgt, lmd_processMessagePlaceholders(activator, self->message, NULL));
         Disp(activator, msgt); //send this as a seperate disp, in case the msg makes us hit MAX_STRING_CHARS
     }
 
@@ -2496,7 +2496,7 @@ void lmd_rentterminal_use(gentity_t* self, gentity_t* other, gentity_t* activato
     int sec = 0, min = 0;
     if (self->message)
     {
-        strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(activator, self->message, NULL));
+        strcpy(msg, lmd_processMessagePlaceholders(activator, self->message, NULL));
         Q_strcat(msg, sizeof(msg), va("\n", msg));
     }
 
@@ -2542,7 +2542,7 @@ void lmd_rentterminal_think(gentity_t* ent)
             char msg[MAX_STRING_CHARS] = "";
             if (ent->message)
             {
-                strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(ent->activator, ent->message, NULL));
+                strcpy(msg, lmd_processMessagePlaceholders(ent->activator, ent->message, NULL));
                 Q_strncpyz(msg, va("%s\n", msg), sizeof(msg));
             }
             Q_strcat(msg, sizeof(msg), va("^3You have ^2%i^3 seconds left.", timeLeft));
@@ -2556,7 +2556,7 @@ void lmd_rentterminal_think(gentity_t* ent)
                 char msg[MAX_STRING_CHARS] = "";
                 if (ent->message)
                 {
-                    strcpy_s(msg, sizeof(msg), lmd_processMessagePlaceholders(ent->activator, ent->message, NULL));
+                    strcpy(msg, lmd_processMessagePlaceholders(ent->activator, ent->message, NULL));
                     Q_strncpyz(msg, va("%s\n", msg), sizeof(msg));
                 }
                 Q_strcat(msg, sizeof(msg), "^1Your rent has expired.");

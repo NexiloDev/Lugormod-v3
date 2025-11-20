@@ -53,7 +53,7 @@ jobs:
             arch_flags: -m32
           - os: ubuntu-latest
             arch: x64
-            arch_flags: ""   # ← fixed: explicit empty string
+            arch_flags: ""
 
     steps:
       - name: Checkout repository

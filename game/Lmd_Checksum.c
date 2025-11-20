@@ -72,7 +72,7 @@ unsigned int Checksum (char *str){
 		while (str[i] && i < MAX_STRING_CHARS){
 			//RoboPhred: serious checksum failure fix
 			//c += (str[i++] + i + k) % 23;
-			c += (str[i++] + i + l) % 23; 
+			c += ((signed char)str[i++] + i + l) % 23;
 			c %= 24;
 			sum ^= (1 << c);
 		}

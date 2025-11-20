@@ -3429,7 +3429,10 @@ void G_VehUpdateShields( gentity_t *targ )
 #endif
 
 // Set the parent entity of this Vehicle NPC.
-void SetParent( Vehicle_t *pVeh, bgEntity_t *pParentEntity ) { pVeh->m_pParentEntity = pParentEntity; }
+void __attribute__((visibility("default"))) SetParent( Vehicle_t *pVeh, bgEntity_t *pParentEntity )
+{
+	pVeh->m_pParentEntity = pParentEntity;
+}
 
 // Add a pilot to the vehicle.
 void SetPilot( Vehicle_t *pVeh, bgEntity_t *pPilot ) { pVeh->m_pPilot = pPilot; }

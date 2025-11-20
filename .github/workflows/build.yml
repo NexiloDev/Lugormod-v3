@@ -11,20 +11,13 @@ on:
         required: true
         default: 'warning'
         type: choice
-        options:
-          - info
-          - warning
-          - debug
+        options: [info, warning, debug]
       environment:
         description: 'Environment to run tests against'
         type: environment
         required: false
   release:
     types: [created]
-    paths-ignore:
-      - "**.md"
-      - ".gitignore"
-      - "docs/*"
   pull_request:
     branches: [ "develop" ]
     paths-ignore:
@@ -35,112 +28,86 @@ on:
 env:
   BUILD_DIR: build
   RESOURCES_DIR: ${{ github.workspace }}/resources
-  ARTIFACT_DIR: ${{ github.workspace }}/build
-  ARTIFACT_NAME: Lugormod-${{ github.event.release.tag_name }}
+  ARTIFACT_DIR: ${{ github.workspace }}/artifacts
+  ARTIFACT_NAME: Lugormod-${{ github.event.release.tag_name || github.sha }}
 
 jobs:
-  windows-build:
-    name: Windows ${{ matrix.arch }} ${{ matrix.build_type }}
-    runs-on: windows-2022
-    strategy:
-      matrix:
-        arch: [x86]
-        build_type: [Debug, Release]
-        include:
-          - arch: x86
-            platform: Win32
-    steps:
-      - name: Checkout repository and branch
-        uses: 'actions/checkout@v4'
-
-      - name: Add `msbuild` to PATH
-        uses: 'microsoft/setup-msbuild@v1.1'
-
-      - name: Setup
-        run: cmake -B ${{ env.BUILD_DIR }} -A ${{ matrix.platform }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-
-      - name: Build codebase
-        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j $NUMBER_OF_PROCESSORS 2>&1 | Out-File -FilePath ${{ github.workspace }}/build/compile.log
-
-      - name: Install binaries
-        if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        run: cmake --install ${{ github.workspace }}\${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} --prefix ${{ env.RESOURCES_DIR }}\GameData
-
-      - name: Create zip archive
-        if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        run: Compress-Archive -Path ${{ env.RESOURCES_DIR }}\* -DestinationPath "${{ env.ARTIFACT_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip"
-
-      - name: Upload artifact
-        uses: 'actions/upload-artifact@v4'
-        if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        with:
-          name: Lugormod ${{ github.event.release.name }} - ${{ runner.os }} ${{ matrix.arch }}
-          path: ${{ env.ARTIFACT_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip
-
-      - name: Publish release files
-        if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-        uses: 'actions/github-script@v7'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const upload = require('./.github/scripts/upload.js')
-            await upload({github, context, core})
-
-
-  linux-build:
-    name: Linux ${{ matrix.arch }} ${{ matrix.build_type }}
-    runs-on: ubuntu-latest
+  build:
+    name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86]
+        os: [windows-2022, ubuntu-latest]
+        arch: [x86, x64]
         build_type: [Debug, Release]
-        c_compiler: [gcc]
-        cpp_compiler: [g++]
+        include:
+          - os: windows-2022
+            arch: x86
+            platform: Win32
+          - os: windows-2022
+            arch: x64
+            platform: x64
+          - os: ubuntu-latest
+            arch: x86
+            arch_flags: -m32
+          - os: ubuntu-latest
+            arch: x64
+            arch_flags: ""
+
     steps:
-    - name: Checkout repository and branch
-      uses: 'actions/checkout@v4'
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Fetch build dependencies
-      run: |
-        if [ ${{ matrix.arch }} == "x86" ]; then
+      - name: Install Linux 32-bit toolchain
+        if: runner.os == 'Linux' && matrix.arch == 'x86'
+        run: |
           sudo dpkg --add-architecture i386
-          sudo apt -qq update
+          sudo apt update -qq
           sudo apt install -y gcc-multilib g++-multilib libc6-dev-i386
-        else
-          sudo apt-get -qq update
-        fi
 
-    - name: Setup
-      run: |
-        cmake -B ${{ env.BUILD_DIR }} \
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      - name: Setup CMake
+        run: cmake -B ${{ env.BUILD_DIR }} ${{ matrix.platform && format('-A {0}', matrix.platform) }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ matrix.arch_flags && format('-DCMAKE_C_FLAGS="{0}" -DCMAKE_CXX_FLAGS="{0}"', matrix.arch_flags) }}
+        shell: bash
 
-    - name: Build codebase
-      run: cmake --build ${{ env.BUILD_DIR }} -j $(nproc) 2>&1 | tee ${{ github.workspace }}/build/compile.log
+      - name: Build
+        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} -j
 
-    - name: Install binaries
-      if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      run: cmake --install ${{ env.BUILD_DIR }} --config ${{ matrix.build_type }} --prefix ${{ env.RESOURCES_DIR }}/GameData
+      - name: Upload PR artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PR${{ github.event.pull_request.number }}-${{ runner.os }}-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: |
+            ${{ env.BUILD_DIR }}/${{ matrix.build_type }}/jampgame*.dll
+            ${{ env.BUILD_DIR }}/jampgame*.so
+          retention-days: 90
 
-    - name: Create tar archive
-      if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      run: tar -czvf ${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz -C ${{ env.RESOURCES_DIR }} .
+      - name: Install binaries (Release only)
+        if: matrix.build_type == 'Release' && github.event_name == 'release'
+        run: cmake --install ${{ env.BUILD_DIR }} --config Release --prefix ${{ env.RESOURCES_DIR }}/GameData
 
-    - name: Upload artifact
-      uses: 'actions/upload-artifact@v4'
-      if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      with:
-        name: Lugormod ${{ github.event.release.name }} - ${{ runner.os }} ${{ matrix.arch }}
-        path:  ${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz
+      - name: Create archive (Release only)
+        if: matrix.build_type == 'Release' && github.event_name == 'release'
+        run: |
+          mkdir -p ${{ env.ARTIFACT_DIR }}
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            Compress-Archive -Path "${{ env.RESOURCES_DIR }}\*" -DestinationPath "${{ env.ARTIFACT_DIR }}\${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.zip"
+          else
+            tar -czvf ${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz -C ${{ env.RESOURCES_DIR }} .
+          fi
 
-    - name: Publish release files
-      uses: 'actions/github-script@v7'
-      if: ${{ matrix.build_type == 'Release' && github.event_name == 'release' }}
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const upload = require('./.github/scripts/upload.js')
-          await upload({github, context, core})
+      - name: Upload release artifact
+        if: matrix.build_type == 'Release' && github.event_name == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lugormod ${{ github.event.release.name }} - ${{ runner.os }} ${{ matrix.arch }}
+          path: ${{ env.ARTIFACT_DIR }}/*
+
+      - name: Publish to release
+        if: matrix.build_type == 'Release' && github.event_name == 'release'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const upload = require('./.github/scripts/upload.js')
+            await upload({github, context, core})

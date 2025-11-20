@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10...3.24)
 set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE STRING INTERNAL FORCE)
 
 # Option Defaults
-option(FORCE_32 "Enable 32 bit compile" ON)
+option(FORCE_32 "Enable 32 bit compile" OFF)
 
 if(UNIX)
 	# Prevent breaking the proxy patcher with over optimization, it doesn't like something in level 3...

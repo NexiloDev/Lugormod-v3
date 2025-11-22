@@ -519,7 +519,7 @@ void Accounts_SetName(Account_t *acc, char *name) {
 	Lmd_Accounts_Modify(acc);
 }
 
-int Accounts_GetPassword(Account_t *acc) {
+unsigned int Accounts_GetPassword(Account_t *acc) {
 	if(!acc)
 		return 0;
 	return acc->pwChksum;

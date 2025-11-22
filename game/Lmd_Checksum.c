@@ -33,6 +33,10 @@ int HexToInt( const char *string ){
 	value = 0;
 	do{
 		c = *string++;
+		// Skip any whitespace (handles trailing \r, \n, space, tab from cross-platform file copying)
+		if ( c <= ' ' && c != 0 ) {
+			continue;
+		}
 		if ( c >= '0' && c <='9' ) {
 			c -= '0';
 		} else if (c >= 'a' && c <= 'f') {
@@ -56,7 +60,7 @@ unsigned int Checksum (char *str){
 	int l;
 	int c = 0;
 	int i;
-	unsigned long int sum = 0xaaaaaa;
+	unsigned int sum = 0xaaaaaa;
 
 	if (!str || str[0] == 0){
 		return 0;
@@ -72,7 +76,7 @@ unsigned int Checksum (char *str){
 		while (str[i] && i < MAX_STRING_CHARS){
 			//RoboPhred: serious checksum failure fix
 			//c += (str[i++] + i + k) % 23;
-			c += ((signed char)str[i++] + i + l) % 23;
+			c += (str[i++] + i + l) % 23;
 			c %= 24;
 			sum ^= (1 << c);
 		}

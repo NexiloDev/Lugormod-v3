@@ -19,6 +19,11 @@ The minimum amount required to do a /bounty.
 ```
 If lmd_maxsameip is set, then this cvar controls whether to ban ips that go over the given limit.
 ```
+## lmd_noPlayerBounce
+### Default value: 0
+```
+<0-1> If 1, you won't slide off of a Players head. Default 0.
+```
 ## lmd_datapath
 ### Default value: default
 ### Restart required

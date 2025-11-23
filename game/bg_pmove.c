@@ -12047,7 +12047,7 @@ void PmoveSingle (pmove_t *pmove) {
 			if ( pm->ps->legsTimer > 0 || pm->ps->torsoTimer > 0 )
 			{
 				stiffenedUp = qtrue;
-				PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
+				//PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
 				pm->cmd.rightmove = 0;
 				pm->cmd.upmove = 0;
 				pm->cmd.forwardmove = 0;
@@ -12059,7 +12059,7 @@ void PmoveSingle (pmove_t *pmove) {
 		&& pm->ps->legsTimer > 0 )
 	{
 		stiffenedUp = qtrue;
-		PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
+		//PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
 		pm->cmd.rightmove = 0;
 		pm->cmd.upmove = 0;
 		pm->cmd.forwardmove = 0;
@@ -12101,7 +12101,7 @@ void PmoveSingle (pmove_t *pmove) {
 		|| endAnim(pm->ps->legsAnim))
 	{
 		stiffenedUp = qtrue;
-		PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
+		//PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
 		//pm->ps->saberLockTime = level.time + 100;
 		pm->cmd.rightmove = 0;
 		pm->cmd.upmove = 0;
@@ -12135,7 +12135,7 @@ void PmoveSingle (pmove_t *pmove) {
 				if (emote->setanim & SETANIM_LEGS
 					&& pm->ps->legsTimer > 0) {
 						stiffenedUp = qtrue;
-						PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
+						//PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
 						pm->cmd.rightmove = 0;
 						pm->cmd.upmove = 0;
 						pm->cmd.forwardmove = 0;

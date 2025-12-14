@@ -729,6 +729,7 @@ void Reached_BinaryMover( gentity_t *ent )
 			ent->activator = ent;
 		}
 		G_UseTargets2( ent, ent->activator, ent->opentarget );
+		ent->Lmd.isOn = qtrue;
 	} 
 	else if ( ent->moverState == MOVER_2TO1 ) 
 	{//closed
@@ -750,6 +751,7 @@ void Reached_BinaryMover( gentity_t *ent )
 			trap_AdjustAreaPortalState( ent, qfalse );
 		}
 		G_UseTargets2( ent, ent->activator, ent->closetarget );
+		ent->Lmd.isOn = qfalse;
 	} 
 	else 
 	{

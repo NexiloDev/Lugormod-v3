@@ -249,6 +249,7 @@ void PlayerUsableGetKeys(gentity_t* ent)
     G_SpawnInt("customskillcompare", "0", &ent->Lmd.UseReq.customSkill.compare);
     G_SpawnString("property", "", &ent->Lmd.UseReq.prop);
     G_SpawnInt("requirecredits", "", &ent->Lmd.UseReq.credits);
+    G_SpawnInt("isOn", "-1", &ent->Lmd.UseReq.isOn);
 }
 
 qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
@@ -278,8 +279,6 @@ qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
     if ((self->Lmd.UseReq.profession < 0 && activatorProf != PROF_NONE) || (self->Lmd.UseReq.profession > 0 &&
         (activatorProf <= PROF_BOT || !(self->Lmd.UseReq.profession & (1 << (activatorProf - 3))))))
         return qfalse;
-
-    
    
     if (self->Lmd.UseReq.sideAcc > 0)
     {
@@ -290,6 +289,9 @@ qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
         if (self->Lmd.UseReq.sideAcc != sideAcc)
             return qfalse;
     }
+
+    if (self->Lmd.UseReq.isOn != -1 && activator->Lmd.isOn != self->Lmd.UseReq.isOn)
+        return qfalse;
 
     if (self->Lmd.UseReq.level > 0 && (activatorLevel < self->Lmd.UseReq.level ||
         (self->Lmd.UseReq.levelMax >= self->Lmd.UseReq.level && activatorLevel > self->Lmd.UseReq.levelMax)))
@@ -3286,6 +3288,34 @@ void lmd_playercheck(gentity_t* ent)
 {
     PlayerUsableGetKeys(ent);
     ent->use = lmd_playercheck_use;
+}
+
+void lmd_entitycheck_use(gentity_t* self, gentity_t* other, gentity_t* activator)
+{
+    if (PlayerUseableCheck(self, activator))
+        G_UseTargets(self, activator);
+    else
+        G_UseTargets2(self, activator, self->target2);
+}
+
+const entityInfoData_t lmd_entitycheck_keys[] = {
+    {"#UKEYS", NULL},
+    {"Target", "Target to fire if the player meets the usability keys."},
+    {"Target2", "Target to fire if the player does not meet the usability keys."},
+    NULL
+};
+
+entityInfo_t lmd_entitycheck_info = {
+    "Fires its target if the entity meets the usability keys, target2 if not.",
+    NULL,
+    lmd_entitycheck_keys
+};
+
+
+void lmd_entitycheck(gentity_t* ent)
+{
+    PlayerUsableGetKeys(ent);
+    ent->use = lmd_entitycheck_use;
 }
 
 void lmd_chance_use(gentity_t* self, gentity_t* other, gentity_t* activator)

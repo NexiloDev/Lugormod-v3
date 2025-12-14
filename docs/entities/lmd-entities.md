@@ -313,6 +313,7 @@ customskillcompare
 customskillvalue
 playerflags
 targetname
+isOn (lmd_door, func_door, fx_runner checks if they're currently open/running)
 
 target    - fire if they meet requirements
 target2   - fire if they do not meet requirements
@@ -321,7 +322,7 @@ target2   - fire if they do not meet requirements
 ### Example code:
 
 ```
-/place lmd_playercheck * targetname,let_me_in,level,5,target,teleport_me_in,target2,deny_msg,
+/place lmd_entitycheck * targetname,let_me_in,level,5,target,teleport_me_in,target2,deny_msg,
 ```
 
 ## LMD_spawner **(L)(If no targetname)

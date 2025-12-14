@@ -349,36 +349,47 @@ void Cmd_TeleMark_f(gentity_t *ent, int iArg)
 	char arg[MAX_STRING_CHARS];
 	vec3_t loc;
 	vec_t vec;
+	const int argc = trap_Argc();
 	
-	if (trap_Argc() == 4)
+	if (argc == 2 || argc == 3)
 	{
-		for(int i = 0;i<3;i++){
+		Disp(ent, "^3Usage:\n  ^3Telemark ^2<x pos> <y pos> <z pos>\n  ^3TeleMark");
+		return;
+	}
+    
+	if (argc == 4)
+	{
+		for(int i = 0; i < 3; i++){
 			trap_Argv(i + 1, arg, sizeof(arg));
 			vec = atoi(arg);
 			if(vec == 0 && !(arg[0] == '0' && arg[1] == 0)){
-				Disp(ent, "^3Invalid argument, expected a number.");
+				Disp(ent, "^3Invalid argument, expected a number");
 				return;
 			}
 			loc[i] = vec;
 		}
-		
+       
 		ent->client->pers.Lmd.teleMarkSet = qtrue;
 		VectorCopy(loc, ent->client->pers.Lmd.teleMarkPosition);
 		VectorCopy(ent->client->ps.viewangles, ent->client->pers.Lmd.teleMarkAngles);
-		Disp(ent, "^2Telemark set to Origin: (^3%d %d %d^2) Angles: (^3%d %d %d^2)", loc[0], loc[1], loc[2], ent->client->ps.viewangles[PITCH], ent->client->ps.viewangles[YAW], ent->client->ps.viewangles[ROLL]);
+		Disp(ent, "^2Telemark set to Origin: (^3%d %d %d^2) Angles: (^3%d %d %d^2)", 
+			(int)loc[0], (int)loc[1], (int)loc[2], 
+			(int)ent->client->ps.viewangles[PITCH], 
+			(int)ent->client->ps.viewangles[YAW], 
+			(int)ent->client->ps.viewangles[ROLL]);
 		return;
 	}
-	
+    
 	ent->client->pers.Lmd.teleMarkSet = qtrue;
 	VectorCopy(ent->client->ps.origin, ent->client->pers.Lmd.teleMarkPosition);
 	VectorCopy(ent->client->ps.viewangles, ent->client->pers.Lmd.teleMarkAngles);
 	Disp(ent, "^2Telemark set to Origin: (^3%d %d %d^2) Angles: (^3%d %d %d^2)",
-		ent->client->pers.Lmd.teleMarkPosition[0],
-		ent->client->pers.Lmd.teleMarkPosition[1],
-		ent->client->pers.Lmd.teleMarkPosition[2],
-		ent->client->pers.Lmd.teleMarkAngles[0],
-		ent->client->pers.Lmd.teleMarkAngles[1],
-		ent->client->pers.Lmd.teleMarkAngles[2]);
+	   (int)ent->client->pers.Lmd.teleMarkPosition[0],
+	   (int)ent->client->pers.Lmd.teleMarkPosition[1],
+	   (int)ent->client->pers.Lmd.teleMarkPosition[2],
+	   (int)ent->client->pers.Lmd.teleMarkAngles[0],
+	   (int)ent->client->pers.Lmd.teleMarkAngles[1],
+	   (int)ent->client->pers.Lmd.teleMarkAngles[2]);
 }
 
 void Cmd_GotoPoint_f(gentity_t *ent, int iArg){

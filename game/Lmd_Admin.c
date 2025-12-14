@@ -341,7 +341,7 @@ void Cmd_Teleport_f (gentity_t *ent, int iArg){
 void Cmd_RefuseTele_f(gentity_t *ent, int iArg)
 {
 	ent->client->pers.Lmd.refuseTele = !ent->client->pers.Lmd.refuseTele;
-	Disp(ent, va("^3You have %s teleportation requests.", (ent->client->pers.Lmd.refuseTele)?"^5accepted":"^5denied"));
+	Disp(ent, va("^3Teleportation requests are now %s.", ent->client->pers.Lmd.refuseTele ? "^5blocked" : "^5allowed"));
 }
 
 void Cmd_TeleMark_f(gentity_t *ent, int iArg)
@@ -365,14 +365,14 @@ void Cmd_TeleMark_f(gentity_t *ent, int iArg)
 		ent->client->pers.Lmd.teleMarkSet = qtrue;
 		VectorCopy(loc, ent->client->pers.Lmd.teleMarkPosition);
 		VectorCopy(ent->client->ps.viewangles, ent->client->pers.Lmd.teleMarkAngles);
-		Disp(ent, "^2Telemark set to Origin: (^3%i %i %i^2) Angles: (^3^3%i %i %i^2)", loc[0], loc[1], loc[2], ent->client->ps.viewangles[PITCH], ent->client->ps.viewangles[YAW], ent->client->ps.viewangles[ROLL]);
+		Disp(ent, "^2Telemark set to Origin: (^3%d %d %d^2) Angles: (^3%d %d %d^2)", loc[0], loc[1], loc[2], ent->client->ps.viewangles[PITCH], ent->client->ps.viewangles[YAW], ent->client->ps.viewangles[ROLL]);
 		return;
 	}
 	
 	ent->client->pers.Lmd.teleMarkSet = qtrue;
 	VectorCopy(ent->client->ps.origin, ent->client->pers.Lmd.teleMarkPosition);
 	VectorCopy(ent->client->ps.viewangles, ent->client->pers.Lmd.teleMarkAngles);
-	Disp(ent, "^2Telemark set to Origin: (^3%i %i %i^2) Angles: (^3^3%i %i %i^2)",
+	Disp(ent, "^2Telemark set to Origin: (^3%d %d %d^2) Angles: (^3%d %d %d^2)",
 		ent->client->pers.Lmd.teleMarkPosition[0],
 		ent->client->pers.Lmd.teleMarkPosition[1],
 		ent->client->pers.Lmd.teleMarkPosition[2],
@@ -412,17 +412,18 @@ void Cmd_GotoPoint_f(gentity_t *ent, int iArg){
 		if(argc < 4){
 			if (argc == 2)
 			{
-				trap_Argv(2, arg, sizeof(arg));
+				trap_Argv(1, arg, sizeof(arg));
+   
 				if (!Q_stricmp(arg, "telemark"))
 				{
-					TeleportPlayer(ent, ent->client->pers.Lmd.teleMarkPosition, ent->client->pers.Lmd.teleMarkAngles, qfalse);
-					return;		
-				}
+					if (!ent->client->pers.Lmd.teleMarkSet)
+					{
+						Disp(ent, "Do /telemark first.");
+						return;
+					}
 					
-				if (!ent->client->pers.Lmd.teleMarkSet)
-				{
-					Disp(ent, "Do /telemark first.");
-					return;					
+					TeleportPlayer(ent, ent->client->pers.Lmd.teleMarkPosition, ent->client->pers.Lmd.teleMarkAngles, qfalse);
+					return;       
 				}
 				return;
 			}
@@ -440,7 +441,7 @@ void Cmd_GotoPoint_f(gentity_t *ent, int iArg){
 			loc[i] = vec;
 		}
 		TeleportPlayer(ent, loc, ent->client->ps.viewangles, qfalse);
-		Disp(ent, "^2Teleported to cordinates.");
+		Disp(ent, "^2Teleported to coordinates.");
 	}
 }
 

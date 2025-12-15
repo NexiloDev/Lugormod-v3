@@ -298,6 +298,28 @@ target2   - fire if they do not meet requirements
 /place lmd_playercheck * targetname,let_me_in,level,5,target,teleport_me_in,target2,deny_msg,
 ```
 
+## lmd_entitycheck ** (L)
+Entity will fire target if the activator meets the usability keys
+
+### Keys:
+
+```
+
+targetname
+isOn (lmd_door, func_door, fx_runner checks if they're currently open/running <0-1>)
+
+
+target    - fire if they meet requirements
+target2   - fire if they do not meet requirements
+checkTarget   - fire if they do not meet requirements
+```
+
+### Example code:
+
+```
+/place lmd_entitycheck * targetname,let_me_in,isOn,2,target,teleport_me_in,target2,deny_msg,
+```
+
 ## LMD_spawner **(L)(If no targetname)
 This entity was implemented by Lugor, it should be able to use any of the keys provided for npc_spawner and one more, it also allows the NPC to respawn after it has been destroyed.
 

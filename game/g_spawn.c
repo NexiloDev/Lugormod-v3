@@ -695,9 +695,6 @@ extern entityInfo_t lmd_mover_info;
 void lmd_playercheck(gentity_t *ent);
 extern entityInfo_t lmd_playercheck_info;
 
-void lmd_entitycheck(gentity_t *ent);
-extern entityInfo_t lmd_entitycheck_info;
-
 void lmd_propertyterminal(gentity_t *ent);
 extern entityInfo_t lmd_propertyterminal_info;
 
@@ -826,9 +823,6 @@ spawn_t	spawnInitValues[] = {
 	{"lmd_mover", lmd_mover, Logical_False, &lmd_mover_info},
 
 	{"lmd_playercheck", lmd_playercheck, Logical_True, &lmd_playercheck_info},
-	{"lmd_entitycheck", lmd_entitycheck, Logical_True, &lmd_entitycheck_info},
-	
-	
 
 	{"lmd_propertyterminal", lmd_propertyterminal, Logical_False, &lmd_propertyterminal_info},
 	{"t2_propertyterminal", lmd_propertyterminal, Logical_False},

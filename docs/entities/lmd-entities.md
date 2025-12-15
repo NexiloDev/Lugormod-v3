@@ -274,7 +274,6 @@ targetname  - make the trigger target this value for the entity to be used
 ```
 
 ## lmd_playercheck ** (L)
-!!DEPRECEATED - USE LMD_ENTITYCHECK!! 
 Entity will fire target if the activator meets the usability keys
 
 ### Keys:
@@ -305,24 +304,20 @@ Entity will fire target if the activator meets the usability keys
 ### Keys:
 
 ```
-level
-adminlevel
-profession
-customskill
-customskillcompare
-customskillvalue
-playerflags
+
 targetname
-isOn (lmd_door, func_door, fx_runner checks if they're currently open/running)
+isOn (lmd_door, func_door, fx_runner checks if they're currently open/running <0-1>)
+
 
 target    - fire if they meet requirements
 target2   - fire if they do not meet requirements
+checkTarget   - fire if they do not meet requirements
 ```
 
 ### Example code:
 
 ```
-/place lmd_entitycheck * targetname,let_me_in,level,5,target,teleport_me_in,target2,deny_msg,
+/place lmd_entitycheck * targetname,let_me_in,isOn,2,target,teleport_me_in,target2,deny_msg,
 ```
 
 ## LMD_spawner **(L)(If no targetname)

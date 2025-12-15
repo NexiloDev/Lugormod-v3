@@ -498,12 +498,6 @@ void Cmd_Place_f (gentity_t *ent, int iArg){
 	trap_Argv(1, classname, sizeof(classname));
 
 	if(!isValidClassname(classname)) {
-		if (!Q_stricmp(classname, "lmd_playercheck"))
-		{
-			Disp(ent, "^3lmd_playercheck is deprecated.  Use lmd_entitycheck instead.");
-			return;
-		}
-		
 		Disp(ent, "^3There is no entity by that classname.");
 		return;
 	}

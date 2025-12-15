@@ -354,7 +354,6 @@ struct gentity_s {
 			}customSkill;
 			char *prop;
 			int credits;
-			int isOn;
 		}UseReq;
 		void(*oldThink)(gentity_t* self);
 		int oldNextthink;
@@ -377,7 +376,6 @@ struct gentity_s {
 		int sideAcc;
 		char * crosshairText;
 		int crosshairTextRange;
-		qboolean isOn;
 	}Lmd;
 	//RoboPhred
 	qboolean isAutoTargeted; //we were given a targetname automatically

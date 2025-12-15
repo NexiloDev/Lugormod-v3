@@ -3505,7 +3505,6 @@ void fx_runner_think( gentity_t *ent )
 
 	// start the fx on the client (continuous)
 	ent->s.modelindex2 = FX_STATE_CONTINUOUS;
-	ent->Lmd.isOn = qtrue;
 
 	VectorCopy(ent->r.currentAngles, ent->s.angles);
 	VectorCopy(ent->r.currentOrigin, ent->s.origin);
@@ -3605,8 +3604,6 @@ void fx_runner_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 				self->s.loopSound = 0;
 				self->s.loopIsSoundset = qfalse;
 			}
-
-			self->Lmd.isOn = qfalse;
 		}
 	}
 }
@@ -3714,7 +3711,6 @@ void SP_fx_runner( gentity_t *ent )
 	ent->s.speed = ent->delay;
 	ent->s.time = ent->random;
 	ent->s.modelindex2 = FX_STATE_OFF;
-	ent->Lmd.isOn = qfalse;
 
 	// Give us a bit of time to spawn in the other entities, since we may have to target one of 'em
 	ent->think = fx_runner_link;

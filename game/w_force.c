@@ -5990,6 +5990,7 @@ qboolean G_SpecialRollGetup(gentity_t *self)
 	return rolled;
 }
 
+extern vmCvar_t lmd_rageRecoveryforceRegenMultipler;
 //RoboPhred
 void Prof_Merc_Flame(gentity_t *ent);
 #ifdef LMD_NEW_FORCEPOWERS
@@ -6577,6 +6578,10 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd ){
 
 			if (self->client->Lmd.customForceRegenSpeedMultiplier > 0.0)
 				regenTime /= self->client->Lmd.customForceRegenSpeedMultiplier;
+
+		
+			if (self->client->ps.fd.forceRageRecoveryTime > level.time)
+				regenTime *= lmd_rageRecoveryforceRegenMultipler.value;
 		
 			if(regenTime <= 0)
 				regenTime = 1;

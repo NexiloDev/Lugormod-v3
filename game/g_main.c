@@ -428,6 +428,12 @@ vmCvar_t lmd_min_bounty_amount;
 
 vmCvar_t lmd_noPlayerBounce;
 
+vmCvar_t lmd_rageRecoveryforceRegenMultipler;
+vmCvar_t lmd_rageSelfDamageMultipler;
+vmCvar_t lmd_rageDrainTimeMultipler;
+vmCvar_t lmd_drainDamageMultiplier;
+vmCvar_t lmd_drainForcePowerMultipler;
+
 //RoboPhred: track this and force it to off
 vmCvar_t sv_allowdownload;
 
@@ -438,6 +444,27 @@ vmCvar_t gamename;
 static cvarTable_t		gameCvarTable[] = {
 	//RoboPhred
 	{ &lmd_maxsameip, "lmd_maxSameIp", "3", CVAR_ARCHIVE, 0, qfalse, qfalse,
+		"Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new "
+		"connections from the ip will be ignored.  Usefull for stopping fake player attacks."
+	},
+	{
+		&lmd_rageRecoveryforceRegenMultipler, "lmd_rageRecoveryforceRegenMultipler", "1.0", CVAR_ARCHIVE, 0, qfalse, qfalse,
+		"Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new "
+		"connections from the ip will be ignored.  Usefull for stopping fake player attacks."
+	},    {
+		&lmd_rageSelfDamageMultipler, "lmd_rageSelfDamageMultipler", "1.0", CVAR_ARCHIVE, 0, qfalse, qfalse,
+		"Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new "
+		"connections from the ip will be ignored.  Usefull for stopping fake player attacks."
+	},    {
+		&lmd_rageDrainTimeMultipler, "lmd_rageDrainTimeMultipler", "1.0", CVAR_ARCHIVE, 0, qfalse, qfalse,
+		"Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new "
+		"connections from the ip will be ignored.  Usefull for stopping fake player attacks."
+	},    {
+		&lmd_drainDamageMultiplier, "lmd_drainDamageMultiplier", "1.0", CVAR_ARCHIVE, 0, qfalse, qfalse,
+		"Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new "
+		"connections from the ip will be ignored.  Usefull for stopping fake player attacks."
+	},    {
+		&lmd_drainForcePowerMultipler, "lmd_drainForcePowerMultipler", "1.0", CVAR_ARCHIVE, 0, qfalse, qfalse,
 		"Maximum number of users that can have the same ip.  Once this limit is reached for a certain ip, all new "
 		"connections from the ip will be ignored.  Usefull for stopping fake player attacks."
 	},

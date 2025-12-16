@@ -574,6 +574,12 @@ forcePower_t Force_Lightning = {
 	256,
 };
 
+extern vmCvar_t lmd_rageRecoveryforceRegenMultipler;
+extern vmCvar_t lmd_rageSelfDamageMultipler;
+extern vmCvar_t lmd_rageDrainTimeMultipler;
+extern vmCvar_t lmd_drainDamageMultiplier;
+extern vmCvar_t lmd_drainForcePowerMultipler;
+
 qboolean Force_Rage_Available(gentity_t *self, const void *vData) {
 	if (self->client->ps.fd.forceRageRecoveryTime >= level.time)
 		return qfalse;
@@ -619,8 +625,8 @@ qboolean Force_Rage_Run(gentity_t *self, const void *vData) {
 			self->health -= 1;
 		}
 		else
-			self->health -= data->selfdamage;
-		self->client->ps.forceRageDrainTime = level.time + data->draintime;
+			self->health -= data->selfdamage * lmd_rageSelfDamageMultipler.value;
+		self->client->ps.forceRageDrainTime = level.time + data->draintime * lmd_rageDrainTimeMultipler.value;
 	}
 
 	if (self->health < 1){
@@ -817,7 +823,7 @@ void Force_Drain_Damage( gentity_t *self, gentity_t *target, vec3_t dir, vec3_t 
 				target->s.genericenemyindex = level.time + 2000;
 		}
 		if (ForcePowerUsableOn(self, target, FP_DRAIN)){
-			int dmg = data->damage;
+			int dmg = data->damage * lmd_drainDamageMultiplier.value;
 
 			if (target->client){
 				dmg *= Force_Drain_AbsorbPower(self, target, data);
@@ -957,7 +963,7 @@ qboolean Force_Drain_Run(gentity_t *self, const void *vData) {
 		
 		if (tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0f || tr.allsolid || tr.startsolid)
 		{
-			BG_ForcePowerDrain( &self->client->ps, FP_DRAIN, data->forcepower );
+			BG_ForcePowerDrain( &self->client->ps, FP_DRAIN, data->forcepower * lmd_drainForcePowerMultipler.value );
 			return qfalse;
 		}
 		
@@ -966,7 +972,7 @@ qboolean Force_Drain_Run(gentity_t *self, const void *vData) {
 
 	self->client->ps.activeForcePass = self->client->ps.fd.forcePowerLevel[FP_DRAIN] + FORCE_LEVEL_3;
 
-	BG_ForcePowerDrain( &self->client->ps, FP_DRAIN, data->forcepower );
+	BG_ForcePowerDrain( &self->client->ps, FP_DRAIN, data->forcepower * lmd_drainForcePowerMultipler.value );
 
 	self->client->ps.fd.forcePowerRegenDebounceTime = level.time + data->regenstun;
 	return qtrue;

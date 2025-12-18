@@ -133,6 +133,7 @@ typedef struct {
 		}Actions;
 		int chatMode[2]; //[0] say, [1] team
 		int fakePing; // ping faking
+		int selectedEntity;
 	}Lmd;
 } clientPersistant_t;
 

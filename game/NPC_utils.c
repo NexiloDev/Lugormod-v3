@@ -1249,6 +1249,26 @@ static int NPC_GetCheckDelta( void )
 }
 */
 
+qboolean NPC_HeardEnemy( gentity_t *enemy )
+{
+	if ( !enemy->client )
+		return qfalse;
+
+	if ((enemy->client->ps.velocity[0] ||
+		 enemy->client->ps.velocity[1] ) && enemy->client->ps.pm_flags & PMF_DUCKED )
+	{
+		float dist = DistanceSquared(
+			NPC->r.currentOrigin,
+			enemy->r.currentOrigin
+		);
+
+		return dist < (512 * 512);
+	}
+
+	return qfalse;
+}
+
+
 /*
 -------------------------
 NPC_FindNearestEnemy
@@ -1286,8 +1306,12 @@ int NPC_FindNearestEnemy( gentity_t *ent )
 		if ( !NPC_ValidEnemy( e ) )
 			continue;
 
-		if (!NPC_TargetVisible(e))
+		const qboolean inFOV = NPC_TargetVisible(e);
+		const qboolean heard = NPC_HeardEnemy(e);
+
+		if (!inFOV && !heard)
 			continue;
+
 
 		const float dist = DistanceSquared(ent->r.currentOrigin, e->r.currentOrigin);
 

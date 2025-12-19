@@ -438,9 +438,30 @@ void Lmd_ModifyMaxsMinsSelect(gentity_t *ent, qboolean push)
 		VectorCopy(tEnt->r.maxs, maxs);
 	}
 
-	for (int i = 0; i < 3; i++)
+	qboolean affectXY = ent->client->buttons & BUTTON_WALKING;
+	qboolean affectZ  = ent->client->buttons & BUTTON_USE;
+
+	for ( int i = 0; i < 3; i++ )
 	{
-		if (push)
+		qboolean affect = qfalse;
+
+		if ( affectXY )
+		{
+			affect = (i < 2);
+		}
+		else if ( affectZ )
+		{
+			affect = (i == 2);
+		}
+		else
+		{
+			affect = qtrue;
+		}
+
+		if ( !affect )
+			continue;
+
+		if ( push )
 		{
 			mins[i] -= 1.0f;
 			maxs[i] += 1.0f;
@@ -450,13 +471,15 @@ void Lmd_ModifyMaxsMinsSelect(gentity_t *ent, qboolean push)
 			mins[i] += 1.0f;
 			maxs[i] -= 1.0f;
 
-			if (mins[i] > maxs[i])
+			if ( mins[i] > maxs[i] )
 			{
-				mins[i] = (mins[i] + maxs[i]) / 2.0f;
-				maxs[i] = mins[i];
+				float mid = (mins[i] + maxs[i]) * 0.5f;
+				mins[i] = mid;
+				maxs[i] = mid;
 			}
 		}
 	}
+
 
 	char minsStr[64], maxsStr[64];
 	Com_sprintf(minsStr, sizeof(minsStr), "%i %i %i",

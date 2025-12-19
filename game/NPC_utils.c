@@ -1251,22 +1251,40 @@ static int NPC_GetCheckDelta( void )
 
 qboolean NPC_HeardEnemy( gentity_t *enemy )
 {
-	if ( !enemy->client )
+	if ( !enemy || !enemy->client )
 		return qfalse;
 
-	if ((enemy->client->ps.velocity[0] ||
-		 enemy->client->ps.velocity[1] ) && enemy->client->ps.pm_flags & PMF_DUCKED )
-	{
-		float dist = DistanceSquared(
-			NPC->r.currentOrigin,
-			enemy->r.currentOrigin
-		);
+	// Ignore if crouched (stealth)
+	if ( enemy->client->ps.pm_flags & PMF_DUCKED )
+		return qfalse;
 
-		return dist < (512 * 512);
-	}
+	// Horizontal movement only
+	if ( fabs(enemy->client->ps.velocity[0]) < 20 &&
+		 fabs(enemy->client->ps.velocity[1]) < 20 )
+		return qfalse;
 
-	return qfalse;
+	float distSq = DistanceSquared(
+		NPC->r.currentOrigin,
+		enemy->r.currentOrigin
+	);
+
+	float hearRange = NPCInfo->stats.earshot > 0
+		? NPCInfo->stats.earshot
+		: 512.0f;
+
+	if ( distSq > hearRange * hearRange )
+		return qfalse;
+
+	// Optional: reaction delay
+	if ( level.time - NPCInfo->enemyLastHeardTime < 500 )
+		return qfalse;
+
+	NPCInfo->enemyLastHeardTime = level.time;
+	VectorCopy(enemy->r.currentOrigin, NPCInfo->enemyLastHeardLocation);
+
+	return qtrue;
 }
+
 
 
 /*

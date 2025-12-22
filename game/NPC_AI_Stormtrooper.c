@@ -2543,7 +2543,7 @@ void NPC_BSST_Attack( void )
 		}
 		else
 		{//can we shoot our target?
-			if ( (NPC->client->ps.weapon == WP_ROCKET_LAUNCHER || (NPC->client->ps.weapon == WP_FLECHETTE && (NPCInfo->scriptFlags&SCF_ALT_FIRE))) && enemyDist < MIN_ROCKET_DIST_SQUARED )//128*128
+			if ( qfalse ) //(NPC->client->ps.weapon == WP_ROCKET_LAUNCHER || (NPC->client->ps.weapon == WP_FLECHETTE && (NPCInfo->scriptFlags&SCF_ALT_FIRE))) && enemyDist < MIN_ROCKET_DIST_SQUARED )//128*128
 			{
 				enemyCS = qfalse;
 				if (NPCInfo->scriptFlags & SCF_DONT_FLEE)

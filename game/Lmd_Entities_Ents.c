@@ -11,6 +11,7 @@
 #include "Lmd_Professions.h"
 #include "Lmd_EntityCore.h"
 #include "Lmd_Inventory.h"
+#include "Lmd_HiRuns.h"
 #include "Lmd_Time.h"
 #include "Lmd_Interact.h"
 #include "Lmd_Professions_Public.h"
@@ -636,6 +637,73 @@ void lmd_toggle(gentity_t* ent)
     {
         EntitySpawnError("lmd_toggle must have a count value greater than or equal to 2.");
         G_FreeEntity(ent);
+    }
+}
+
+void lmd_timer_use(gentity_t* self, gentity_t* other, gentity_t* activator)
+{
+    if (!activator || !activator->client)
+        return;
+
+    if (!self->target || !self->target[0])
+    {
+        Disp(activator, "^3lmd_timer has no target run name.");
+        return;
+    }
+
+    if (self->spawnflags & 2)
+    {
+        HiRuns_ShowTerminal(activator, self->target);
+        return;
+    }
+
+    if (self->spawnflags & 1)
+    {
+        HiRuns_TimerStop(activator, self->target);
+        return;
+    }
+
+    HiRuns_TimerStart(activator, self->target, self->count > 0 ? self->count : 1);
+}
+
+const entityInfoData_t lmd_timer_spawnflags[] = {
+    {"1", "Stop the timer and record the run when all participants finish."},
+    {"2", "Show the run list in a terminal menu for the activator."},
+    {NULL, NULL}
+};
+
+const entityInfoData_t lmd_timer_keys[] = {
+    {"Count", "Number of players required to start the run (default 1)."},
+    {"Target", "Name of the run to record."},
+    {NULL, NULL}
+};
+
+entityInfo_t lmd_timer_info = {
+    "Start/stop a named run timer and record top run times.",
+    lmd_timer_spawnflags,
+    lmd_timer_keys
+};
+
+void lmd_timer(gentity_t* ent)
+{
+    ent->use = lmd_timer_use;
+
+    if (ent->Lmd.spawnData && Q_stricmp(ent->classname, "lmd_timer") != 0)
+    {
+        ent->classname = "lmd_timer";
+        Lmd_Entities_setSpawnstringKey(ent->Lmd.spawnData, "classname", "lmd_timer");
+    }
+
+    if (!ent->target || !ent->target[0])
+    {
+        EntitySpawnError("lmd_timer must have a target value for the run name.");
+        G_FreeEntity(ent);
+        return;
+    }
+
+    if (ent->count < 1)
+    {
+        ent->count = 1;
     }
 }
 

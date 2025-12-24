@@ -253,6 +253,13 @@ typedef struct renderInfo_s
 	int			boltValidityTime;
 } renderInfo_t;
 
+typedef struct {
+	int runIndex; // 0 means none, index + 1 otherwise
+	qboolean pendingStart;
+	qboolean running;
+	qboolean pendingStop;
+} lmdHiRunClient_t;
+
 // this structure is cleared on each ClientSpawn(),
 // except for 'client->pers' and 'client->sess'
 struct gclient_s {
@@ -611,6 +618,7 @@ struct gclient_s {
 		qboolean lockSaber;
 		int canPickUpWeapons;
 		float customForceRegenSpeedMultiplier;
+		lmdHiRunClient_t hiRuns;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

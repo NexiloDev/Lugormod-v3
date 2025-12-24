@@ -757,6 +757,11 @@ void SP_target_print(gentity_t* ent)
         G_SpawnString("arg", "", &ent->target2);
 }
 
+const entityInfoData_t target_fp_spawnflags[] = {
+    {"1", "Modify only if FP is known"},
+    {NULL, NULL}
+};
+
 const entityInfoData_t target_fp_keys[] = {
 	{"targetname", "make the trigger target this value for the entity to be used"},
 	{"ModifyPowers", "E.g. ModifyPowers,heal2.rage2 -> would set force heal and rage to level 2. Available keys are: jump, push, pull, speed, seeing, heal, protect, absorb"
@@ -767,7 +772,7 @@ const entityInfoData_t target_fp_keys[] = {
 
 const entityInfo_t target_fp_info = {
 	"The activator is given the forcepower + levels given in the ModifyPowers key. ForcePowers not given in ModifyPowers key will remain unchanged. Only death can reset this.",
-	NULL,
+	target_fp_spawnflags,
 	target_fp_keys
 };
 
@@ -810,10 +815,15 @@ int lmd_get_forcePowerMapIndex(const char *token) {
 	return -1;
 }
 
+extern qboolean PlayerUseableCheck(gentity_t *self, gentity_t *activator);
+
 void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 {
 	if (!activator || !activator->client)
 		return;
+
+    if (!PlayerUseableCheck(ent, activator))
+        return;
 
 	activator->client->Lmd.customForceRegenSpeedMultiplier = ent->modelScale[0];
 	
@@ -828,6 +838,9 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 			int fpIndex = lmd_get_forcePowerMapIndex(powerName);
 			if (fpIndex >= 0 && level >= 0 && level <= FORCE_LEVEL_5)
 			{
+			    if (ent->spawnflags & 1 && !(activator->client->ps.fd.forcePowersKnown & (1 << fpIndex)))
+			        continue;
+			    
 				activator->client->ps.fd.forcePowerLevel[fpIndex] = level;
 				if (level > 0)
 					activator->client->ps.fd.forcePowersKnown |= (1 << fpIndex);
@@ -840,8 +853,11 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 	}
 }
 
+extern void PlayerUsableGetKeys(gentity_t *ent);
+
 void SP_target_fp( gentity_t *ent )
 {
+    PlayerUsableGetKeys(ent);
 	G_SpawnString("ModifyPowers", "", &ent->target2);
 	G_SpawnFloat("ForceRegenSpeedMultiplier", "0.0", &ent->modelScale[0]);
 

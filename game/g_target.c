@@ -534,11 +534,18 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 			int fpIndex = lmd_get_forcePowerMapIndex(powerName);
 			if (fpIndex >= 0 && level >= 0 && level <= FORCE_LEVEL_5)
 			{
-				activator->client->ps.fd.forcePowerLevel[fpIndex] = level;
-				if (level > 0)
-					activator->client->ps.fd.forcePowersKnown |= (1 << fpIndex);
-				else
-					activator->client->ps.fd.forcePowersKnown &= ~(1 << fpIndex);
+			    if (ent->spawnflags & 1 && !(activator->client->ps.fd.forcePowersKnown & (1 << fpIndex)))
+			    {
+			        //modify only if fp is known
+			    }
+                else
+                {
+				    activator->client->ps.fd.forcePowerLevel[fpIndex] = level;
+				    if (level > 0)
+					    activator->client->ps.fd.forcePowersKnown |= (1 << fpIndex);
+				    else
+					    activator->client->ps.fd.forcePowersKnown &= ~(1 << fpIndex);
+                }
 			}
 		}
 

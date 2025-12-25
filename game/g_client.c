@@ -4509,11 +4509,11 @@ void ClientSpawn(gentity_t *ent) {
 	ClientSpawn_ResetClient(ent, index);
 
 	// Initialize NPC possession state
-	client->possessedNPCNum = -1;
-	client->possessionStartTime = 0;
-	client->possessionDummy = -1;
-	VectorClear(client->possessionOldOrigin);
-	VectorClear(client->possessionOldAngles);
+	client->Lmd.possessedNPCNum = -1;
+	client->Lmd.possessionStartTime = 0;
+	client->Lmd.possessionDummy = -1;
+	VectorClear(client->Lmd.possessionOldOrigin);
+	VectorClear(client->Lmd.possessionOldAngles);
 
 	//Ravensoft had this before resetting, but meh.
 	ClientSpawn_SetupSkin(client, userinfo);
@@ -4734,7 +4734,7 @@ void ClientDisconnect( int clientNum ) {
 	Interact_Clear(ent);
 
 	// NPC Possession System - cleanup if player was possessing an NPC
-	if (ent->client->possessedNPCNum >= 0)
+	if (ent->client->Lmd.possessedNPCNum >= 0)
 	{
 		G_UnpossessNPC(ent);
 	}

@@ -2292,10 +2292,10 @@ void G_PossessNPC(gentity_t *player, gentity_t *npc)
 		return;
 	}
 
-	VectorCopy(player->client->ps.origin, player->client->possessionOldOrigin);
-	VectorCopy(player->client->ps.viewangles, player->client->possessionOldAngles);
-	player->client->possessedNPCNum = npc->s.number;
-	player->client->possessionStartTime = level.time;
+	VectorCopy(player->client->ps.origin, player->client->Lmd.possessionOldOrigin);
+	VectorCopy(player->client->ps.viewangles, player->client->Lmd.possessionOldAngles);
+	player->client->Lmd.possessedNPCNum = npc->s.number;
+	player->client->Lmd.possessionStartTime = level.time;
 
 	dummy = G_Spawn();
 	if (dummy)
@@ -2326,13 +2326,13 @@ void G_PossessNPC(gentity_t *player, gentity_t *npc)
 		dummy->damageRedirect = qtrue;
 		dummy->damageRedirectTo = npc->s.number;
 
-		player->client->possessionDummy = dummy->s.number;
+		player->client->Lmd.possessionDummy = dummy->s.number;
 		
 		trap_LinkEntity(dummy);
 	}
 	else
 	{
-		player->client->possessionDummy = -1;
+		player->client->Lmd.possessionDummy = -1;
 	}
 
 	npc->client->Lmd.isPossessed = qtrue;
@@ -2358,21 +2358,21 @@ void G_UnpossessNPC(gentity_t *player)
 	gentity_t *npc;
 	gentity_t *dummy;
 
-	if (!player || !player->client || player->client->possessedNPCNum < 0)
+	if (!player || !player->client || player->client->Lmd.possessedNPCNum < 0)
 	{
 		return;
 	}
 
-	npc = &g_entities[player->client->possessedNPCNum];
+	npc = &g_entities[player->client->Lmd.possessedNPCNum];
 
-	if (player->client->possessionDummy >= 0 && player->client->possessionDummy < ENTITYNUM_MAX_NORMAL)
+	if (player->client->Lmd.possessionDummy >= 0 && player->client->Lmd.possessionDummy < ENTITYNUM_MAX_NORMAL)
 	{
-		dummy = &g_entities[player->client->possessionDummy];
+		dummy = &g_entities[player->client->Lmd.possessionDummy];
 		if (dummy && dummy->inuse)
 		{
 			G_FreeEntity(dummy);
 		}
-		player->client->possessionDummy = -1;
+		player->client->Lmd.possessionDummy = -1;
 	}
 
 	if (npc->NPC)
@@ -2387,11 +2387,11 @@ void G_UnpossessNPC(gentity_t *player)
 	player->clipmask = MASK_PLAYERSOLID;   
 	trap_LinkEntity(player);
 
-	VectorCopy(player->client->possessionOldOrigin, player->client->ps.origin);
-	VectorCopy(player->client->possessionOldAngles, player->client->ps.viewangles);
+	VectorCopy(player->client->Lmd.possessionOldOrigin, player->client->ps.origin);
+	VectorCopy(player->client->Lmd.possessionOldAngles, player->client->ps.viewangles);
 
-	player->client->possessedNPCNum = -1;
-	player->client->possessionStartTime = 0;
+	player->client->Lmd.possessedNPCNum = -1;
+	player->client->Lmd.possessionStartTime = 0;
 }
 
 void G_HandlePossessionInput(gentity_t *player, usercmd_t *ucmd)
@@ -2411,13 +2411,13 @@ void G_HandlePossessionInput(gentity_t *player, usercmd_t *ucmd)
 		return;
 	}
 
-	if (player->client->possessionStartTime > 0 &&
-		level.time - player->client->possessionStartTime < POSSESSION_USE_DEBOUNCE)
+	if (player->client->Lmd.possessionStartTime > 0 &&
+		level.time - player->client->Lmd.possessionStartTime < POSSESSION_USE_DEBOUNCE)
 	{
 		return;
 	}
 	
-	if (player->client->possessedNPCNum >= 0)
+	if (player->client->Lmd.possessedNPCNum >= 0)
 	{
 		G_UnpossessNPC(player);
 		return;
@@ -2712,9 +2712,9 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	// If player is currently possessing an NPC, redirect their input
-	if (!isNPC && client->possessedNPCNum >= 0 && client->possessedNPCNum < ENTITYNUM_MAX_NORMAL)
+	if (!isNPC && client->Lmd.possessedNPCNum >= 0 && client->Lmd.possessedNPCNum < ENTITYNUM_MAX_NORMAL)
 	{
-		gentity_t *possessedNPC = &g_entities[client->possessedNPCNum];
+		gentity_t *possessedNPC = &g_entities[client->Lmd.possessedNPCNum];
 
 		// Validate NPC is still valid and alive
 		if (!possessedNPC->inuse || !possessedNPC->client ||

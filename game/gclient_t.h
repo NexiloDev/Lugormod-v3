@@ -621,6 +621,11 @@ struct gclient_s {
 
 		qboolean	isPossessed;
 		int			possessingClient;
+		vec3_t		possessionOldOrigin;
+		vec3_t		possessionOldAngles;
+		int			possessedNPCNum;
+		int			possessionStartTime;
+		int			possessionDummy;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

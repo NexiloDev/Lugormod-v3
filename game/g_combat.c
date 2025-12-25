@@ -2205,6 +2205,18 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (!self->client)
 		return;
 
+
+	if (self->NPC && self->client->Lmd.isPossessed &&
+		self->client->Lmd.possessingClient >= 0 &&
+		self->client->Lmd.possessingClient < MAX_CLIENTS)
+	{
+		gentity_t *possessor = &g_entities[self->client->Lmd.possessingClient];
+		if (possessor && possessor->client && possessor->inuse)
+		{
+			G_UnpossessNPC(possessor);
+		}
+	}
+
 	if ( self->client->ps.pm_type == PM_DEAD ) {
 		return;
 	}

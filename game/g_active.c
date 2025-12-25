@@ -2187,6 +2187,249 @@ void Merc_Unhook (gentity_t *ent);
 float Merc_SpeedFactor(gentity_t *ent);
 extern void Cmd_GrabOffsetDec_f(gentity_t* player);
 extern void Cmd_GrabOffsetInc_f(gentity_t* player);
+
+#define POSSESSION_MAX_DISTANCE 2056
+#define POSSESSION_USE_DEBOUNCE 500
+
+qboolean IsNPCMindTrickedByPlayer(gentity_t *npc, gentity_t *player)
+{
+	int npcNum;
+	forcedata_t *fd;
+
+	if (!npc || !player || !player->client || !npc->NPC)
+	{
+		return qfalse;
+	}
+
+	npcNum = npc->s.number;
+	fd = &player->client->ps.fd;
+
+	if (npcNum > 47)
+	{
+		if (fd->forceMindtrickTargetIndex4 & (1 << (npcNum - 48)))
+		{
+			return qtrue;
+		}
+	}
+	else if (npcNum > 31)
+	{
+		if (fd->forceMindtrickTargetIndex3 & (1 << (npcNum - 32)))
+		{
+			return qtrue;
+		}
+	}
+	else if (npcNum > 15)
+	{
+		if (fd->forceMindtrickTargetIndex2 & (1 << (npcNum - 16)))
+		{
+			return qtrue;
+		}
+	}
+	else
+	{
+		if (fd->forceMindtrickTargetIndex & (1 << npcNum))
+		{
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+gentity_t *G_FindNPCInFront(gentity_t *player)
+{
+	gentity_t *traceEnt;
+
+	if (!player || !player->client)
+	{
+		return NULL;
+	}
+
+	traceEnt = &g_entities[player->client->Lmd.crosshairEntNum];
+	
+	if (!traceEnt->client || !traceEnt->NPC || !traceEnt->inuse ||
+		traceEnt->client->ps.weapon == WP_SABER || Distance(player->client->ps.origin, traceEnt->r.currentOrigin) > POSSESSION_MAX_DISTANCE)
+	{
+		return NULL;
+	}
+	
+	if (traceEnt->health <= 0)
+	{
+		return NULL;
+	}
+
+	if (traceEnt->s.number < MAX_CLIENTS)
+	{
+		return NULL;
+	}
+
+	if (traceEnt->client->Lmd.isPossessed)
+	{
+		return NULL;
+	}
+
+	if (!IsNPCMindTrickedByPlayer(traceEnt, player))
+	{
+		return NULL;
+	}
+
+	return traceEnt;
+}
+
+
+void G_PossessNPC(gentity_t *player, gentity_t *npc)
+{
+	int i;
+	gentity_t *dummy;
+
+	if (!player || !player->client || !npc || !npc->client || !npc->NPC)
+	{
+		return;
+	}
+
+	if (npc->client->Lmd.isPossessed)
+	{
+		return;
+	}
+
+	VectorCopy(player->client->ps.origin, player->client->possessionOldOrigin);
+	VectorCopy(player->client->ps.viewangles, player->client->possessionOldAngles);
+	player->client->possessedNPCNum = npc->s.number;
+	player->client->possessionStartTime = level.time;
+
+	dummy = G_Spawn();
+	if (dummy)
+	{
+		dummy->classname = "possession_dummy";
+		G_SetOrigin(dummy, player->client->ps.origin);
+		VectorCopy(player->client->ps.origin, dummy->s.pos.trBase);
+		VectorCopy(player->client->ps.viewangles, dummy->s.apos.trBase);
+
+		dummy->r.contents = CONTENTS_BODY;
+		dummy->clipmask = MASK_PLAYERSOLID;
+		dummy->takedamage = qtrue;
+		dummy->health = npc->health;
+
+		VectorSet(dummy->r.mins, -15, -15, DEFAULT_MINS_2);
+		VectorSet(dummy->r.maxs, 15, 15, DEFAULT_MAXS_2);
+
+		dummy->s.eType = ET_PLAYER;
+		dummy->s.clientNum = player->s.number;
+		dummy->s.modelindex = player->s.modelindex;
+		dummy->s.weapon = player->s.weapon;
+
+		if (player->ghoul2)
+		{
+			dummy->s.modelGhoul2 = 1;
+		}
+
+		dummy->damageRedirect = qtrue;
+		dummy->damageRedirectTo = npc->s.number;
+
+		player->client->possessionDummy = dummy->s.number;
+		
+		trap_LinkEntity(dummy);
+	}
+	else
+	{
+		player->client->possessionDummy = -1;
+	}
+
+	npc->client->Lmd.isPossessed = qtrue;
+	npc->client->Lmd.possessingClient = player->s.number;
+	
+	player->r.svFlags |= SVF_NOCLIENT;
+	player->s.eFlags |= EF_NODRAW;
+	player->r.contents = 0;             
+	player->clipmask = 0;               
+	trap_LinkEntity(player);            
+
+	VectorCopy(player->client->ps.viewangles, npc->client->ps.viewangles);
+
+	for (i = 0; i < 3; i++)
+	{
+		int cmdAngle = ANGLE2SHORT(player->client->ps.viewangles[i]);
+		npc->client->ps.delta_angles[i] = cmdAngle - player->client->pers.cmd.angles[i];
+	}
+}
+
+void G_UnpossessNPC(gentity_t *player)
+{
+	gentity_t *npc;
+	gentity_t *dummy;
+
+	if (!player || !player->client || player->client->possessedNPCNum < 0)
+	{
+		return;
+	}
+
+	npc = &g_entities[player->client->possessedNPCNum];
+
+	if (player->client->possessionDummy >= 0 && player->client->possessionDummy < ENTITYNUM_MAX_NORMAL)
+	{
+		dummy = &g_entities[player->client->possessionDummy];
+		if (dummy && dummy->inuse)
+		{
+			G_FreeEntity(dummy);
+		}
+		player->client->possessionDummy = -1;
+	}
+
+	if (npc->NPC)
+	{
+		npc->client->Lmd.isPossessed = qfalse;
+		npc->client->Lmd.possessingClient = -1;
+	}
+
+	player->r.svFlags &= ~SVF_NOCLIENT;
+	player->s.eFlags &= ~EF_NODRAW;
+	player->r.contents = CONTENTS_BODY;    
+	player->clipmask = MASK_PLAYERSOLID;   
+	trap_LinkEntity(player);
+
+	VectorCopy(player->client->possessionOldOrigin, player->client->ps.origin);
+	VectorCopy(player->client->possessionOldAngles, player->client->ps.viewangles);
+
+	player->client->possessedNPCNum = -1;
+	player->client->possessionStartTime = 0;
+}
+
+void G_HandlePossessionInput(gentity_t *player, usercmd_t *ucmd)
+{
+	gentity_t *targetNPC;
+	qboolean pressedUse;
+
+	if (!player || !player->client)
+	{
+		return;
+	}
+
+	pressedUse = (ucmd->buttons & BUTTON_USE) && !(player->client->oldbuttons & BUTTON_USE);
+
+	if (!pressedUse)
+	{
+		return;
+	}
+
+	if (player->client->possessionStartTime > 0 &&
+		level.time - player->client->possessionStartTime < POSSESSION_USE_DEBOUNCE)
+	{
+		return;
+	}
+	
+	if (player->client->possessedNPCNum >= 0)
+	{
+		G_UnpossessNPC(player);
+		return;
+	}
+	
+	targetNPC = G_FindNPCInFront(player);
+	if (targetNPC)
+	{
+		G_PossessNPC(player, targetNPC);
+	}
+}
+
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t	*client;
 	pmove_t		pm;
@@ -2459,6 +2702,48 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// mark the time, so the connection sprite can be removed
 	ucmd = &ent->client->pers.cmd;
+
+	// ========== NPC POSSESSION SYSTEM ==========
+
+	// Check for Use button to toggle possession (only for real players, not NPCs)
+	if (!isNPC)
+	{
+		G_HandlePossessionInput(ent, ucmd);
+	}
+
+	// If player is currently possessing an NPC, redirect their input
+	if (!isNPC && client->possessedNPCNum >= 0 && client->possessedNPCNum < ENTITYNUM_MAX_NORMAL)
+	{
+		gentity_t *possessedNPC = &g_entities[client->possessedNPCNum];
+
+		// Validate NPC is still valid and alive
+		if (!possessedNPC->inuse || !possessedNPC->client ||
+			!possessedNPC->NPC || possessedNPC->health <= 0)
+		{
+			// NPC died or became invalid - auto-release player
+			G_UnpossessNPC(ent);
+			// Fall through to normal player thinking below
+		}
+		else
+		{
+			// NPC is valid - redirect player's commands to it
+			// Copy player's usercmd to the NPC's command
+			memcpy(&possessedNPC->client->pers.cmd, ucmd, sizeof(usercmd_t));
+
+			// Synchronize player's playerState to match NPC for rendering
+			// This makes the camera follow the NPC
+			VectorCopy(possessedNPC->client->ps.origin, client->ps.origin);
+			VectorCopy(possessedNPC->client->ps.velocity, client->ps.velocity);
+			VectorCopy(possessedNPC->client->ps.viewangles, client->ps.viewangles);
+			client->ps.viewheight = possessedNPC->client->ps.viewheight;
+
+			// Player's body doesn't think - they're just a camera now
+			// The NPC will think with the player's commands in NPC_Think()
+			return;
+		}
+	}
+
+	// ========== END NPC POSSESSION SYSTEM ==========
 
 	if ( client && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) )
 	{

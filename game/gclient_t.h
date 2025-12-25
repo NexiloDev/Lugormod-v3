@@ -402,6 +402,13 @@ struct gclient_s {
 
 	renderInfo_t	renderInfo;
 
+	// NPC Possession System
+	int			possessedNPCNum;		// Entity number of possessed NPC, or -1 if not possessing
+	vec3_t		possessionOldOrigin;	// Player's original body position before possession
+	vec3_t		possessionOldAngles;	// Player's original view angles
+	int			possessionStartTime;	// When possession started (for debouncing Use key)
+	int			possessionDummy;		// Entity number of dummy2 body left behind, or -1 if none
+
 	//mostly NPC stuff:
 	npcteam_t	playerTeam;
 	npcteam_t	enemyTeam;
@@ -611,6 +618,9 @@ struct gclient_s {
 		qboolean lockSaber;
 		int canPickUpWeapons;
 		float customForceRegenSpeedMultiplier;
+
+		qboolean	isPossessed;
+		int			possessingClient;
 	}Lmd;
 	unsigned int lastTargetUse;
 	unsigned int infoChanged;

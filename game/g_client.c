@@ -4508,6 +4508,13 @@ void ClientSpawn(gentity_t *ent) {
 
 	ClientSpawn_ResetClient(ent, index);
 
+	// Initialize NPC possession state
+	client->possessedNPCNum = -1;
+	client->possessionStartTime = 0;
+	client->possessionDummy = -1;
+	VectorClear(client->possessionOldOrigin);
+	VectorClear(client->possessionOldAngles);
+
 	//Ravensoft had this before resetting, but meh.
 	ClientSpawn_SetupSkin(client, userinfo);
 	
@@ -4725,6 +4732,12 @@ void ClientDisconnect( int clientNum ) {
 	updatePlayer(ent);
 	Confirm_Clear(ent);
 	Interact_Clear(ent);
+
+	// NPC Possession System - cleanup if player was possessing an NPC
+	if (ent->client->possessedNPCNum >= 0)
+	{
+		G_UnpossessNPC(ent);
+	}
 
 	//Lugormod remove buddies and ignores
 	j = (int)floor((float)clientNum / 16);

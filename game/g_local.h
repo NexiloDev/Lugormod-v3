@@ -1,4 +1,7 @@
-#pragma once 
+#pragma once
+
+// Enable crash handler to write crash logs
+#define CRASH_HANDLER
 
 #include "gentity_t.h"
 #include "gclient_t.h"

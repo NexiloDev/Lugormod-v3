@@ -1859,6 +1859,14 @@ void NPC_Think ( gentity_t *self)//, int msec )
 	self->nextthink = level.time + FRAMETIME;
 
 	SetNPCGlobals( self );
+	
+	if (self->NPC && self->client->Lmd.isPossessed && self->client->Lmd.possessingClient >= 0)
+	{
+
+		ClientThink(self->s.number, &self->client->pers.cmd);
+		VectorCopy(self->r.currentOrigin, self->client->ps.origin);
+		return; // Skip all AI thinking
+	}
 
 	//RoboPhred
 	if (self->client != client) {

@@ -2325,6 +2325,11 @@ void G_PossessNPC(gentity_t *player, gentity_t *npc)
 
 		dummy->damageRedirect = qtrue;
 		dummy->damageRedirectTo = npc->s.number;
+		dummy->client->ps.torsoAnim = player->client->ps.torsoAnim;
+		dummy->client->ps.legsAnim = player->client->ps.legsAnim;
+		dummy->client->ps.torsoTimer = player->client->ps.torsoTimer;
+		dummy->client->ps.legsTimer = player->client->ps.legsTimer;
+
 
 		player->client->Lmd.possessionDummy = dummy->s.number;
 		
@@ -2337,12 +2342,14 @@ void G_PossessNPC(gentity_t *player, gentity_t *npc)
 
 	npc->client->Lmd.isPossessed = qtrue;
 	npc->client->Lmd.possessingClient = player->s.number;
-	
+
 	player->r.svFlags |= SVF_NOCLIENT;
 	player->s.eFlags |= EF_NODRAW;
-	player->r.contents = 0;             
-	player->clipmask = 0;               
-	trap_LinkEntity(player);            
+	player->client->ps.eFlags |= EF_NODRAW;
+	player->r.contents = 0;
+	player->clipmask = 0;
+	player->client->Lmd.flags |= SNF_FREEZE;
+	//trap_LinkEntity(player);            
 
 	VectorCopy(player->client->ps.viewangles, npc->client->ps.viewangles);
 
@@ -2383,8 +2390,11 @@ void G_UnpossessNPC(gentity_t *player)
 
 	player->r.svFlags &= ~SVF_NOCLIENT;
 	player->s.eFlags &= ~EF_NODRAW;
-	player->r.contents = CONTENTS_BODY;    
-	player->clipmask = MASK_PLAYERSOLID;   
+	player->client->ps.eFlags &= ~EF_NODRAW;
+	player->r.contents = CONTENTS_BODY;
+	player->clipmask = MASK_PLAYERSOLID;
+	player->client->Lmd.flags &= ~SNF_FREEZE;
+	player->r.ownerNum = ENTITYNUM_NONE;
 	trap_LinkEntity(player);
 
 	VectorCopy(player->client->Lmd.possessionOldOrigin, player->client->ps.origin);
@@ -2702,49 +2712,33 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// mark the time, so the connection sprite can be removed
 	ucmd = &ent->client->pers.cmd;
-
-	// ========== NPC POSSESSION SYSTEM ==========
-
-	// Check for Use button to toggle possession (only for real players, not NPCs)
+	
 	if (!isNPC)
 	{
 		G_HandlePossessionInput(ent, ucmd);
 	}
-
-	// If player is currently possessing an NPC, redirect their input
+	
 	if (!isNPC && client->Lmd.possessedNPCNum >= 0 && client->Lmd.possessedNPCNum < ENTITYNUM_MAX_NORMAL)
 	{
 		gentity_t *possessedNPC = &g_entities[client->Lmd.possessedNPCNum];
-
-		// Validate NPC is still valid and alive
+		
 		if (!possessedNPC->inuse || !possessedNPC->client ||
 			!possessedNPC->NPC || possessedNPC->health <= 0)
 		{
-			// NPC died or became invalid - auto-release player
 			G_UnpossessNPC(ent);
-			// Fall through to normal player thinking below
 		}
 		else
 		{
-			// NPC is valid - redirect player's commands to it
-			// Copy player's usercmd to the NPC's command
 			memcpy(&possessedNPC->client->pers.cmd, ucmd, sizeof(usercmd_t));
-
-			// Synchronize player's playerState to match NPC for rendering
-			// This makes the camera follow the NPC
+			
 			VectorCopy(possessedNPC->client->ps.origin, client->ps.origin);
 			VectorCopy(possessedNPC->client->ps.velocity, client->ps.velocity);
 			VectorCopy(possessedNPC->client->ps.viewangles, client->ps.viewangles);
 			client->ps.viewheight = possessedNPC->client->ps.viewheight;
-
-			// Player's body doesn't think - they're just a camera now
-			// The NPC will think with the player's commands in NPC_Think()
 			return;
 		}
 	}
-
-	// ========== END NPC POSSESSION SYSTEM ==========
-
+	
 	if ( client && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) )
 	{
 		G_HeldByMonster( ent, &ucmd );

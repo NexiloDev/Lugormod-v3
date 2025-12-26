@@ -296,15 +296,25 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 	playerState_t *parentPS;
 	playerState_t *pilotPS = NULL;
 	int	curTime;
+	bgEntity_t *parent = pVeh->m_pParentEntity;
+
+	if (!parent)
+	{
+		return;
+	}
 
 #ifdef _JK2MP
-	parentPS = pVeh->m_pParentEntity->playerState;
+	parentPS = parent->playerState;
+	if (!parentPS)
+	{
+		return;
+	}
 	if (pVeh->m_pPilot)
 	{
 		pilotPS = pVeh->m_pPilot->playerState;
 	}
 #else
-	parentPS = &pVeh->m_pParentEntity->client->ps;
+	parentPS = &parent->client->ps;
 	if (pVeh->m_pPilot)
 	{
 		pilotPS = &pVeh->m_pPilot->client->ps;
@@ -520,19 +530,25 @@ void ProcessOrientCommands( Vehicle_t *pVeh )
 	/********************************************************************************/
 	playerState_t *riderPS;
 	playerState_t *parentPS;
+	bgEntity_t *parent = pVeh->m_pParentEntity;
 
 #ifdef _JK2MP
 	float angDif;
 
-	if (pVeh->m_pPilot)
+	if (!parent || !parent->playerState)
+	{
+		return;
+	}
+
+	if (pVeh->m_pPilot && pVeh->m_pPilot->playerState)
 	{
 		riderPS = pVeh->m_pPilot->playerState;
 	}
 	else
 	{
-		riderPS = pVeh->m_pParentEntity->playerState;
+		riderPS = parent->playerState;
 	}
-	parentPS = pVeh->m_pParentEntity->playerState;
+	parentPS = parent->playerState;
 
 	//pVeh->m_vOrientation[YAW] = 0.0f;//riderPS->viewangles[YAW];
 	angDif = AngleSubtract(pVeh->m_vOrientation[YAW], riderPS->viewangles[YAW]);

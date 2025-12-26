@@ -177,6 +177,8 @@ activated again while it is counting down to an event.
 */
 const entityInfoData_t target_delay_spawnflags[] = {
     {"1", "Keeps the delay from resetting the time if it is activated again while it is counting down to an event."},
+    {"2", "Each player gets their own independent delay timer."},
+
     {NULL, NULL}
 };
 const entityInfoData_t target_delay_keys[] = {

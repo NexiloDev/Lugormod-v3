@@ -317,7 +317,7 @@ targetWeaponsName_t targetWeaponsTable[] = {
     {"disruptor", WP_DISRUPTOR},
     {"bowcaster", WP_BOWCASTER},
     {"repeater", WP_REPEATER},
-    {"demp2", WP_DEMP2},
+    {"demp", WP_DEMP2},
     {"flechette", WP_FLECHETTE},
     {"rocket_launcher", WP_ROCKET_LAUNCHER},
     {"thermal", WP_THERMAL},

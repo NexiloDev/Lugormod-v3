@@ -1993,6 +1993,13 @@ void NPC_Spawn_Tjo(gentity_t *ent){
 	if ( ent->alt_fire )
 	{
 		int iVehIndex;
+		if ( !ent->NPC_type || !ent->NPC_type[0] )
+		{
+			G_Printf( S_COLOR_RED"ERROR: Vehicle spawner has no NPC_type set!\n" );
+			G_FreeEntity( newent );
+			//G_FreeEntity( ent );
+			return;
+		}
 		iVehIndex = BG_VehicleGetIndex( ent->NPC_type );
 		// Get the vehicle entry index.
 

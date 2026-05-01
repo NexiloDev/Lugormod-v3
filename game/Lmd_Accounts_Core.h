@@ -26,6 +26,7 @@ int Account_GetNumCharacters(Account_t *acc);
 Character_t *Account_GetActiveCharacter(Account_t *acc);
 void Account_SetActiveCharacter(Account_t *acc, Character_t *ch);
 Character_t *Account_FindCharacterByName(Account_t *acc, char *name);
+Character_t *Account_GetMostRecentCharacter(Account_t *acc); // highest lastPlayed; falls back to characters[0]
 Character_t *Account_NewCharacter(Account_t *acc, char *name);
 qboolean Account_DeleteCharacter(Account_t *acc, Character_t *ch);
 qboolean Account_MoveCharacter(Account_t *src, Character_t *ch, Account_t *dst);
@@ -41,6 +42,7 @@ int Character_GetTime(Character_t *ch);
 void Character_SetTime(Character_t *ch, int value);
 int Character_GetScore(Character_t *ch);
 void Character_SetScore(Character_t *ch, int value);
+void Character_StampLastPlayed(Character_t *ch); // sets lastPlayed = Time_Now() and marks dirty
 
 // Iterating every character across every account (for leaderboards etc.)
 unsigned int Characters_Count();

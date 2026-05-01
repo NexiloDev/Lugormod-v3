@@ -534,6 +534,7 @@ qboolean Lmd_Accounts_Player_SelectCharacter(gentity_t *ent, Character_t *ch) {
 
 	Account_SetActiveCharacter(acc, ch);
 	ent->client->pers.Lmd.character = ch;
+	Character_StampLastPlayed(ch);
 
 	if (!Accounts_Prof_GetLevel(acc)) {
 		Accounts_Prof_SetProfession(acc, PROF_NONE);
@@ -611,12 +612,15 @@ qboolean Lmd_Accounts_Player_Login(gentity_t *ent, Account_t *acc){
 
 	Lmd_Accounts_LogAction(ent, acc, "logged in");
 
-	// Auto-pick the only character if there is one (preserves single-character UX).
-	if (Account_GetNumCharacters(acc) == 1) {
-		Lmd_Accounts_Player_SelectCharacter(ent, Account_GetCharacter(acc, 0));
-	}
-	else {
-		Disp(ent, "^3You have multiple characters. Use ^2/charlist^3 and ^2/play <name>^3 to enter the game.");
+	// Auto-select the most recently played character. Falls back to characters[0]
+	// when no character has ever been played (e.g. fresh registration / migration).
+	Character_t *recent = Account_GetMostRecentCharacter(acc);
+	if (recent) {
+		Lmd_Accounts_Player_SelectCharacter(ent, recent);
+		if (Account_GetNumCharacters(acc) > 1) {
+			Disp(ent, va("^3Resumed ^7%s^3. Use ^2/charlist^3 and ^2/play <name|index>^3 to switch.",
+				Character_GetName(recent)));
+		}
 	}
 
 	return qtrue;

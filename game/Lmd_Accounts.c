@@ -613,7 +613,7 @@ qboolean Lmd_Accounts_Player_Login(gentity_t *ent, Account_t *acc){
 	if (recent) {
 		Lmd_Accounts_Player_SelectCharacter(ent, recent);
 		if (Account_GetNumCharacters(acc) > 1) {
-			Disp(ent, va("^3Resumed ^7%s^3. Use ^2/charlist^3 and ^2/play <name|index>^3 to switch.",
+			Disp(ent, va("^3Resumed ^7%s^3. Use ^2/charlist^3 and ^2/charselect <name|index>^3 to switch.",
 				Character_GetName(recent)));
 		}
 	}
@@ -1178,14 +1178,14 @@ void Cmd_CharList_f(gentity_t *ent, int iArg) {
 	Account_SetActiveCharacter(acc, ent->client->pers.Lmd.character);
 }
 
-void Cmd_Play_f(gentity_t *ent, int iArg) {
+void Cmd_CharSelect_f(gentity_t *ent, int iArg) {
 	Account_t *acc = ent->client->pers.Lmd.account;
 	if (!acc) {
 		Disp(ent, "^3You must be logged in to use this.");
 		return;
 	}
 	if (trap_Argc() < 2) {
-		Disp(ent, "^3Usage: ^2/play <name>^3 or ^2/play <number>");
+		Disp(ent, "^3Usage: ^2/charselect <name>^3 or ^2/charselect <number>");
 		return;
 	}
 	char arg[MAX_NETNAME];
@@ -1263,7 +1263,7 @@ void Cmd_CharCreate_f(gentity_t *ent, int iArg) {
 		return;
 	}
 	Accounts_Save(acc); // flush immediately so a crash before the periodic save won't drop the new char
-	Disp(ent, va("^2Character ^7%s^2 created. Use ^2/play %s^2 to enter the game.", name, name));
+	Disp(ent, va("^2Character ^7%s^2 created. Use ^2/charselect %s^2 to enter the game.", name, name));
 }
 
 void Cmd_CharDelete_f(gentity_t *ent, int iArg) {
@@ -1296,7 +1296,7 @@ void Cmd_CharDelete_f(gentity_t *ent, int iArg) {
 		Accounts_Save(acc);
 		Disp(ent, va("^2Character ^7%s^2 deleted.", name));
 		if (wasActive)
-			Disp(ent, "^3Use ^2/play <name>^3 to select a different character.");
+			Disp(ent, "^3Use ^2/charselect <name>^3 to select a different character.");
 	}
 	else {
 		Disp(ent, "^1Failed to delete character.");
@@ -1317,7 +1317,7 @@ cmdEntry_t accountCommandEntries[] = {
 	{"login"," Login to use the name you registered with \\register.\nIf you change name when you are logged in, the new name will become the registered name.", Cmd_Login_f, 0, qfalse, 0, 1, 0, 0, qtrue},
 	{"logout", "Logs out of your account.  If you are not in an account but have admin, you will loose admin status.", Cmd_Logout_f, 0, qfalse, 1, 0, 0, 0},
 	{"pay", "Give the player you are looking at CR <amount>.", Cmd_Credits_f, 1, qfalse, 1, 128, ~(1 << GT_FFA), 0},
-	{"charselect", "Switch to one of the characters on your account. Pass name or 1-based index.", Cmd_Play_f, 0, qfalse, 0, 0, 0, 0},
+	{"charselect", "Switch to one of the characters on your account. Pass name or 1-based index.", Cmd_CharSelect_f, 0, qfalse, 0, 0, 0, 0},
 	{"property", "View your owned properties.  If you have the right rank, you can modify your property access here.", Cmd_Property_f, 0, qfalse, 1, 0, 0, 0},
 	{"register", "Register your account.", Cmd_Register_f, 0, qfalse, 0, 1, 0, 0, qtrue},
 	{"seccode", "Show, edit, regenerate, or enable/disable your security code.", Cmd_Seccode_f, 0, qfalse, 1, 1, 0, 0},

@@ -50,6 +50,7 @@ struct Character_s {
 	int bounty;
 	int time;
 	int score;
+	int lastPlayed; // unix timestamp of most recent /play; used to auto-select on next /login
 	Account_t *account;
 
 	struct {
@@ -356,6 +357,7 @@ const int AccountFields_Count = DATAFIELDS_COUNT(AccountFields);
 	_m##_AUTO(bounty, CHAROFS(bounty), F_INT) \
 	_m##_AUTO(time, CHAROFS(time), F_INT) \
 	_m##_AUTO(score, CHAROFS(score), F_INT) \
+	_m##_AUTO(lastPlayed, CHAROFS(lastPlayed), F_INT) \
 	_m##_DEFL(Characters_Parse_Modules, Characters_Write_Modules, NULL)
 
 CharacterFields_Base(DEFINE_FIELD_PRE)
@@ -459,6 +461,18 @@ Character_t *Account_FindCharacterByName(Account_t *acc, char *name) {
 			return ch;
 	}
 	return NULL;
+}
+
+Character_t *Account_GetMostRecentCharacter(Account_t *acc) {
+	if (!acc || acc->numCharacters <= 0) return NULL;
+	Character_t *best = acc->characters[0];
+	int i;
+	for (i = 1; i < acc->numCharacters; i++) {
+		Character_t *ch = acc->characters[i];
+		if (ch && ch->lastPlayed > best->lastPlayed)
+			best = ch;
+	}
+	return best;
 }
 
 Character_t *Account_NewCharacter(Account_t *acc, char *name) {
@@ -595,6 +609,12 @@ int Character_GetScore(Character_t *ch) { return ch ? ch->score : 0; }
 void Character_SetScore(Character_t *ch, int v) {
 	if (!ch) return;
 	ch->score = v;
+	if (ch->account) Lmd_Accounts_Modify(ch->account);
+}
+
+void Character_StampLastPlayed(Character_t *ch) {
+	if (!ch) return;
+	ch->lastPlayed = Time_Now();
 	if (ch->account) Lmd_Accounts_Modify(ch->account);
 }
 

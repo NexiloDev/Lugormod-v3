@@ -314,10 +314,12 @@ void Cmd_Teleport_f (gentity_t *ent, int iArg){
 	//RoboPhred: why only ent?  Need to get this back now that I have /sendto
 	trap_Trace(&tr, tEnt->client->ps.origin, fEnt->r.mins, fEnt->r.maxs, t, tEnt->s.number, fEnt->clipmask);
 	//trap_Trace(&tr, tEnt->client->ps.origin, fEnt->r.mins,fEnt->r.maxs, t, tEnt->s.number, /*fEnt->clipmask*/ent->clipmask);
+	/* lumaya: don't need this
 	if(!fEnt->client->noclip && tr.fraction != 1.0f){
 		Disp(ent, "^3Target area is blocked.");
 		return;
 	}
+	*/
 	VectorCopy (t,to);
 	to[2] -= 4096;
 

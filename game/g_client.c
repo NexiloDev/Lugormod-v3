@@ -2168,7 +2168,7 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 			char *p;
 
 			// If this is a vehicle, get it's model name.
-			if ( ent->client->NPC_class == CLASS_VEHICLE )
+			if ( ent->client && ent->client->NPC_class == CLASS_VEHICLE )
 			{
 				strcpy(vehicleName, modelname);
 				BG_GetVehicleModelName(modelname);

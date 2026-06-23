@@ -177,6 +177,8 @@ activated again while it is counting down to an event.
 */
 const entityInfoData_t target_delay_spawnflags[] = {
     {"1", "Keeps the delay from resetting the time if it is activated again while it is counting down to an event."},
+    {"2", "Each player gets their own independent delay timer."},
+
     {NULL, NULL}
 };
 const entityInfoData_t target_delay_keys[] = {
@@ -315,7 +317,7 @@ targetWeaponsName_t targetWeaponsTable[] = {
     {"disruptor", WP_DISRUPTOR},
     {"bowcaster", WP_BOWCASTER},
     {"repeater", WP_REPEATER},
-    {"demp2", WP_DEMP2},
+    {"demp", WP_DEMP2},
     {"flechette", WP_FLECHETTE},
     {"rocket_launcher", WP_ROCKET_LAUNCHER},
     {"thermal", WP_THERMAL},
@@ -820,14 +822,13 @@ void Use_Target_Fp (gentity_t *ent, gentity_t *other, gentity_t *activator)
 {
 	if (!activator || !activator->client)
 		return;
-		
-	if (PlayerUseableCheck(ent, activator) == qfalse)
-		return;
+    
 
     if (!PlayerUseableCheck(ent, activator))
         return;
 
-	activator->client->Lmd.customForceRegenSpeedMultiplier = ent->modelScale[0];
+    if (ent->modelScale[0] > 0.0)
+	    activator->client->Lmd.customForceRegenSpeedMultiplier = ent->modelScale[0];
 
 	if (ent->Lmd.customIndex == 1)
 	{

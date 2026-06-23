@@ -279,8 +279,6 @@ qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
     if ((self->Lmd.UseReq.profession < 0 && activatorProf != PROF_NONE) || (self->Lmd.UseReq.profession > 0 &&
         (activatorProf <= PROF_BOT || !(self->Lmd.UseReq.profession & (1 << (activatorProf - 3))))))
         return qfalse;
-
-    
    
     if (self->Lmd.UseReq.sideAcc > 0)
     {
@@ -291,7 +289,7 @@ qboolean PlayerUseableCheck(gentity_t* self, gentity_t* activator)
         if (self->Lmd.UseReq.sideAcc != sideAcc)
             return qfalse;
     }
-
+    
     if (self->Lmd.UseReq.level > 0 && (activatorLevel < self->Lmd.UseReq.level ||
         (self->Lmd.UseReq.levelMax >= self->Lmd.UseReq.level && activatorLevel > self->Lmd.UseReq.levelMax)))
         return qfalse;
@@ -2790,7 +2788,7 @@ void lmd_scale(gentity_t* ent)
 const entityInfoData_t lmd_playereffect_keys[] = {
     {
         "effect",
-        "1: Invincible, 2: Electrocution, 3: Fall to death, 4: Jail, 5: Godmode, 6: Shield, 7: Notarget, 8: Invisible, 9. Undying."
+        "1: Invincible, 2: Electrocution, 3: Fall to death, 4: Jail, 5: Godmode, 6: Shield, 7: Notarget, 8: Invisible, 9. Undying., 10: Freeze"
     },
     {"wait", "Time to play the effect for.  Default 30."},
     {NULL, NULL}
@@ -2847,6 +2845,16 @@ void lmd_playereffect_use(gentity_t* ent, gentity_t* other, gentity_t* activator
         activator->flags |= FL_UNDYING;
         activator->client->Lmd.undyingTime = level.time + ent->wait;
         break;
+    case 10:
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                activator->client->ps.velocity[i] = 0;
+            }
+            activator->client->Lmd.flags |= SNF_FREEZE;
+            activator->client->Lmd.freezeTime = level.time + ent->wait;
+            break;
+        }
     }
 }
 

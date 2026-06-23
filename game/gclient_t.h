@@ -135,6 +135,12 @@ typedef struct {
 		}Actions;
 		int chatMode[2]; //[0] say, [1] team
 		int fakePing; // ping faking
+
+		qboolean teleMarkSet;
+		vec3_t teleMarkPosition;
+		vec3_t teleMarkAngles;
+		qboolean refuseTele;
+		int selectedEntity;
 	}Lmd;
 } clientPersistant_t;
 
@@ -556,6 +562,7 @@ struct gclient_s {
 		int notargetTime;
 		int invisibleTime;
 		int undyingTime;
+		int freezeTime;
 		int backupJumpLevel; // lmd_restrict jump
 
 		vec3_t mark;

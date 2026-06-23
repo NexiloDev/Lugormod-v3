@@ -305,21 +305,55 @@ void Cmd_Teleport_f (gentity_t *ent, int iArg){
 	}
 
 	dist = fEnt->r.maxs[0] + tEnt->r.maxs[0] + 30;
-	VectorCopy(tEnt->r.currentOrigin, t);
 	AngleVectors(tEnt->client->ps.viewangles, tv, NULL, NULL);
 	tv[2] = 0;
 	VectorNormalize(tv);
-	VectorMA(t, dist, tv, t);
-	t[2] += 64;
-	//RoboPhred: why only ent?  Need to get this back now that I have /sendto
-	trap_Trace(&tr, tEnt->client->ps.origin, fEnt->r.mins, fEnt->r.maxs, t, tEnt->s.number, fEnt->clipmask);
-	//trap_Trace(&tr, tEnt->client->ps.origin, fEnt->r.mins,fEnt->r.maxs, t, tEnt->s.number, /*fEnt->clipmask*/ent->clipmask);
-	/* lumaya: don't need this
-	if(!fEnt->client->noclip && tr.fraction != 1.0f){
-		Disp(ent, "^3Target area is blocked.");
-		return;
+
+	/* Try every 45-degree position around the target. Keep the final
+	 * candidate as a fallback, even when every direction is blocked. */
+	for (i = 0; i < 8; i++) {
+		VectorCopy(tEnt->r.currentOrigin, t);
+		switch (i) {
+		case 0: /* left */
+			t[0] += dist * tv[1];
+			t[1] -= dist * tv[0];
+			break;
+		case 1: /* front-left */
+			t[0] += dist * (tv[0] + tv[1]) * 0.70710678f;
+			t[1] += dist * (tv[1] - tv[0]) * 0.70710678f;
+			break;
+		case 2: /* front */
+			VectorMA(t, dist, tv, t);
+			break;
+		case 3: /* front-right */
+			t[0] += dist * (tv[0] - tv[1]) * 0.70710678f;
+			t[1] += dist * (tv[1] + tv[0]) * 0.70710678f;
+			break;
+		case 4: /* right */
+			t[0] -= dist * tv[1];
+			t[1] += dist * tv[0];
+			break;
+		case 5: /* back-right */
+			t[0] -= dist * (tv[0] + tv[1]) * 0.70710678f;
+			t[1] += dist * (tv[0] - tv[1]) * 0.70710678f;
+			break;
+		case 6: /* back */
+			VectorMA(t, -dist, tv, t);
+			break;
+		case 7: /* back-left */
+			t[0] += dist * (tv[1] - tv[0]) * 0.70710678f;
+			t[1] -= dist * (tv[0] + tv[1]) * 0.70710678f;
+			break;
+		}
+		t[2] += 64;
+
+		trap_Trace(&tr, tEnt->client->ps.origin, fEnt->r.mins, fEnt->r.maxs,
+			t, tEnt->s.number, fEnt->clipmask);
+		if (fEnt->client->noclip || tr.fraction == 1.0f) {
+			break;
+		}
 	}
-	*/
+
 	VectorCopy (t,to);
 	to[2] -= 4096;
 

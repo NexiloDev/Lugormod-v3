@@ -115,6 +115,7 @@ game/Lmd_Force_Core.c
 game/Lmd_Force_Dark.c
 game/Lmd_Force_Light.c
 game/Lmd_Force_Neutral.c
+game/Lmd_HiRuns.c
 game/Lmd_Inventory_Core.c
 game/Lmd_Inventory_Core_AccBased.c
 game/Lmd_Inventory_General.c
